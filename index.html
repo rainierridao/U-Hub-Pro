@@ -11,6 +11,12 @@
     <link rel="manifest" href="/manifest.json">
     <style>
     
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;           /* Lock to viewport height */
+        overflow: hidden;        /* Prevent scrolling */
+    }
 
 
         body {
@@ -48,6 +54,7 @@
             color: white;
         }
         .login-container {
+            max-height: calc(100vh - 70px); /* Adjust based on header height */
             background: white;
             padding: 40px;
             border-radius: 10px;
