@@ -872,7 +872,7 @@ td[contenteditable="true"] {
                 color: red;
             }
             .tree:last-child {
-                gap: 180px;
+                gap: 150px;
             }
             .node {
                 padding: 10px;
