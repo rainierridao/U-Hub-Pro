@@ -69,25 +69,25 @@
             
             
             
-            .birthday-container select {
-            -webkit-appearance: none; 
-            -moz-appearance: none;
-            appearance: none;
-            background-color: white;
-            border: 1px solid #ccc;
+            .birthday-container {
+                display: flex;
+            
+
             border-radius: 5px;
-            padding: 10px;
             width: 100%;
             font-size: 10px;
             color:grey;
             text-align: left;
+                gap: 8px;
+                width: 100%;
+                box-sizing: border-box;
         }
         
         /* Add a wrapper to position a custom dropdown arrow */
         .select-wrapper {
             position: relative;
             display: inline-block;
-            width: 32.4%;
+            width: 33.333%; /* Clean thirds */
         }
         
         .select-wrapper::after {
