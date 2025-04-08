@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U Hub Pro - The Blue Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <img src="https://i.ibb.co/mC4TTHNK/logousana.png" alt="USANA Logo">
+            <span style="margin-left: 7px;">The Blue Guide</span>
+        </div>
+        <div class="profile-settings">
+            <i class="fas fa-user-circle"></i>
+        </div>
+    </div>
+    
+    <div class="dashboard">
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+    <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <a href="blueguide.html" class="active" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+    <div class="main-content blue-guide" style="background-color: #fff; display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+    
+    <!-- Illness Dropdown -->
+    <div style="flex: 0 0 300px; margin-top: 0px;">
+    <div class="input-container" style="flex: 0 0 300px; margin-top: -20px;">
+    <label for="illnessSelect"><strong>Select an Illness:</strong></label>
+        <select id="illnessSelect" style="width: 100%; padding: 8px; font-size: 16px;">
+        <option value="" selected disabled>Loading...</option>
+        </select>
+
+            </div>
+            
+            
+
+        
+        
+
+                <!-- Illness Title + Description RIGHT AFTER the dropdown -->
+        <div id="illnessIntro" style="margin-top: -10px; max-width: 600px;">
+        <h3 id="illnessTitle" style="color: #1a4aa8;"></h3>
+        <p id="illnessDescription"></p>
+        </div>
+                
+</div>
+            
+        <!-- Illness Title & Description -->
+        
+        
+        <!-- Illness Details -->
+        <div id="illnessDetails" class="illness-details">
+        
+        <!-- Optimal Dose Section -->
+        <div class="dose-section">
+        <h4 style="color: #1a4aa8; font-weight: 700;">Optimal Dose</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #3f86f9; color: #fff;">
+        <tr>
+        <th style="padding: 0.5rem; text-align: left;">Product</th>
+        <th style="padding: 0.5rem; text-align: center;">Breakfast</th>
+        <th style="padding: 0.5rem; text-align: center;">Lunch</th>
+        <th style="padding: 0.5rem; text-align: center;">Dinner</th>
+        </tr>
+        </thead>
+        <tbody id="optimalDoseTableBody" style="background-color: #f9f9f9;">
+        <!-- Dynamic rows go here -->
+        </tbody>
+        </table>
+        </div>
+        
+        <!-- Minimal Dose Section -->
+        <div class="dose-section" style="margin-top: 2rem;">
+        <h4 style="color: #1a4aa8; font-weight: 700;">Minimal Dose</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #3f86f9; color: #fff;">
+        <tr>
+        <th style="padding: 0.5rem; text-align: left;">Product</th>
+        <th style="padding: 0.5rem; text-align: center;">Breakfast</th>
+        <th style="padding: 0.5rem; text-align: center;">Lunch</th>
+        <th style="padding: 0.5rem; text-align: center;">Dinner</th>
+        </tr>
+        </thead>
+        <tbody id="minimalDoseTableBody" style="background-color: #f9f9f9;">
+        <!-- Dynamic rows go here -->
+        </tbody>
+        </table>
+        </div>
+        
+        </div>
+
+        <!-- Loader -->
+        <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        </div>
+
+
+        <script src="script.js" defer></script>
+        <script src="script_theblueguide.js" defer></script>
+
+</body>
+</html>
+            

@@ -1,0 +1,1005 @@
+/* ========== GLOBAL RESET & BASE STYLES ========== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+:root {
+    --primary-blue: #003366;
+    --accent-blue: #0055a5;
+    --highlight-green: #28a745;
+    --text-light: #ffffff;
+    --gray-border: #ddd;
+}
+
+/* ========== HEADER ========== */
+.header {
+    width: 100%;
+    background: var(--primary-blue);
+    color: var(--text-light);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    position: sticky;
+    top: 0;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 29px;
+}
+
+.logo-text {
+    color: var(--text-light);
+    font-size: 30px;
+    font-weight: bold;
+    margin-left: 30px;
+}
+
+.profile-settings {
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: auto;
+    padding-right: 30px;
+    transform: scale(1.5);
+}
+
+/* ========== LAYOUT ========== */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 60px;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1rem;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #999;
+    padding: 12px;
+    font-size: 18px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar a:hover {
+    color: #0055a5;
+}
+
+.sidebar a.active {
+    background-color: #0072ce;
+    color: white;
+    border-radius: 10px;
+}
+
+.sidebar a.active i {
+    color: white;
+}
+
+/* ========== CONTENT ========== */
+.content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.left-section {
+    flex: 1 1 300px;
+}
+
+.right-section {
+    flex: 2 1 600px;
+}
+
+/* ========== CARDS ========== */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    text-align: center;
+    flex: 1;
+    min-height: 300px;
+}
+
+.left-section .card {
+    min-height: 380px;
+}
+
+.right-section .card {
+    min-height: 393px;
+}
+
+/* ========== TREE VIEW ========== */
+.tree-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    gap: 20px;
+}
+
+.tree {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.tree:last-child {
+    gap: 180px;
+}
+
+
+.node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.node {
+    background: var(--accent-blue);
+    color: white;
+    padding: 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 50px;
+}
+
+.node-value {
+    font-size: 14px;
+    color: black;
+    position: absolute;
+}
+
+.left-value {
+    left: -40px;
+}
+
+.right-value {
+    right: -40px;
+}
+
+/* ========== INPUTS ========== */
+.input-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    margin-top: -100px;
+    padding-top: 20px;
+}
+
+.inputs-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 75px;
+    flex-wrap: wrap;
+}
+
+.bc-inputs {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.binary-input {
+    width: 90px;
+    padding: 8px;
+    text-align: center;
+    color: red;
+}
+
+/* ========== TABLE ========== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+th {
+    background: var(--primary-blue);
+    color: var(--text-light);
+}
+
+table, th, td {
+    border: 1px solid var(--gray-border);
+    padding: 10px;
+}
+
+td[contenteditable="true"] {
+    background-color: #eef2f7;
+    cursor: pointer;
+}
+
+/* ========== INCOME STYLING ========== */
+.default-text {
+    text-align: left;
+    font-weight: normal;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.income-section {
+    margin-top: 15px;
+    border-top: 2px solid #ddd;
+}
+
+.income-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+}
+
+.income-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--highlight-green);
+}
+
+.rank-income {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--accent-blue);
+    position: relative;
+    top: -10px;
+}
+
+/* ========== LOADING SCREEN ========== */
+#loading-screen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.loading-logo {
+    width: 120px;
+    animation: fadeInScale 1s ease-in-out;
+}
+
+.progress-bar {
+    width: 80%;
+    max-width: 300px;
+    height: 8px;
+    background: #ddd;
+    border-radius: 10px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background: #007bff;
+    animation: progressAnim 1s linear forwards;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+@keyframes fadeInScale {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes progressAnim {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* ========== BLUE GUIDE ========== */
+.blue-guide {
+    padding: 1.5rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.blue-guide select {
+    padding: 8px;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.illness-details h3,
+.dose-section h4 {
+    color: #1e3a8a;
+    margin-top: 1.5rem;
+}
+
+.dose-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+.dose-section th,
+.dose-section td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.dose-section th {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.dose-section tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px;
+    }
+    .logo {
+        font-size: 22px;
+    }
+    .logo img {
+        height: 20px;
+    }
+    .logo-text {
+        font-size: 18px;
+    }
+    .main-content {
+        flex-direction: column;
+    }
+    .sidebar {
+        display: none;
+    }
+    .left-section, .right-section {
+        flex: 1;
+        width: 100%;
+    }
+    .node {
+        padding: 15px;
+        font-size: 14px;
+        min-width: 30px;
+    }
+    .node-value {
+        font-size: 10px;
+    }
+    .tree:last-child {
+        gap: 120px;/* ========== GLOBAL RESET & BASE STYLES ========== */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        :root {
+            --primary-blue: #003366;
+            --accent-blue: #0055a5;
+            --highlight-green: #28a745;
+            --text-light: #ffffff;
+            --gray-border: #ddd;
+        }
+        
+        /* ========== HEADER ========== */
+        .header {
+            width: 100%;
+            background: var(--primary-blue);
+            color: var(--text-light);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            position: sticky;
+            top: 0;
+        }
+        
+        .logo {
+            font-size: 30px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 29px;
+        }
+        
+        .logo-text {
+            color: var(--text-light);
+            font-size: 30px;
+            font-weight: bold;
+            margin-left: 30px;
+        }
+        
+        .profile-settings {
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: auto;
+            padding-right: 30px;
+            transform: scale(1.5);
+        }
+        
+        /* ========== LAYOUT ========== */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 60px;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1rem;
+        }
+        
+        .sidebar a {
+            text-decoration: none;
+            color: #999;
+            padding: 12px;
+            font-size: 18px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sidebar a:hover {
+            color: #0055a5;
+        }
+        
+        .sidebar a.active {
+            background-color: #0072ce;
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .sidebar a.active i {
+            color: white;
+        }
+        
+        /* ========== CONTENT ========== */
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .main-content {
+            display: flex;
+            justify-content: space-evenly;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .left-section {
+            flex: 1 1 300px;
+        }
+        
+        .right-section {
+            flex: 2 1 600px;
+        }
+        
+        /* ========== CARDS ========== */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            text-align: center;
+            flex: 1;
+            min-height: 300px;
+        }
+        
+        .left-section .card {
+            min-height: 380px;
+        }
+        
+        .right-section .card {
+            min-height: 393px;
+        }
+        
+        /* ========== TREE VIEW ========== */
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            gap: 20px;
+        }
+        
+        .tree {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .tree:last-child {
+            gap: 180px;
+        }
+        
+        
+        .node-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        
+        .node {
+            background: var(--accent-blue);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 50px;
+        }
+        
+        .node-value {
+            font-size: 14px;
+            color: black;
+            position: absolute;
+        }
+        
+        .left-value {
+            left: -40px;
+        }
+        
+        .right-value {
+            right: -40px;
+        }
+        
+        /* ========== INPUTS ========== */
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            margin-top: -100px;
+            padding-top: 20px;
+        }
+        
+        .inputs-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 75px;
+            flex-wrap: wrap;
+        }
+        
+        .bc-inputs {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+        
+        .binary-input {
+            width: 90px;
+            padding: 8px;
+            text-align: center;
+            color: red;
+        }
+        
+        /* ========== TABLE ========== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        th {
+            background: var(--primary-blue);
+            color: var(--text-light);
+        }
+        
+        table, th, td {
+            border: 1px solid var(--gray-border);
+            padding: 10px;
+        }
+        
+        td[contenteditable="true"] {
+            background-color: #eef2f7;
+            cursor: pointer;
+        }
+        
+        /* ========== INCOME STYLING ========== */
+        .default-text {
+            text-align: left;
+            font-weight: normal;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .income-section {
+            margin-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+        
+        .income-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: black;
+        }
+        
+        .income-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--highlight-green);
+        }
+        
+        .rank-income {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-blue);
+            position: relative;
+            top: -10px;
+        }
+        
+        /* ========== LOADING SCREEN ========== */
+        #loading-screen {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 9999;
+        transition: opacity 0.5s ease-in-out;
+    }
+    
+    .loading-logo {
+        width: 120px;
+        animation: fadeInScale 1s ease-in-out;
+    }
+    
+    .progress-bar {
+        width: 80%;
+        max-width: 300px;
+        height: 8px;
+        background: #ddd;
+        border-radius: 10px;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+    
+    .progress {
+        width: 0%;
+        height: 100%;
+        background: #007bff;
+        animation: progressAnim 1s linear forwards;
+    }
+    
+    @keyframes fadeOut {
+        to {
+            opacity: 0;
+            visibility: hidden;
+        }
+    }
+    
+    @keyframes fadeInScale {
+        0% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes progressAnim {
+        0% { width: 0%; }
+        100% { width: 100%; }
+    }
+    
+    /* ========== BLUE GUIDE ========== */
+    .blue-guide {
+        padding: 1.5rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    
+    .blue-guide select {
+        padding: 8px;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        width: 100%;
+        max-width: 400px;
+    }
+        
+        .illness-details h3,
+        .dose-section h4 {
+            color: #1e3a8a;
+            margin-top: 1.5rem;
+        }
+        
+        .dose-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+        
+        .dose-section th,
+        .dose-section td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .dose-section th {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .dose-section tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            .logo {
+                font-size: 22px;
+            }
+            .logo img {
+                height: 20px;
+            }
+            .logo-text {
+                font-size: 18px;
+            }
+            .main-content {
+                flex-direction: column;
+            }
+            .sidebar {
+                display: none;
+            }
+            .left-section, .right-section {
+                flex: 1;
+                width: 100%;
+            }
+            .node {
+                padding: 15px;
+                font-size: 14px;
+                min-width: 30px;
+            }
+            .node-value {
+                font-size: 10px;
+            }
+            .tree:last-child {
+                gap: 120px;
+            }
+            
+            .input-container {
+                margin-top: clamp(-120px, -8vw, -60px); /* adjust values to taste */
+            }
+            
+            input {
+                width: 100%;
+                font-size: 12px;
+                padding: 5px;
+            }
+            h3 {
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 22px;
+            }
+            .logo img {
+                height: 20px;
+            }
+            .inputs-wrapper {
+                justify-content: space-between;
+                gap: 50px;
+            }
+            .bc-inputs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .binary-input {
+                width: 100px;
+                padding: 8px;
+                color: red;
+            }
+            .tree:last-child {
+                gap: 180px;
+            }
+            .node {
+                padding: 10px;
+                min-width: 20px;
+            }
+            .input-container {
+                margin-top: -140px;
+            }
+            
+        }
+        
+    }
+    
+    .input-container {
+        margin-top: clamp(-120px, -8vw, -60px); /* adjust values to taste */
+    }
+    
+    input {
+        width: 100%;
+        font-size: 12px;
+        padding: 5px;
+    }
+    h3 {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 22px;
+    }
+    .logo img {
+        height: 20px;
+    }
+    .inputs-wrapper {
+        justify-content: space-between;
+        gap: 50px;
+    }
+    .bc-inputs {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .binary-input {
+        width: 100px;
+        padding: 8px;
+        color: red;
+    }
+    .tree:last-child {
+        gap: 180px;
+    }
+    .node {
+        padding: 10px;
+        min-width: 20px;
+    }
+    .input-container {
+        margin-top: -140px;
+    }
+    
+}
+    
+    
+    
+    
+    
+    
+    /*The Blue Guide*/
+    
+    
+        .dose-section table td,
+        .dose-section table th {
+            padding: 4px 8px;     /* Reduce padding (was probably 8-12px) */
+            font-size: 14px;       /* Optional: smaller text */
+            line-height: 1.2;      /* Tighter row spacing */
+                }
+    
+        .dose-section table th:nth-child(2),
+        .dose-section table th:nth-child(3),
+        .dose-section table th:nth-child(4),
+        .dose-section table td:nth-child(2),
+        .dose-section table td:nth-child(3),
+        .dose-section table td:nth-child(4) {
+            text-align: center;
+        }
+
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loader-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3f86f9;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        .illness-details {
+            flex: 1;
+            max-height: 600px;
+            overflow-y: auto;
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .dose-section {
+            margin-top: -30px;
+        }
+        
+        @media (max-width: 600px) {
+            .illness-details {
+                margin-top: -80px; /* or a smaller negative value if needed */
+                    padding: 10px;    /* optional: add padding for mobile layout */
+                        }
+                        }
+                        
+                        
+                        
+                        

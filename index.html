@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U Hub Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+    
+
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #003366;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;            
+        }
+        .header img {
+            height: 25px;
+            width: auto;
+        }
+        .header span {
+            margin-left: 7px;
+            font-size: 25px;
+            font-weight: bold;
+            color: white;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            margin-top: 80px; /* Adjusted for fixed header */
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .forgot-password {
+            display: block;
+            margin: 10px 0;
+            color: #003366;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .login-btn:hover {
+            background-color: #0055a5;
+        }
+        .signup-text {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .signup-text a {
+            color: #003366;
+            text-decoration: none;
+        }
+                
+                
+                
+                
+                input::placeholder, select::placeholder, textarea::placeholder {
+                    text-align: left !important;
+                }
+                    input, select, textarea {
+                        text-align: left !important;
+                    }
+
+                
+                
+                
+                
+                
+                #loading-overlay {
+                display: none; /* Start hidden */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                }
+
+                
+                #loading-overlay img {
+                width: 80px;
+                height: 80px;
+                }
+                
+                
+                /* Adjust the width of the input boxes */
+                .login-container input {
+                    width: 90%; /* Reduce the width to 90% of the container */
+                    margin: 10px auto; /* Center the input boxes horizontally */
+                    display: block; /* Ensure the inputs are block-level elements */
+                }
+                
+                
+                
+                /* Ensure the button matches the width of the input boxes */
+                .login-btn {
+                    width: 97%; /* Match the width of the input boxes */
+                    padding: 10px;
+                    background-color: #003366;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                    margin: 10px auto; /* Center the button */
+                    display: block; /* Ensure the button is block-level */
+                }    
+                
+                /* Align the error message with the input boxes */
+                #error-message {
+                width: 90%; /* Match the width of the input boxes */
+                margin: 5px auto 5px 2%; /* Center horizontally but shift left */
+                text-align: left; /* Align text to the left */
+                font-size: 14px;
+                color: red;
+                display: none; /* Start hidden */
+                }
+                
+                
+                
+                
+                .password-container {
+                    display: flex;
+                    align-items: center;
+                    width: 97%;
+                    position: relative;
+                    border-radius: 5px;
+                    background: white;
+                    padding: 0; /* Ensure it aligns properly */
+                    margin: 10px auto; /* Same margin as other inputs */                }
+                
+                .password-container input {
+                    flex: 1;
+                    padding-right: 40px; /* Space for the eye icon */
+                        }
+                        
+                        .password-container .eye-icon {
+                            position: absolute;
+                            right: 10px;
+                            cursor: pointer;
+                        }
+
+                        .toggle-password {
+                            position: absolute;
+                            right: 10px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                        }
+                        
+                        .toggle-password img {
+                            width: 20px;
+                            height: 20px;
+                        }
+                
+                
+    </style>
+</head>
+<body>
+                <div id="loading-overlay">
+                <img src="https://cdn.pixabay.com/animation/2022/07/29/03/42/03-42-07-846_512.gif" alt="Loading..." />
+                </div>
+                
+    <div class="header">
+        <img src="https://i.ibb.co/mC4TTHNK/logousana.png" alt="USANA Logo">
+        <span>BC Tracker</span>
+    </div>
+    <div class="login-container">
+        <form id="loginForm">
+            <input type="email" placeholder="Email Address" id="email" required>
+                <div class="password-container">
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">
+                <img id="eye-icon" src="https://cdn-icons-png.flaticon.com/512/159/159604.png" alt="Show Password">
+                </button>
+                </div>
+                <p id="error-message" style="color: red; font-size: 14px; margin-top: 5px; display: none; text-align: left;">Email or Password are incorrect</p>
+
+            <a href="www.usana.com/hub" class="forgot-password">Forgot Password?</a>
+            <button type="submit" class="login-btn">Log In</button>
+        </form>
+        <p class="signup-text">Don’t have an account? <a href="signup.html">Sign up here</a></p>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <script>
+    
+    
+                        function togglePassword() {
+                            const passwordField = document.getElementById("password");
+                            const eyeIcon = document.getElementById("eye-icon");
+                            
+                            if (passwordField.type === "password") {
+                                passwordField.type = "text";
+                                eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/2767/2767146.png"; // Eye-off icon
+                            } else {
+                                passwordField.type = "password";
+                                eyeIcon.src = "https://cdn-icons-png.flaticon.com/512/159/159604.png"; // Eye icon
+                            }
+                                }
+    
+    
+    
+    
+    
+                // Firebase configuration (replace with your Firebase project config)
+                const firebaseConfig = {
+                    apiKey: "AIzaSyC8Yn92BRWaUw6KElX5UIdIa4RjPdxYESg",
+                    authDomain: "usana-bc-tracker-signup.firebaseapp.com",
+                    projectId: "usana-bc-tracker-signup",
+                    storageBucket: "usana-bc-tracker-signup.appspot.com",
+                    messagingSenderId: "605379613292",
+                    appId: "1:605379613292:web:b50b8d185c2d20db82fe49"
+                };
+                
+                // Initialize Firebase
+                const app = firebase.initializeApp(firebaseConfig);
+                const auth = firebase.auth();
+                const db = firebase.firestore();
+                
+                // Login form submission
+                document.getElementById('loginForm').addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    const email = document.getElementById('email').value.trim();
+                    const password = document.getElementById('password').value.trim();
+                    const errorMessage = document.getElementById('error-message');
+                    
+                    // Clear previous error messages
+                    errorMessage.style.display = "none";
+                    errorMessage.textContent = "";
+                    
+                    // Show loading overlay
+                    document.getElementById('loading-overlay').style.display = "flex";
+                    
+                    // Sign in with Firebase Authentication
+                    auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+            const user = userCredential.user;
+
+            // Fetch additional user data from Firestore
+            return db.collection('users').doc(user.uid).get();
+        })
+        .then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                
+                // Hide loader
+                document.getElementById('loading-overlay').style.display = "none";
+
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                throw new Error("User data not found");
+            }
+        })
+        .catch((error) => {
+            console.error("Firebase Auth Error:", error);
+
+            // Hide loader on error
+            document.getElementById('loading-overlay').style.display = "none";
+
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                errorMessage.textContent = "Email or Password are incorrect";
+                errorMessage.style.display = "block";
+                document.getElementById('password').value = ""; // Clear password field
+            } else {
+                errorMessage.textContent = "Email or Password are incorrect";
+                errorMessage.style.display = "block";
+            }
+        });
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>U Hub Pro - Blue Guide</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    select { padding: 8px; font-size: 16px; }
+    h2, h3 { margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+  <h1>U Hub Pro - Blue Guide</h1>
+
+  <label for="diseaseDropdown">Select a Disease:</label>
+  <select id="diseaseDropdown">
+    <option value="">-- Choose an illness --</option>
+  </select>
+
+  <h2 id="descriptionDiv"></h2>
+
+  <h3>Optimal Dose</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Breakfast</th>
+        <th>Lunch</th>
+        <th>Dinner</th>
+      </tr>
+    </thead>
+    <tbody id="optimalTable"></tbody>
+  </table>
+
+  <h3>Minimal Dose</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Breakfast</th>
+        <th>Lunch</th>
+        <th>Dinner</th>
+      </tr>
+    </thead>
+    <tbody id="minimalTable"></tbody>
+  </table>
+
+    <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwdErQVdZCbDIOys7Yubq8boZ1yiHM6qcb7PmrfFU2YMO_aBPnyThABlM7uI-MSZCO6/exec';
+    
+    const dropdown = document.getElementById('diseaseDropdown');
+    const descriptionDiv = document.getElementById('descriptionDiv');
+    const optimalTable = document.getElementById('optimalTable');
+    const minimalTable = document.getElementById('minimalTable');
+    
+    function displayDose(value) {
+      // Fix Excel timestamp misinterpretation
+      if (value === 45659) return '1/2';
+        if (value == null || value === '') return '0';
+          if (typeof value === 'string' && /^\d+\/\d+$/.test(value)) return value;
+            return isNaN(value) ? value : Number(value);
+            }
+            
+            function createRow(item) {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+      <td>${item.product}</td>
+      <td>${displayDose(item.breakfast)}</td>
+      <td>${displayDose(item.lunch)}</td>
+      <td>${displayDose(item.dinner)}</td>
+    `;
+              return row;
+            }
+            
+            window.addEventListener('DOMContentLoaded', async () => {
+              try {
+                const res = await fetch(`${scriptURL}?list=true`);
+                const diseases = await res.json();
+                
+                diseases.forEach(disease => {
+                  const option = document.createElement('option');
+                  option.value = disease;
+                  option.textContent = disease;
+                  dropdown.appendChild(option);
+                });
+              } catch (err) {
+                console.error('Error loading disease list:', err);
+              }
+            });
+            
+            dropdown.addEventListener('change', async () => {
+              const selected = dropdown.value;
+              if (!selected) return;
+                
+                const res = await fetch(`${scriptURL}?disease=${encodeURIComponent(selected)}`);
+                const data = await res.json();
+                
+                descriptionDiv.textContent = data.description || 'No description available.';
+                optimalTable.innerHTML = '';
+                minimalTable.innerHTML = '';
+                
+                data.doses.optimal.forEach(item => {
+                  optimalTable.appendChild(createRow(item));
+                });
+                
+                data.doses.minimal.forEach(item => {
+                  minimalTable.appendChild(createRow(item));
+                });
+                });
+                </script>
+
+</body>
+</html>
