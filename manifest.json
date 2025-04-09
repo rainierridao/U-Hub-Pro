@@ -1,7 +1,7 @@
 {
-    "short_name": "USNABCT",
-    "name": "USANA BC Tracker",
-    "description": "The USANA BC Tracker is a web-based tool that helps USANA associates visualize their binary structure and calculate commissions easily.",
+    "short_name": "UHubPro",
+    "name": "USANA Hub Pro",
+    "description": "The USANA Hub Pro is a web-based tool that helps USANA associates make their lives easy.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
