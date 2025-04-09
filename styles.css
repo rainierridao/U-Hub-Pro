@@ -1065,9 +1065,33 @@ td[contenteditable="true"] {
         
         @media (max-width: 600px) {
             .illness-details {
-                margin-top: -80px; /* or a smaller negative value if needed */
-                    padding: 10px;    /* optional: add padding for mobile layout */
+                margin-top: -30px; /* or a smaller negative value if needed */
+                padding: 10px;    /* optional: add padding for mobile layout */
+                font-size: 14px;
                         }
+                        
+                    .dose-section table td,
+                    .dose-section table th {
+                                            font-size: 12px;       /* Optional: smaller text */
+                    }
+                    
+                    .dose-section table th:nth-child(2),
+                    .dose-section table th:nth-child(3),
+                    .dose-section table th:nth-child(4),
+                    .dose-section table td:nth-child(2),
+                    .dose-section table td:nth-child(3),
+                    .dose-section table td:nth-child(4) {
+                        font-size: 12px; 
+                    }
+                        
+                        
+                        
+                    .content {
+                        flex: 1;
+                        padding: 1rem;
+                    }
+                        
+                        
                         }
                         
                         
