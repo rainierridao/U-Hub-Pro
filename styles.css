@@ -1080,7 +1080,7 @@ td[contenteditable="true"] {
                         
                     .dose-section table td,
                     .dose-section table th {
-                                            font-size: 11px;       /* Optional: smaller text */
+                                            font-size: 9px;       /* Optional: smaller text */
                     }
                     
                     .dose-section table th:nth-child(2),
@@ -1089,7 +1089,7 @@ td[contenteditable="true"] {
                     .dose-section table td:nth-child(2),
                     .dose-section table td:nth-child(3),
                     .dose-section table td:nth-child(4) {
-                        font-size: 11px; 
+                        font-size: 9px; 
                     }
                         
                         
