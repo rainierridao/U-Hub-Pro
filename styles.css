@@ -1060,7 +1060,7 @@ td[contenteditable="true"] {
 
 
         .dose-section {
-            margin-top: -30px;
+            margin-top: -15px;
         }
         
         @media (max-width: 600px) {
