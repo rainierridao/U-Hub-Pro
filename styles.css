@@ -947,7 +947,7 @@ td[contenteditable="true"] {
     }
     
     .input-container {
-        margin-top: clamp(-120px, -8vw, -60px); /* adjust values to taste */
+        margin-top: -140px;
     }
     
     input {
