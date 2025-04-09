@@ -86,6 +86,13 @@ body {
     padding-top: 1rem;
 }
 
+
+/* Default: hidden on desktop */
+.topbar {
+    display: none;
+}
+
+
 .sidebar a {
     text-decoration: none;
     color: #999;
@@ -489,39 +496,36 @@ td[contenteditable="true"] {
             min-height: 100vh;
         }
         
-        .sidebar {
-            width: 60px;
-            background-color: #f4f4f4;
+        
+        .topbar {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: space-around;
             align-items: center;
-            padding-top: 1rem;
+            position: sticky;
+            top: 60px; /* or adjust based on header height */
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+            padding: 10px 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            z-index: 999;
         }
         
-        .sidebar a {
+        .topbar a {
+            color: #004990;
+            font-size: 16px;
             text-decoration: none;
-            color: #999;
-            padding: 12px;
-            font-size: 18px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 6px 10px;
+            transition: background-color 0.2s ease;
         }
         
-        .sidebar a:hover {
-            color: #0055a5;
+        .topbar a:hover {
+            background-color: #f0f0f0;
+            border-radius: 5px;
         }
         
-        .sidebar a.active {
-            background-color: #0072ce;
-            color: white;
-            border-radius: 10px;
-        }
-        
-        .sidebar a.active i {
-            color: white;
-        }
+            
+    }        
         
         /* ========== CONTENT ========== */
         .content {
@@ -816,9 +820,63 @@ td[contenteditable="true"] {
             .main-content {
                 flex-direction: column;
             }
+            
+            
+            .topbar {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                position: fixed;
+                top: 20;
+                right: 0;
+                background-color: #ffffff;
+                border-bottom-left-radius: 10px; /* round only the bottom-left corner */
+                height: 61px;
+                padding: 0 10px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                width: auto; /* or set a specific width like 200px */
+            }
+            
+            .topbar a {
+                color: #004990;
+                font-size: 16px;
+                text-decoration: none;
+                padding: 6px 10px;
+                transition: background-color 0.2s ease;
+            }
+            
+            .topbar a:hover {
+                background-color: #f0f0f0;
+                border-radius: 5px;
+            }
+            
             .sidebar {
                 display: none;
-            }
+            }    
+            
+            
+            
+                
+                .topbar a.active {
+                    background-color: var(--accent-blue);
+                    color: white;
+                    border-radius: 8px;
+                }
+                
+                .topbar a.active i {
+                    color: white;
+                }
+                
+                .left-section, .right-section {
+                    flex: 1;
+                    width: 100%;
+                }
+
+                
+                
+                
             .left-section, .right-section {
                 flex: 1;
                 width: 100%;
@@ -850,6 +908,8 @@ td[contenteditable="true"] {
                 text-align: center;
             }
         }
+        
+        
         
         @media (max-width: 480px) {
             .logo {
