@@ -805,6 +805,7 @@ td[contenteditable="true"] {
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .header {
+                position:sticky;
                 padding: 15px 20px;
             }
             .logo {
@@ -1061,6 +1062,16 @@ td[contenteditable="true"] {
         }
         
         @media (max-width: 600px) {
+            
+            .header {
+                                position: sticky;
+
+            }
+
+            
+            
+            
+            
             .illness-details {
                 margin-top: -30px; /* or a smaller negative value if needed */
                 padding: 10px;    /* optional: add padding for mobile layout */
