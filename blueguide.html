@@ -14,6 +14,40 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="styles.css">
 </head>
+<style>
+/* Remove all horizontal scrolling */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Prevent any flex overflow from main-content */
+.main-content {
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+/* Tables should be responsive within bounds */
+table {
+    width: 100%;
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+/* Optional: make sure sidebar doesn't push layout */
+    .sidebar {
+        max-width: 80px;
+        overflow-x: hidden;
+    }
+
+    /* Prevent layout shifts due to large content */
+    .content, .dashboard {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+</style>
 <body>
 
 <!-- Topbar Icons -->
