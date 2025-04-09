@@ -503,7 +503,7 @@ td[contenteditable="true"] {
             justify-content: space-around;
             align-items: center;
             position: sticky;
-            top: 60px; /* or adjust based on header height */
+            top: 55px; /* or adjust based on header height */
             background-color: #ffffff;
             border-top: 1px solid #ddd;
             padding: 10px 0;
