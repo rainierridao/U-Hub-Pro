@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <style>
 
@@ -106,11 +107,25 @@ html, body {
             <div>Total Amount: <span id="totalAmount">₱0</span></div>
             <div>Total SVP: <span id="totalSVP">0</span></div>
         </div>
+        
+        <div class="text-right mt-4">
+        <button 
+        onclick="copySummaryToClipboard()" 
+        class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-2xl shadow-md transition duration-300"
+        >
+        📋 Copy Summary
+        </button>
+        </div>
+
+        
+        
+        
     </div>
     
     
     
     </div>
+
 
 
     <script>
@@ -271,6 +286,38 @@ html, body {
                         document.getElementById('totalSVP').textContent = totalSVP;
                     }
                     
+    
+    
+    
+    
+                    function copySummaryToClipboard() {
+                        let summary = "🧾 *Order Summary*:\n\n";
+                        document.querySelectorAll('.product-card').forEach(card => {
+                            const cardId = card.id.replace('card-', '');
+                            const productName = card.querySelector('.product-dropdown').value;
+                            const quantity = document.getElementById(`quantity-${cardId}`).value;
+                            const unitPrice = document.getElementById(`unit-price-${cardId}`).innerText;
+                            const subtotal = document.getElementById(`subtotal-${cardId}`).innerText;
+                            
+                            summary += `• ${productName} x${quantity}\n`;
+                            summary += `  ₱${unitPrice} each | Subtotal: ₱${subtotal}\n\n`;
+                        });
+                        
+                        const totalAmount = document.getElementById('totalAmount').innerText;
+                        const totalSVP = document.getElementById('totalSVP').innerText;
+                        
+                        summary += `💰 *Total Amount:* ${totalAmount}\n`;
+                        summary += `🎯 *Total SVP:* ${totalSVP}\n`;
+                        
+                        // Copy to clipboard
+                        navigator.clipboard.writeText(summary).then(() => {
+        alert("Summary copied to clipboard!");
+    }, () => {
+        alert("Failed to copy summary.");
+    });
+}
+
+    
     
     </script>    
 
