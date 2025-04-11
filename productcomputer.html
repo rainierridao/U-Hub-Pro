@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U Hub Pro - Product Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+
+
+
+/* Remove all horizontal scrolling */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Prevent any flex overflow from main-content */
+.main-content {
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+
+/* Optional: make sure sidebar doesnt push layout */
+    .sidebar {
+        max-width: 80px;
+        overflow-x: hidden;
+    }
+
+
+
+</style>
+<body>
+
+<!-- Topbar Icons -->
+<div class="topbar">
+<a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+<a href="productcomputer.html" class="active" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+<a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+<a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+
+
+</div>
+<div class="header">
+<div class="logo">
+<span style="margin-left: 0px;">Product Calculator</span>
+
+
+</div>
+
+
+</div>
+    
+    <div class="dashboard">
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+    <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" class="active" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+        
+        <div class="container">
+        <div class="header-controls">
+            <button class="add-product-btn" id="addProduct">+ Add Product</button>
+            <div class="price-type-toggle" id="globalPriceToggle">
+                <div class="price-option active" data-type="member">Member</div>
+                <div class="price-option" data-type="srp">SRP</div>
+                <div class="price-option" data-type="ao">
+                <span class="desktop-text">Auto Order</span>
+                <span class="mobile-text">AO</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="productsContainer">
+            <!-- Header Row -->
+            <div class="products-header">
+                <div class="product-header">Product</div>
+                <div>Quantity</div>
+                <div class="price-header">Price</div> <!-- Added class here -->
+                <div>SVP</div>
+                <div>SubTotal</div>
+                <div>SVP Total</div>
+                <div></div>
+            </div>
+        </div>
+
+        <div class="total-bar">
+            <div>Total Amount: <span id="totalAmount">₱0</span></div>
+            <div>Total SVP: <span id="totalSVP">0</span></div>
+        </div>
+    </div>
+    
+    
+    
+    </div>
+
+
+    <script>
+    
+    
+    const products = {
+        "CellSentials": { member: 3490, srp: 4190, ao: 3141, svp: 34 },
+        "Usanimals": { member: 1300, srp: 1560, ao: 1170, svp: 8 },
+        "Mini CellSentials": { member: 1050, srp: 1260, ao: 945, svp: 7 },
+        "USANA Probiotic": { member: 1600, srp: 1920, ao: 1440, svp: 10 },
+        "Proflavanol C100": { member: 2900, srp: 3480, ao: 2610, svp: 20 },
+        "Digestive Enzyme": { member: 1600, srp: 1920, ao: 1440, svp: 14 },
+        "Magnecal D": { member: 2100, srp: 2520, ao: 1890, svp: 16 },
+        "BiOmega": { member: 1900, srp: 2280, ao: 1710, svp: 16 },
+        "CoQuinone": { member: 2350, srp: 2820, ao: 2115, svp: 18 },
+        "CopaPrime+": { member: 2450, srp: 2940, ao: 2205, svp: 20 },
+        "Palmetto Plus": { member: 2600, srp: 3120, ao: 2340, svp: 17 },
+        "Procosa": { member: 2900, srp: 3480, ao: 2610, svp: 19 },
+        "Visionex": { member: 2100, srp: 2520, ao: 1890, svp: 14 },
+        "Hepasil DTX": { member: 2800, srp: 3360, ao: 2520, svp: 22 },
+        "Pure Rest": { member: 800, srp: 960, ao: 720, svp: 3 },
+        "Proglucamune": { member: 2100, srp: 2520, ao: 1890, svp: 12 },
+        "Poly C": { member: 1500, srp: 1800, ao: 1350, svp: 10 },
+        "Procalm+": { member: 1000, srp: 1200, ao: 900, svp: 10 },
+        "Calm Response Balm": { member: 850, srp: 1020, ao: 765, svp: 2 },
+        "Nutrimeal": { member: 1850, srp: 2220, ao: 1665, svp: 15 },
+        "Active+": { member: 2150, srp: 2580, ao: 1935, svp: 14 },
+        "Fibergy Active": { member: 1750, srp: 2100, ao: 1575, svp: 10 },
+        "Electrolyte": { member: 1050, srp: 1260, ao: 945, svp: 3 },
+        "USANA DTX Tea Mix": { member: 1450, srp: 1740, ao: 1305, svp: 5 },
+        "Whitening Toothpaste": { member: 540, srp: 650, ao: 486, svp: 1 },
+        "Advanced Collagen": { member: 2000, srp: 2400, ao: 1800, svp: 12 },
+        
+        // Celavive Skincare (associate price = AO price)
+        "Creamy Foam Cleanser": { member: 1800, srp: 2160, ao: 1800, svp: 14 },
+        "Gentle Milk Cleanser": { member: 1800, srp: 2160, ao: 1800, svp: 14 },
+        "Perfecting Toner": { member: 1850, srp: 2220, ao: 1850, svp: 14 },
+        "Vitalizing Serum": { member: 2550, srp: 3060, ao: 2550, svp: 22 },
+        "Hydrating Eye Essence": { member: 2800, srp: 3360, ao: 2800, svp: 22 },
+        "Exfoliating Scrub + Mask": { member: 1500, srp: 1800, ao: 1500, svp: 10 },
+        "Hydrating Sheet Mask": { member: 1200, srp: 1440, ao: 1200, svp: 9 },
+        "Protective Day Lotion": { member: 1900, srp: 2280, ao: 1900, svp: 16 },
+        "Protective Day Cream": { member: 1900, srp: 2280, ao: 1900, svp: 16 },
+        "Replenishing Night Gel": { member: 1900, srp: 2280, ao: 1900, svp: 16 },
+        "Replenishing Night Cream": { member: 1900, srp: 2280, ao: 1900, svp: 16 },
+        "Daily Protective Cream": { member: 1900, srp: 2280, ao: 1900, svp: 16 },
+        "Brightening Serum": { member: 2500, srp: 3000, ao: 2500, svp: 25 },
+        "Dark Spot Corrector": { member: 1600, srp: 1920, ao: 1600, svp: 14 },
+        "Luminous Moisture Cream": { member: 2200, srp: 2640, ao: 2200, svp: 22 },
+    };
+
+    
+    let currentPriceType = 'member';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('addProduct').addEventListener('click', addProductCard);
+        
+        document.querySelectorAll('#globalPriceToggle .price-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('#globalPriceToggle .price-option').forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentPriceType = option.dataset.type;
+                document.querySelectorAll('.product-card').forEach(card => updateProductPrice(card.id.replace('card-', '')));
+            });
+        });
+        
+        addProductCard();
+    });
+    
+    function addProductCard() {
+        const container = document.getElementById('productsContainer');
+        const cardId = Date.now();
+        
+        const cardHTML = `
+                <div class="product-card" id="card-${cardId}">
+                    <select class="product-dropdown" onchange="updateProductPrice('${cardId}')">
+                        <option value="">-- Select Product --</option>
+                        ${Object.keys(products).map(p => `<option value="${p}">${p}</option>`).join('')}
+                    </select>
+                    
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="adjustQuantity('${cardId}', -1)">−</button>
+                        <input type="number" id="quantity-${cardId}" class="quantity-input" value="1" min="1" onchange="updateTotals('${cardId}')">
+                        <button class="quantity-btn" onclick="adjustQuantity('${cardId}', 1)">+</button>
+                    </div>
+                    
+                    <div class="price-display">₱<span class="unit-price" id="unit-price-${cardId}">0</span></div>
+                    <div class="svp-display"><span class="unit-svp" id="unit-svp-${cardId}">0</span></div>
+                    <div class="subtotal-display">₱<span class="subtotal" id="subtotal-${cardId}">0</span></div>
+                    <div class="svp-total-display"><span class="svp-total" id="svp-total-${cardId}">0</span></div>
+                    <button class="remove-product" onclick="removeProductCard('${cardId}')">×</button>
+                </div>
+            `;
+        
+        // Changed to append to the end of the products container
+        container.insertAdjacentHTML('beforeend', cardHTML);
+    }
+    
+    function updateProductPrice(cardId) {
+        const card = document.getElementById(`card-${cardId}`);
+        const dropdown = card.querySelector('.product-dropdown');
+        const selected = dropdown.value;
+        
+        if (selected && products[selected]) {
+            const price = products[selected][currentPriceType];
+            const svp = products[selected].svp;
+            
+            document.getElementById(`unit-price-${cardId}`).textContent = price.toLocaleString();
+            document.getElementById(`unit-svp-${cardId}`).textContent = svp;
+            
+            updateTotals(cardId);
+        } else {
+            document.getElementById(`unit-price-${cardId}`).textContent = '0';
+            document.getElementById(`unit-svp-${cardId}`).textContent = '0';
+            updateTotals(cardId);
+        }
+            }
+            
+            function adjustQuantity(cardId, delta) {
+                const input = document.getElementById(`quantity-${cardId}`);
+                let newVal = parseInt(input.value) + delta;
+                if (newVal < 1) newVal = 1;
+                    input.value = newVal;
+                    updateTotals(cardId);
+                    }
+                    
+                    function updateTotals(cardId) {
+                        const qty = parseInt(document.getElementById(`quantity-${cardId}`).value);
+                        const unitPrice = parseInt(document.getElementById(`unit-price-${cardId}`).textContent.replace(/,/g, '')) || 0;
+                        const unitSvp = parseInt(document.getElementById(`unit-svp-${cardId}`).textContent) || 0;
+                        
+                        const subtotal = qty * unitPrice;
+                        const svpTotal = qty * unitSvp;
+                        
+                        document.getElementById(`subtotal-${cardId}`).textContent = subtotal.toLocaleString();
+                        document.getElementById(`svp-total-${cardId}`).textContent = svpTotal;
+                        
+                        updateGrandTotals();
+                    }
+                    
+                    function removeProductCard(cardId) {
+                        document.getElementById(`card-${cardId}`).remove();
+                        updateGrandTotals();
+                    }
+                    
+                    function updateGrandTotals() {
+                        let totalAmount = 0;
+                        let totalSVP = 0;
+                        
+                        document.querySelectorAll('.product-card').forEach(card => {
+                            const subtotal = parseInt(card.querySelector('.subtotal').textContent.replace(/,/g, '')) || 0;
+                            const svp = parseInt(card.querySelector('.svp-total').textContent) || 0;
+                            totalAmount += subtotal;
+                            totalSVP += svp;
+                        });
+                        
+                        document.getElementById('totalAmount').textContent = `₱${totalAmount.toLocaleString()}`;
+                        document.getElementById('totalSVP').textContent = totalSVP;
+                    }
+                    
+    
+    </script>    
+
+    </body>
+</html>
+                    

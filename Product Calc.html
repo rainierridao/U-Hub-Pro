@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USANA Product Calculator</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f9fc;
+      color: #1a1a1a;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .price-type-toggle {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .price-option {
+      background-color: #E6F2FA;
+      border: 1px solid #0072C6;
+      color: #0072C6;
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .price-option.active {
+      background-color: #0072C6;
+      color: #fff;
+    }
+
+    .add-product-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .add-product-btn:hover {
+      background-color: #218838;
+    }
+
+    /* Header Row Styles */
+    .products-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 24px;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #0072C6;
+      color: white;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      align-items: center;
+    }
+    
+    .price-header {
+      padding-left: 10px; /* Adjust this value to move it left/right */
+      margin-left: -5px; /* Negative value pulls it left */
+    }
+    
+    .product-header {
+      padding-left: 10px; /* Adjust this value to move it left/right */
+      margin-left: -10px; /* Negative value pulls it left */
+    }
+
+    .product-card {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 24px;
+      gap: 0.5rem;
+      align-items: center;
+      background-color: #fff;
+      border-radius: 1rem;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 4px 10px rgba(0, 114, 198, 0.1);
+      margin-bottom: 0.5rem;
+    }
+
+    .product-dropdown {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+      width: 100%;
+    }
+
+    .quantity-input {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
+      width: 30px;
+      text-align: center;
+    }
+
+    .quantity-control {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .quantity-btn {
+      background-color: #0072C6;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-product {
+      background: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .total-bar {
+      position: sticky;
+      bottom: 0;
+      background-color: #0072C6;
+      color: white;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      border-radius: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .products-header,
+      .product-card {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1rem;
+      }
+      
+      .products-header {
+        display: none;
+      }
+      
+      .product-header-item {
+        display: flex;
+        justify-content: space-between;
+      }
+      
+      .product-header-item::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-controls">
+      <button class="add-product-btn" id="addProduct">+ Add Product</button>
+      <div class="price-type-toggle" id="globalPriceToggle">
+        <div class="price-option active" data-type="member">Member</div>
+        <div class="price-option" data-type="srp">SRP</div>
+        <div class="price-option" data-type="ao">Auto Order</div>
+      </div>
+    </div>
+
+    <div id="productsContainer">
+      <!-- Header Row -->
+      <div class="products-header">
+        <div class="product-header">Product</div>
+        <div>Quantity</div>
+        <div class="price-header">Price</div> <!-- Added class here -->
+        <div>SVP</div>
+        <div>SubTotal</div>
+        <div>SVP Total</div>
+        <div></div>
+      </div>
+    </div>
+
+    <div class="total-bar">
+      <div>Total Amount: <span id="totalAmount">₱0</span></div>
+      <div>Total SVP: <span id="totalSVP">0</span></div>
+    </div>
+  </div>
+
+  <script>
+    const products = {
+      "CellSentials": { member: 3490, srp: 4190, ao: 3141, svp: 34 },
+      "Usanimals": { member: 1300, srp: 1560, ao: 1170, svp: 10 },
+      "Mini CellSentials": { member: 1050, srp: 1260, ao: 945, svp: 30 },
+      "USANA Probiotic": { member: 1600, srp: 1920, ao: 1440, svp: 14 },
+      "Proflavanol C100": { member: 2900, srp: 3480, ao: 2610, svp: 15 },
+    };
+
+    let currentPriceType = 'member';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('addProduct').addEventListener('click', addProductCard);
+
+      document.querySelectorAll('#globalPriceToggle .price-option').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('#globalPriceToggle .price-option').forEach(opt => opt.classList.remove('active'));
+          option.classList.add('active');
+          currentPriceType = option.dataset.type;
+          document.querySelectorAll('.product-card').forEach(card => updateProductPrice(card.id.replace('card-', '')));
+        });
+      });
+
+      addProductCard();
+    });
+
+    function addProductCard() {
+      const container = document.getElementById('productsContainer');
+      const cardId = Date.now();
+
+      const cardHTML = `
+        <div class="product-card" id="card-${cardId}">
+          <!-- Product Dropdown -->
+          <select class="product-dropdown" onchange="updateProductPrice('${cardId}')">
+            <option value="">-- Select Product --</option>
+            ${Object.keys(products).map(p => `<option value="${p}">${p}</option>`).join('')}
+          </select>
+          
+          <!-- Quantity Controls -->
+          <div class="quantity-control">
+            <button class="quantity-btn" onclick="adjustQuantity('${cardId}', -1)">−</button>
+            <input type="number" id="quantity-${cardId}" class="quantity-input" value="1" min="1" onchange="updateTotals('${cardId}')">
+            <button class="quantity-btn" onclick="adjustQuantity('${cardId}', 1)">+</button>
+          </div>
+          
+          <!-- Price -->
+          <div>₱<span class="unit-price" id="unit-price-${cardId}">0</span></div>
+          
+          <!-- SVP -->
+          <div><span class="unit-svp" id="unit-svp-${cardId}">0</span></div>
+          
+          <!-- Subtotal -->
+          <div>₱<span class="subtotal" id="subtotal-${cardId}">0</span></div>
+          
+          <!-- SVP Total -->
+          <div><span class="svp-total" id="svp-total-${cardId}">0</span></div>
+          
+          <!-- Remove Button -->
+          <button class="remove-product" onclick="removeProductCard('${cardId}')">×</button>
+        </div>
+      `;
+
+      // Insert after the header row
+      const header = container.querySelector('.products-header');
+      container.insertAdjacentHTML('beforeend', cardHTML);
+  }
+
+    function updateProductPrice(cardId) {
+      const card = document.getElementById(`card-${cardId}`);
+      const dropdown = card.querySelector('.product-dropdown');
+      const selected = dropdown.value;
+
+      if (selected && products[selected]) {
+        const price = products[selected][currentPriceType];
+        const svp = products[selected].svp;
+
+        document.getElementById(`unit-price-${cardId}`).textContent = price.toLocaleString();
+        document.getElementById(`unit-svp-${cardId}`).textContent = svp;
+
+        updateTotals(cardId);
+      }
+    }
+
+    function adjustQuantity(cardId, delta) {
+      const input = document.getElementById(`quantity-${cardId}`);
+      let newVal = parseInt(input.value) + delta;
+      if (newVal < 1) newVal = 1;
+      input.value = newVal;
+      updateTotals(cardId);
+    }
+
+    function updateTotals(cardId) {
+      const qty = parseInt(document.getElementById(`quantity-${cardId}`).value);
+      const unitPrice = parseInt(document.getElementById(`unit-price-${cardId}`).textContent.replace(/,/g, '')) || 0;
+      const unitSvp = parseInt(document.getElementById(`unit-svp-${cardId}`).textContent) || 0;
+
+      const subtotal = qty * unitPrice;
+      const svpTotal = qty * unitSvp;
+
+      document.getElementById(`subtotal-${cardId}`).textContent = subtotal.toLocaleString();
+      document.getElementById(`svp-total-${cardId}`).textContent = svpTotal;
+
+      updateGrandTotals();
+    }
+
+    function removeProductCard(cardId) {
+      document.getElementById(`card-${cardId}`).remove();
+      updateGrandTotals();
+    }
+
+    function updateGrandTotals() {
+      let totalAmount = 0;
+      let totalSVP = 0;
+
+      document.querySelectorAll('.product-card').forEach(card => {
+        const subtotal = parseInt(card.querySelector('.subtotal').textContent.replace(/,/g, '')) || 0;
+        const svp = parseInt(card.querySelector('.svp-total').textContent) || 0;
+        totalAmount += subtotal;
+        totalSVP += svp;
+      });
+
+      document.getElementById('totalAmount').textContent = `₱${totalAmount.toLocaleString()}`;
+      document.getElementById('totalSVP').textContent = totalSVP;
+    }
+  </script>
+</body>
+</html>

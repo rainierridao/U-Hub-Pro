@@ -26,6 +26,8 @@ html, body {
 .main-content {
     max-width: 100vw;
     box-sizing: border-box;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Tables should be responsive within bounds */
@@ -35,7 +37,6 @@ table {
     word-wrap: break-word;
 }
 
-/* Optional: make sure sidebar doesn't push layout */
     .sidebar {
         max-width: 80px;
         overflow-x: hidden;
@@ -51,12 +52,13 @@ table {
 <body>
 
 <!-- Topbar Icons -->
-<div class="topbar">
-<a href="dashboard.html" title="Dashboard"><i class="fas fa-sitemap"></i></a>
-<a href="#" title="Inventory"><i class="fas fa-chart-line"></i></a>
-<a href="blueguide.html" class="active"  title="Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <div class="topbar">
+    <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html" class="active"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    </div>
 
-</div>
 <div class="header">
 <div class="logo">
 <span style="margin-left: 0px;">The Blue Guide</span>
@@ -69,12 +71,14 @@ table {
     
     <div class="dashboard">
     
-    <!-- Sidebar -->
     <div class="sidebar">
     <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html" class="active"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
     <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
-    <a href="blueguide.html" class="active" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+
     </div>
+    
     
     <!-- Content -->
     <div class="content">
@@ -82,7 +86,7 @@ table {
     
     <!-- Illness Dropdown -->
     <div style="flex: 0 0 300px; margin-top: 0px;">
-    <div class="input-container" style="flex: 0 0 300px; margin-top: -20px;">
+    <div class="input-container" style="flex: 0 0 300px; margin-top: 0px;">
     <label for="illnessSelect"><strong>Select an Illness:</strong></label>
         <select id="illnessSelect" style="width: 100%; padding: 8px; font-size: 16px;">
         <option value="" selected disabled>Loading...</option>
