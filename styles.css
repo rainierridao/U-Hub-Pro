@@ -1271,6 +1271,13 @@ td[contenteditable="true"] {
                             align-items: center;
                         }
                         
+                        
+                        .quantity-input {
+                            width: 40px;
+                            font-size: 12px;
+            
+                        }
+                        
                         .add-product-btn {
                             width: auto;
                             font-size: 10px;
