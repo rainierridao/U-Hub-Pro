@@ -1273,12 +1273,12 @@ td[contenteditable="true"] {
                                 width: 24px !important;
                                 height: 24px !important;
                                 padding: 0 !important;
-                                margin-left: 8px !important;
+                                margin-left: 327px !important;
                                 display: flex !important;
                                 align-items: center;
                                 justify-content: center;
                             }
-
+                            
                             
                                                     
                             /* Responsive Design for smaller screens */
@@ -1380,7 +1380,7 @@ td[contenteditable="true"] {
                                     
                                     /* Adjust total bar for mobile */
                                         .total-bar {
-                                            height: auto !important;
+                                            height: 120px !important;
                                             padding: 10px 15px !important;
                                             flex-wrap: wrap;
                                         }
