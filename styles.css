@@ -1263,6 +1263,22 @@ td[contenteditable="true"] {
                                 display: none;
                             }
                             
+                            /* Remove button */
+                            .product button {
+                                position: static !important;
+                                background: #e74c3c !important;
+                                color: white !important;
+                                border: none !important;
+                                border-radius: 4px !important;
+                                width: 24px !important;
+                                height: 24px !important;
+                                padding: 0 !important;
+                                margin-left: 8px !important;
+                                display: flex !important;
+                                align-items: center;
+                                justify-content: center;
+                            }
+
                             
                                                     
                             /* Responsive Design for smaller screens */
@@ -1287,6 +1303,7 @@ td[contenteditable="true"] {
                                             align-items: center;
                                             justify-content: center;
                                             padding: 0 !important;
+                                            margin: 2px;
                                         }
                                     
                                     
