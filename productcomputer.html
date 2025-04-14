@@ -17,17 +17,7 @@
 </head>
 <style>
 
-.shake-feedback {
-    animation: shake 0.5s;
-}
 
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    50% { transform: translateX(10px); }
-    75% { transform: translateX(-10px); }
-    100% { transform: translateX(0); }
-}
 
 /* Remove all horizontal scrolling */
 html, body {
@@ -90,10 +80,15 @@ html, body {
         <div class="container">
         <div class="controls">
         <div>
-        <button onclick="setCategory('supplements')">Supplements</button>
-        <button onclick="setCategory('skincare')">Skincare</button>
-        </div>
-        <div>
+        <button onclick="setCategory('supplements')">
+        <span class="full-text">Nutritionals</span>
+        <span class="short-text">N</span>
+        </button>
+        <button onclick="setCategory('skincare')">
+        <span class="full-text">Skincare</span>
+        <span class="short-text">S</span>
+        </button>
+        </div>        <div>
         <label>Price Type:
         <select id="priceType" onchange="renderProducts()">
         <option value="member">Member</option>
@@ -128,60 +123,6 @@ html, body {
 
 
 <script>
-
-
-
-// Shake detection implementation
-const SHAKE_THRESHOLD = 15; // Adjust this sensitivity as needed
-let lastUpdate = 0;
-let lastShakeTime = 0;
-
-function initShakeDetection() {
-    if (window.DeviceMotionEvent) {
-        let lastX = null, lastY = null, lastZ = null;
-        
-        window.addEventListener('devicemotion', (event) => {
-            const acceleration = event.accelerationIncludingGravity;
-            const currentTime = Date.now();
-            
-            if ((currentTime - lastShakeTime) > 1000) { // 1 second between shakes
-                const diffTime = currentTime - lastUpdate;
-                
-                if (diffTime > 10) { // Limit sampling rate
-                    const {x, y, z} = acceleration;
-                    
-                    if (lastX !== null && lastY !== null && lastZ !== null) {
-                        const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
-                        
-                        if (speed > SHAKE_THRESHOLD) {
-                            lastShakeTime = currentTime;
-                            clearAll();
-                            // Visual feedback
-                            document.body.classList.add('shake-feedback');
-                            setTimeout(() => {
-                                document.body.classList.remove('shake-feedback');
-                            }, 500);
-                        }
-                    }
-                    
-                    lastX = x;
-                    lastY = y;
-                    lastZ = z;
-                    lastUpdate = currentTime;
-                }
-            }
-        }, false);
-    }
-}
-
-// Initialize shake detection when page loads
-window.addEventListener('DOMContentLoaded', initShakeDetection);
-
-
-
-
-
-
 const products = {
     supplements: {
         "CellSentials": { member: 3490, srp: 4190, ao: 3141, svp: 34 },
@@ -256,38 +197,10 @@ function addToCart(name) {
                     }
                     
                     function clearAll() {
-                        // Clear all cart items
-                        for (let item in cart) {
-                            delete cart[item];
-                        }
-                            
-                            // Reset to default category and price type
-                            selectedCategory = 'supplements';
-                            selectedPrice = 'member';
-                            document.getElementById("priceType").value = 'member';
-                            
-                            // Update the UI
+                        for (let item in cart) cart[item] = 0;
                             updateTotal();
                             renderProducts();
-                            
-                            // Optional: Show a brief notification
-                            const notification = document.createElement('div');
-                            notification.textContent = 'Cart cleared!';
-                            notification.style.position = 'fixed';
-                            notification.style.bottom = '20px';
-                            notification.style.left = '50%';
-                            notification.style.transform = 'translateX(-50%)';
-                            notification.style.backgroundColor = 'rgba(0,0,0,0.7)';
-                            notification.style.color = 'white';
-                            notification.style.padding = '10px 20px';
-                            notification.style.borderRadius = '5px';
-                            notification.style.zIndex = '1000';
-                            document.body.appendChild(notification);
-                            
-                            setTimeout(() => {
-        document.body.removeChild(notification);
-    }, 2000);
-}
+                            }
                             
                             function renderProducts() {
                                 selectedPrice = document.getElementById("priceType").value;
@@ -302,20 +215,27 @@ function addToCart(name) {
                                     div.className = "product";
                                     
                                     div.innerHTML = `
-                    <div class="product-name">${name}</div>
-                    <div class="product-price">₱${product[selectedPrice]}</div>
-                    <div class="product-price" style="font-size:0.85em;color:#555;">SVP: ${product.svp}</div>
-                    <div class="product-quantity" style="${qty ? '' : 'display:none'}">${qty}</div>
-                    ${qty > 0 ? `<button onclick="event.stopPropagation(); removeFromCart('${name}')" style="position:absolute;bottom:10px;left:10px;padding:2px 6px;">-</button>` : ''}
-                `;
+            <div class="product-info" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div class="product-name" style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${name}</div>
+    <div class="product-prices" style="display: flex; gap: 8px; margin-left: 10px;">
+        <div class="product-price" style="font-weight: 600;">₱${product[selectedPrice]}</div>
+        <div class="product-svp" style="color: #666; font-size: 0.9em;">SVP: ${product.svp}</div>
+    </div>
+</div>
+            ${qty > 0 ? `
+                <div class="product-controls">
+                    <div class="product-quantity">${qty}</div>
+                    <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart('${name}')">-</button>
+                </div>
+            ` : ''}
+        `;
                                     
                                     div.onclick = () => addToCart(name);
                                     grid.appendChild(div);
                                 });
                                 
                                 updateTotal();
-                            }
-                            
+                            }                            
                             
                             function updateTotal() {
                                 let total = 0;
@@ -348,6 +268,9 @@ function addToCart(name) {
         }
         
         renderProducts();
+
+
+
     </script>
     </body>
 </html>
