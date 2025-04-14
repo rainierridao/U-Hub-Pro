@@ -78,45 +78,34 @@ html, body {
     <div class="content">
         
         <div class="container">
-        <div class="header-controls">
-            <button class="add-product-btn" id="addProduct">+ Add Product</button>
-            <div class="price-type-toggle" id="globalPriceToggle">
-                <div class="price-option active" data-type="member">Member</div>
-                <div class="price-option" data-type="srp">SRP</div>
-                <div class="price-option" data-type="ao">
-                <span class="desktop-text">Auto Order</span>
-                <span class="mobile-text">AO</span>
-                </div>
-            </div>
+        <div class="controls">
+        <div>
+        <button onclick="setCategory('supplements')">Supplements</button>
+        <button onclick="setCategory('skincare')">Skincare</button>
         </div>
-
-        <div id="productsContainer">
-            <!-- Header Row -->
-            <div class="products-header">
-                <div class="product-header">Product</div>
-                <div>Quantity</div>
-                <div class="price-header">Price</div> <!-- Added class here -->
-                <div>SVP</div>
-                <div>SubTotal</div>
-                <div>SVP Total</div>
-                <div></div>
-            </div>
+        <div>
+        <label>Price Type:
+        <select id="priceType" onchange="renderProducts()">
+        <option value="member">Member</option>
+        <option value="srp">SRP</option>
+        <option value="ao">Auto Order</option>
+        </select>
+        </label>
         </div>
-
+        </div>
+        
+        <div class="product-grid" id="productGrid"></div>
+        
         <div class="total-bar">
-            <div>Total Amount: <span id="totalAmount">₱0</span></div>
-            <div>Total SVP: <span id="totalSVP">0</span></div>
+        <div class="total-info">
+        <span class="total-label">Total: ₱<span id="totalAmount">0</span></span>
+        <span class="svp-label">SVP: <span id="svpAmount">0</span></span>
         </div>
-        
-        <div class="text-right mt-4">
-        <button 
-        onclick="copySummaryToClipboard()" 
-        class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-2xl shadow-md transition duration-300"
-        >
-        📋 Copy Summary
-        </button>
+        <div class="button-container">
+        <button class="btn-clear" onclick="clearAll()">Clear</button>
+        <button class="btn-clear copy-summary" onclick="copySummary()">Copy Summary</button>
         </div>
-
+        </div>
         
         
         
@@ -128,10 +117,9 @@ html, body {
 
 
 
-    <script>
-    
-    
-    const products = {
+<script>
+const products = {
+    supplements: {
         "CellSentials": { member: 3490, srp: 4190, ao: 3141, svp: 34 },
         "Usanimals": { member: 1300, srp: 1560, ao: 1170, svp: 8 },
         "Mini CellSentials": { member: 1050, srp: 1260, ao: 945, svp: 7 },
@@ -157,9 +145,9 @@ html, body {
         "Electrolyte": { member: 1050, srp: 1260, ao: 945, svp: 3 },
         "USANA DTX Tea Mix": { member: 1450, srp: 1740, ao: 1305, svp: 5 },
         "Whitening Toothpaste": { member: 540, srp: 650, ao: 486, svp: 1 },
-        "Advanced Collagen": { member: 2000, srp: 2400, ao: 1800, svp: 12 },
-        
-        // Celavive Skincare (associate price = AO price)
+        "Advanced Collagen": { member: 2000, srp: 2400, ao: 1800, svp: 12 }
+    },
+    skincare: {
         "Creamy Foam Cleanser": { member: 1800, srp: 2160, ao: 1800, svp: 14 },
         "Gentle Milk Cleanser": { member: 1800, srp: 2160, ao: 1800, svp: 14 },
         "Perfecting Toner": { member: 1850, srp: 2220, ao: 1850, svp: 14 },
@@ -174,153 +162,101 @@ html, body {
         "Daily Protective Cream": { member: 1900, srp: 2280, ao: 1900, svp: 16 },
         "Brightening Serum": { member: 2500, srp: 3000, ao: 2500, svp: 25 },
         "Dark Spot Corrector": { member: 1600, srp: 1920, ao: 1600, svp: 14 },
-        "Luminous Moisture Cream": { member: 2200, srp: 2640, ao: 2200, svp: 22 },
-    };
-
-    
-    let currentPriceType = 'member';
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('addProduct').addEventListener('click', addProductCard);
-        
-        document.querySelectorAll('#globalPriceToggle .price-option').forEach(option => {
-            option.addEventListener('click', () => {
-                document.querySelectorAll('#globalPriceToggle .price-option').forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                currentPriceType = option.dataset.type;
-                document.querySelectorAll('.product-card').forEach(card => updateProductPrice(card.id.replace('card-', '')));
-            });
-        });
-        
-        addProductCard();
-    });
-    
-    function addProductCard() {
-        const container = document.getElementById('productsContainer');
-        const cardId = Date.now();
-        
-        const cardHTML = `
-                <div class="product-card" id="card-${cardId}">
-                    <select class="product-dropdown" onchange="updateProductPrice('${cardId}')">
-                        <option value="">-- Select Product --</option>
-                        ${Object.keys(products).map(p => `<option value="${p}">${p}</option>`).join('')}
-                    </select>
-                    
-                    <div class="quantity-control">
-                        <button class="quantity-btn" onclick="adjustQuantity('${cardId}', -1)">−</button>
-                        <input type="number" id="quantity-${cardId}" class="quantity-input" value="1" min="1" onchange="updateTotals('${cardId}')">
-                        <button class="quantity-btn" onclick="adjustQuantity('${cardId}', 1)">+</button>
-                    </div>
-                    
-                    <div class="price-display">₱<span class="unit-price" id="unit-price-${cardId}">0</span></div>
-                    <div class="svp-display"><span class="unit-svp" id="unit-svp-${cardId}">0</span></div>
-                    <div class="subtotal-display">₱<span class="subtotal" id="subtotal-${cardId}">0</span></div>
-                    <div class="svp-total-display"><span class="svp-total" id="svp-total-${cardId}">0</span></div>
-                    <button class="remove-product" onclick="removeProductCard('${cardId}')">×</button>
-                </div>
-            `;
-        
-        // Changed to append to the end of the products container
-        container.insertAdjacentHTML('beforeend', cardHTML);
+        "Luminous Moisture Cream": { member: 2200, srp: 2640, ao: 2200, svp: 22 }
     }
-    
-    function updateProductPrice(cardId) {
-        const card = document.getElementById(`card-${cardId}`);
-        const dropdown = card.querySelector('.product-dropdown');
-        const selected = dropdown.value;
-        
-        if (selected && products[selected]) {
-            const price = products[selected][currentPriceType];
-            const svp = products[selected].svp;
-            
-            document.getElementById(`unit-price-${cardId}`).textContent = price.toLocaleString();
-            document.getElementById(`unit-svp-${cardId}`).textContent = svp;
-            
-            updateTotals(cardId);
-        } else {
-            document.getElementById(`unit-price-${cardId}`).textContent = '0';
-            document.getElementById(`unit-svp-${cardId}`).textContent = '0';
-            updateTotals(cardId);
-        }
-            }
-            
-            function adjustQuantity(cardId, delta) {
-                const input = document.getElementById(`quantity-${cardId}`);
-                let newVal = parseInt(input.value) + delta;
-                if (newVal < 1) newVal = 1;
-                    input.value = newVal;
-                    updateTotals(cardId);
-                    }
-                    
-                    function updateTotals(cardId) {
-                        const qty = parseInt(document.getElementById(`quantity-${cardId}`).value);
-                        const unitPrice = parseInt(document.getElementById(`unit-price-${cardId}`).textContent.replace(/,/g, '')) || 0;
-                        const unitSvp = parseInt(document.getElementById(`unit-svp-${cardId}`).textContent) || 0;
-                        
-                        const subtotal = qty * unitPrice;
-                        const svpTotal = qty * unitSvp;
-                        
-                        document.getElementById(`subtotal-${cardId}`).textContent = subtotal.toLocaleString();
-                        document.getElementById(`svp-total-${cardId}`).textContent = svpTotal;
-                        
-                        updateGrandTotals();
-                    }
-                    
-                    function removeProductCard(cardId) {
-                        document.getElementById(`card-${cardId}`).remove();
-                        updateGrandTotals();
-                    }
-                    
-                    function updateGrandTotals() {
-                        let totalAmount = 0;
-                        let totalSVP = 0;
-                        
-                        document.querySelectorAll('.product-card').forEach(card => {
-                            const subtotal = parseInt(card.querySelector('.subtotal').textContent.replace(/,/g, '')) || 0;
-                            const svp = parseInt(card.querySelector('.svp-total').textContent) || 0;
-                            totalAmount += subtotal;
-                            totalSVP += svp;
-                        });
-                        
-                        document.getElementById('totalAmount').textContent = `₱${totalAmount.toLocaleString()}`;
-                        document.getElementById('totalSVP').textContent = totalSVP;
-                    }
-                    
-    
-    
-    
-    
-                    function copySummaryToClipboard() {
-                        let summary = "🧾 *Order Summary*:\n\n";
-                        document.querySelectorAll('.product-card').forEach(card => {
-                            const cardId = card.id.replace('card-', '');
-                            const productName = card.querySelector('.product-dropdown').value;
-                            const quantity = document.getElementById(`quantity-${cardId}`).value;
-                            const unitPrice = document.getElementById(`unit-price-${cardId}`).innerText;
-                            const subtotal = document.getElementById(`subtotal-${cardId}`).innerText;
-                            
-                            summary += `• ${productName} x${quantity}\n`;
-                            summary += `  ₱${unitPrice} each | Subtotal: ₱${subtotal}\n\n`;
-                        });
-                        
-                        const totalAmount = document.getElementById('totalAmount').innerText;
-                        const totalSVP = document.getElementById('totalSVP').innerText;
-                        
-                        summary += `💰 *Total Amount:* ${totalAmount}\n`;
-                        summary += `🎯 *Total SVP:* ${totalSVP}\n`;
-                        
-                        // Copy to clipboard
-                        navigator.clipboard.writeText(summary).then(() => {
-        alert("Summary copied to clipboard!");
-    }, () => {
-        alert("Failed to copy summary.");
-    });
+};
+
+let selectedCategory = 'supplements';
+let selectedPrice = 'member';
+const cart = {};
+
+function setCategory(cat) {
+    selectedCategory = cat;
+    renderProducts();
 }
 
-    
-    
-    </script>    
-
+function addToCart(name) {
+    if (!cart[name]) cart[name] = 0;
+        cart[name]++;
+        renderProducts();
+        updateTotal();
+        }
+        
+        function removeFromCart(name) {
+            if (cart[name]) {
+                cart[name]--;
+                if (cart[name] <= 0) delete cart[name];
+                    renderProducts();
+                    updateTotal();
+                    }
+                    }
+                    
+                    function clearAll() {
+                        for (let item in cart) cart[item] = 0;
+                            updateTotal();
+                            renderProducts();
+                            }
+                            
+                            function renderProducts() {
+                                selectedPrice = document.getElementById("priceType").value;
+                                const grid = document.getElementById("productGrid");
+                                grid.innerHTML = "";
+                                const list = products[selectedCategory];
+                                
+                                Object.keys(list).forEach(name => {
+                                    const product = list[name];
+                                    const qty = cart[name] || 0;
+                                    const div = document.createElement("div");
+                                    div.className = "product";
+                                    
+                                    div.innerHTML = `
+                    <div class="product-name">${name}</div>
+                    <div class="product-price">₱${product[selectedPrice]}</div>
+                    <div class="product-price" style="font-size:0.85em;color:#555;">SVP: ${product.svp}</div>
+                    <div class="product-quantity" style="${qty ? '' : 'display:none'}">${qty}</div>
+                    ${qty > 0 ? `<button onclick="event.stopPropagation(); removeFromCart('${name}')" style="position:absolute;bottom:10px;left:10px;padding:2px 6px;">-</button>` : ''}
+                `;
+                                    
+                                    div.onclick = () => addToCart(name);
+                                    grid.appendChild(div);
+                                });
+                                
+                                updateTotal();
+                            }
+                            
+                            
+                            function updateTotal() {
+                                let total = 0;
+                                let svpTotal = 0;
+                                for (let name in cart) {
+                                    const product = products.supplements[name] || products.skincare[name];
+                                    total += product[selectedPrice] * cart[name];
+                                    svpTotal += product.svp * cart[name];
+                                }
+                                    document.getElementById("totalAmount").innerText = total.toLocaleString();
+                                    document.getElementById("svpAmount").innerText = svpTotal;
+                                    }
+                                    
+                                    function copySummary() {
+                                        let text = "🧾 Order Summary:\n\n";
+                                        for (let name in cart) {
+                                            const product = products.supplements[name] || products.skincare[name];
+                                            const qty = cart[name];
+                                            if (qty > 0) {
+                                                text += `${qty} x ${name} - ₱${product[selectedPrice] * qty} (${product.svp * qty} SVP)\n`;
+                                            }
+                                                }
+                                                const total = document.getElementById("totalAmount").innerText;
+                                                const svp = document.getElementById("svpAmount").innerText;
+                                                text += `\n💰 Total: ₱${total}\n✨ SVP: ${svp}`;
+                                                
+                                                navigator.clipboard.writeText(text).then(() => {
+                alert("Summary copied to clipboard!");
+            });
+        }
+        
+        renderProducts();
+    </script>
     </body>
 </html>
                     
