@@ -1278,5 +1278,10 @@ td[contenteditable="true"] {
                                         padding: 10px;
                                         margin: 0;
                                     }
+                                        
+                                        .total-bar {
+                                        font-size: .9em;
+                                                                                                                        }
+
                                 }
                                 
