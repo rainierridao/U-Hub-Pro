@@ -191,12 +191,62 @@ function addToCart(name) {
                     }
                     }
                     
-                    function clearAll() {
-                        for (let item in cart) cart[item] = 0;
-                            updateTotal();
-                            renderProducts();
-                            }
-                            
+                    // Threshold for shake detection (adjust as needed)
+                        const SHAKE_THRESHOLD = 15;
+                        // Minimum time between shakes (in milliseconds)
+                        const SHAKE_INTERVAL = 1000; 
+                        let lastShakeTime = 0;
+                        
+                        // Function to handle shake event
+                        function handleShake() {
+                            const now = Date.now();
+                            if (now - lastShakeTime < SHAKE_INTERVAL) return; // Too soon since last shake
+                                
+                                lastShakeTime = now;
+                                clearAll();
+                                // Optional: Show visual feedback that shake was detected
+                                alert('Cart cleared by shake!'); // Or use a more subtle notification
+                                }
+                                
+                                // Add device motion event listener
+                                function initShakeDetection() {
+                                    if (window.DeviceMotionEvent) {
+                                        let lastX, lastY, lastZ;
+                                        
+                                        window.addEventListener('devicemotion', (event) => {
+                                            const { x, y, z } = event.accelerationIncludingGravity;
+                                            const currentTime = Date.now();
+                                            
+                                            if ((currentTime - lastShakeTime) > SHAKE_INTERVAL) {
+                const diffTime = currentTime - lastUpdate;
+                if (diffTime > 10) { // Limit sampling rate
+                    const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+                    
+                    if (speed > SHAKE_THRESHOLD) {
+                        handleShake();
+                    }
+                    
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
+                    lastUpdate = currentTime;
+                }
+            }
+        }, false);
+    } else {
+        console.log("DeviceMotionEvent not supported");
+    }
+}
+
+// Initialize shake detection when the page loads
+window.addEventListener('DOMContentLoaded', initShakeDetection);
+
+// Your existing clearAll function
+function clearAll() {
+    for (let item in cart) cart[item] = 0;
+    updateTotal();
+    renderProducts();
+}                            
                             function renderProducts() {
                                 selectedPrice = document.getElementById("priceType").value;
                                 const grid = document.getElementById("productGrid");
