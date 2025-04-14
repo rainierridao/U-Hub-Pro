@@ -17,7 +17,17 @@
 </head>
 <style>
 
+.shake-feedback {
+    animation: shake 0.5s;
+}
 
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
 
 /* Remove all horizontal scrolling */
 html, body {
@@ -118,6 +128,60 @@ html, body {
 
 
 <script>
+
+
+
+// Shake detection implementation
+const SHAKE_THRESHOLD = 15; // Adjust this sensitivity as needed
+let lastUpdate = 0;
+let lastShakeTime = 0;
+
+function initShakeDetection() {
+    if (window.DeviceMotionEvent) {
+        let lastX = null, lastY = null, lastZ = null;
+        
+        window.addEventListener('devicemotion', (event) => {
+            const acceleration = event.accelerationIncludingGravity;
+            const currentTime = Date.now();
+            
+            if ((currentTime - lastShakeTime) > 1000) { // 1 second between shakes
+                const diffTime = currentTime - lastUpdate;
+                
+                if (diffTime > 10) { // Limit sampling rate
+                    const {x, y, z} = acceleration;
+                    
+                    if (lastX !== null && lastY !== null && lastZ !== null) {
+                        const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+                        
+                        if (speed > SHAKE_THRESHOLD) {
+                            lastShakeTime = currentTime;
+                            clearAll();
+                            // Visual feedback
+                            document.body.classList.add('shake-feedback');
+                            setTimeout(() => {
+                                document.body.classList.remove('shake-feedback');
+                            }, 500);
+                        }
+                    }
+                    
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
+                    lastUpdate = currentTime;
+                }
+            }
+        }, false);
+    }
+}
+
+// Initialize shake detection when page loads
+window.addEventListener('DOMContentLoaded', initShakeDetection);
+
+
+
+
+
+
 const products = {
     supplements: {
         "CellSentials": { member: 3490, srp: 4190, ao: 3141, svp: 34 },
@@ -191,62 +255,40 @@ function addToCart(name) {
                     }
                     }
                     
-                    // Threshold for shake detection (adjust as needed)
-                        const SHAKE_THRESHOLD = 15;
-                        // Minimum time between shakes (in milliseconds)
-                        const SHAKE_INTERVAL = 1000; 
-                        let lastShakeTime = 0;
-                        
-                        // Function to handle shake event
-                        function handleShake() {
-                            const now = Date.now();
-                            if (now - lastShakeTime < SHAKE_INTERVAL) return; // Too soon since last shake
-                                
-                                lastShakeTime = now;
-                                clearAll();
-                                // Optional: Show visual feedback that shake was detected
-                                alert('Cart cleared by shake!'); // Or use a more subtle notification
-                                }
-                                
-                                // Add device motion event listener
-                                function initShakeDetection() {
-                                    if (window.DeviceMotionEvent) {
-                                        let lastX, lastY, lastZ;
-                                        
-                                        window.addEventListener('devicemotion', (event) => {
-                                            const { x, y, z } = event.accelerationIncludingGravity;
-                                            const currentTime = Date.now();
-                                            
-                                            if ((currentTime - lastShakeTime) > SHAKE_INTERVAL) {
-                const diffTime = currentTime - lastUpdate;
-                if (diffTime > 10) { // Limit sampling rate
-                    const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
-                    
-                    if (speed > SHAKE_THRESHOLD) {
-                        handleShake();
-                    }
-                    
-                    lastX = x;
-                    lastY = y;
-                    lastZ = z;
-                    lastUpdate = currentTime;
-                }
-            }
-        }, false);
-    } else {
-        console.log("DeviceMotionEvent not supported");
-    }
+                    function clearAll() {
+                        // Clear all cart items
+                        for (let item in cart) {
+                            delete cart[item];
+                        }
+                            
+                            // Reset to default category and price type
+                            selectedCategory = 'supplements';
+                            selectedPrice = 'member';
+                            document.getElementById("priceType").value = 'member';
+                            
+                            // Update the UI
+                            updateTotal();
+                            renderProducts();
+                            
+                            // Optional: Show a brief notification
+                            const notification = document.createElement('div');
+                            notification.textContent = 'Cart cleared!';
+                            notification.style.position = 'fixed';
+                            notification.style.bottom = '20px';
+                            notification.style.left = '50%';
+                            notification.style.transform = 'translateX(-50%)';
+                            notification.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                            notification.style.color = 'white';
+                            notification.style.padding = '10px 20px';
+                            notification.style.borderRadius = '5px';
+                            notification.style.zIndex = '1000';
+                            document.body.appendChild(notification);
+                            
+                            setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 2000);
 }
-
-// Initialize shake detection when the page loads
-window.addEventListener('DOMContentLoaded', initShakeDetection);
-
-// Your existing clearAll function
-function clearAll() {
-    for (let item in cart) cart[item] = 0;
-    updateTotal();
-    renderProducts();
-}                            
+                            
                             function renderProducts() {
                                 selectedPrice = document.getElementById("priceType").value;
                                 const grid = document.getElementById("productGrid");
