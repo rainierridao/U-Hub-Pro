@@ -173,7 +173,6 @@ align-items: center;
 .content {
     flex: 1;
     padding: 2rem;
-    margin-top: 60px;
 }
 
 .main-content {
@@ -1183,8 +1182,9 @@ td[contenteditable="true"] {
                     .content {
                         flex: 1;
                         padding: 1rem;
-                        margin-top: 60px;
-                    }
+                    
+                                            }
+                                            
                         
                         
                         }
