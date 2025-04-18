@@ -11,11 +11,18 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Add to <head> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+    
+    
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script src="Firebasenameandlogout.js"></script>
+    
     </head>
 <style>
 #additem {
@@ -242,9 +249,7 @@ select, input[type="number"], input[type="date"] {
   </select>
   
   <input type="number" id="stock" placeholder="Stock Quantity" required />
-  <div class="date-wrapper">
-  <input type="date" id="expiry" required />
-  </div>
+ <input type="text" id="expiry" placeholder="Select Expiry Date">
   
   <button type="submit" id="additem">Add Item</button>
   </form>
@@ -286,6 +291,13 @@ select, input[type="number"], input[type="date"] {
 </div>
 
 <script>
+
+    new Pikaday({
+        field: document.getElementById('expiry'),
+        format: 'YYYY-MM-DD',
+        minDate: new Date()
+    });
+
 
 
 // Product data
