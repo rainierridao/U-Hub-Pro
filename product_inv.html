@@ -64,12 +64,7 @@ form#addItemForm {
   gap: 15px;
 }
 
-/* FORM SECTION - MOBILE FIRST (4 ROWS) */
-form#addItemForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+
 
 /* Desktop/Tablet (2 columns) */
 @media (min-width: 768px) {
@@ -175,12 +170,30 @@ select, input[type="number"], input[type="date"] {
   }
   
     
+        
   @media (max-width: 600px) {
     .content {
       max-width: 390px;
       margin-top: 0px;
     }
+        form#addItemForm {
+            grid-template-columns: repeat(2, 1fr);
+        }
         
+        /* Make these two inputs share one grid row */
+        #stock {
+        grid-column: 1;
+    }
+    
+    #expiry {
+    grid-column: 2;
+    }
+    
+    /* Submit button spans both columns */
+    button#additem {
+        grid-column: span 2;
+    }
+
         
   }
     
@@ -206,7 +219,11 @@ select, input[type="number"], input[type="date"] {
         background-size: 20px;
         padding-right: 40px; /* Prevents text overlap with icon */
         }
-
+        
+        
+        
+        
+        
 </style>
 <body>
 
@@ -271,8 +288,10 @@ select, input[type="number"], input[type="date"] {
   <option value="" disabled selected>Select Item</option>
   </select>
   
-  <input type="number" id="stock" placeholder="Stock Quantity" required />
- <input type="text" id="expiry" placeholder="Select Expiry Date">
+        
+        <input type="number" id="stock" class="half-width" placeholder="Stock Quantity" required />
+        <input type="text" id="expiry" class="half-width" placeholder="Expiry Date">
+
   
   <button type="submit" id="additem">Add Item</button>
   </form>
