@@ -133,27 +133,33 @@ select, input[type="number"], input[type="date"] {
     color: #e63946;
   }
   
-  /* Wrapper style */
   .date-wrapper {
     position: relative;
+    width: 100%;
   }
   
-  /* Fake placeholder */
-  .date-wrapper input[type="date"]::before {
-    content: attr(data-placeholder);
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-    pointer-events: none;
-  }
-  
-  /* Hide the fake placeholder if user picks a date */
-    .date-wrapper input[type="date"]:valid::before {
-      content: '';
-    }
-
+  .date-wrapper input[type="date"] {
+    padding: 12px; /* Adjust padding if needed */
+      width: 100%;
+      font-size: 14px;
+      }
+      
+      .date-wrapper input[type="date"]::before {
+        content: attr(data-placeholder);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #999;
+        font-size: 14px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      
+      /* Hide placeholder when a date is selected */
+      .date-wrapper input[type="date"]:valid::before {
+        content: '';
+      }
   
   
   @media (max-width: 600px) {
