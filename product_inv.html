@@ -27,6 +27,121 @@ padding: 8px 12px;
 background: #005B99; /* Darker blue on hover */
 }
 
+
+
+.content {
+  max-width: auto;
+  margin: auto;
+  margin-top: -20px;
+}
+
+
+
+section.form-section {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+section.form-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+form#addItemForm {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+@media (min-width: 768px) {
+  form#addItemForm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+select, input[type="number"], input[type="date"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+}
+  
+  button#additem {
+    background-color: #0b72c9;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    grid-column: span 2;
+  }
+  
+  button#additem:hover {
+    background-color: #0859a6;
+  }
+  
+  section.table-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  section.table-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  thead {
+    background-color: #e5e7eb;
+  }
+  
+  th, td {
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    text-align: left;
+  }
+  
+  td.actions a {
+    margin-right: 10px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  td.actions a.edit {
+    color: #0b72c9;
+  }
+  
+  td.actions a.delete {
+    color: #e63946;
+  }
+  
+  
+  
+  @media (max-width: 600px) {
+    .content {
+      max-width: 390px;
+      margin-top: 0px;
+    }
+  }
+
 </style>
 <body>
 
@@ -44,7 +159,7 @@ background: #005B99; /* Darker blue on hover */
 </div>
 <div class="header">
 <div class="logo">
-<span style="margin-left: 0px;">Product Inventory</span>
+<span style="margin-left: 0px;">Inventory</span>
 
 
 </div>
@@ -76,60 +191,53 @@ background: #005B99; /* Darker blue on hover */
 
 
     <!-- Form: Add Inventory -->
-    <section class="mt-6 bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-semibold mb-4">Add New Item</h2>
-    <form id="addItemForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- Category Dropdown -->
-    <select id="category" class="border p-2 rounded" required>
-    <option value="" disabled selected>Select Category</option>
-    <option value="Nutritionals">Nutritionals</option>
-    <option value="Celavive">Celavive</option>
-    </select>
-    
-    <!-- Item Dropdown -->
-    <select id="itemName" class="border p-2 rounded" required>
-    <option value="" disabled selected>Select Item</option>
-    </select>
-    
-    <!-- Quantity -->
-    <input type="number" id="stock" placeholder="Stock Quantity" class="border p-2 rounded" required />
-    
-    <!-- Expiry Date -->
-    <input type="date" id="expiry" class="border p-2 rounded" required />
-    
-    <button type="submit" id="additem" class="text-white px-4 py-2 rounded md:col-span-2">
-    Add Item
-    </button>
-    </form>
-    </section>
-    
-    <!-- Inventory Table -->
-    <section class="mt-6 bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-semibold mb-4">Inventory List</h2>
-    <div class="overflow-x-auto">
-    <table class="min-w-full bg-white border border-gray-200">
-    <thead class="bg-gray-200 text-left text-sm">
-    <tr>
-    <th class="p-2 border">Item Name</th>
-    <th class="p-2 border">Category</th>
-    <th class="p-2 border">Stock</th>
-    <th class="p-2 border">Price (Member)</th>
-    <th class="p-2 border">Expiry Date</th>
-    <th class="p-2 border">Actions</th>
-    </tr>
-    </thead>
-    <tbody id="inventoryTable" class="text-sm">
-    <!-- Dynamic rows will go here -->
-    </tbody>
-    </table>
-    </div>
-    </section>        
+  <section class="form-section">
+  <h2>Add New Item</h2>
+  <form id="addItemForm">
+  <select id="category" required>
+  <option value="" disabled selected>Select Category</option>
+  <option value="Nutritionals">Nutritionals</option>
+  <option value="Celavive">Celavive</option>
+  </select>
+  
+  <select id="itemName" required>
+  <option value="" disabled selected>Select Item</option>
+  </select>
+  
+  <input type="number" id="stock" placeholder="Stock Quantity" required />
+  <input type="date" id="expiry" required />
+  
+  <button type="submit" id="additem">Add Item</button>
+  </form>
+  </section>
+  
+  <!-- Table Section -->
+  <section class="table-section">
+  <h2>Inventory List</h2>
+  <div class="overflow-x-auto">
+  <table>
+  <thead>
+  <tr>
+  <th>Item Name</th>
+  <th>Category</th>
+  <th>Stock</th>
+  <th>Price (Member)</th>
+  <th>Expiry Date</th>
+  <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody id="inventoryTable">
+  <!-- Dynamic rows will go here -->
+  </tbody>
+  </table>
+  </div>
+  </section>
         
         
         
     </div>
     
-    
+
     
     </div>
 
