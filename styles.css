@@ -1147,8 +1147,9 @@ td[contenteditable="true"] {
         @media (max-width: 600px) {
             
             .header {
-            position: sticky;
-            height: 63px
+            position: fixed;
+            height: 63px;
+            z-index: 9999px;
 
             }
 
@@ -1491,6 +1492,7 @@ td[contenteditable="true"] {
                                         flex-wrap: nowrap; /* Prevent wrapping */
                                         overflow-x: auto;  /* Allow horizontal scrolling */
                                         gap: 8px;
+                                        z-index: 1;
                                     }
                                     
                                     .controls > div {
