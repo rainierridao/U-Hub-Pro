@@ -57,11 +57,45 @@ form#addItemForm {
   gap: 15px;
 }
 
-@media (min-width: 768px) {
-  form#addItemForm {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* FORM SECTION - MOBILE FIRST (4 ROWS) */
+form#addItemForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
+
+/* Desktop/Tablet (2 columns) */
+@media (min-width: 768px) {
+    form#addItemForm {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Make button span 2 columns */
+    button#additem {
+        grid-column: span 2;
+    }
+}
+
+/* Input styling (keep your existing) */
+select, input[type="number"], input[type="date"] {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+}
+    
+    button#additem {
+        background: #0b72c9;
+        color: white;
+        padding: 14px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
 
 select, input[type="number"], input[type="date"] {
   padding: 10px;
@@ -221,6 +255,8 @@ select, input[type="number"], input[type="date"] {
   <section class="form-section">
   <h2>Add New Item</h2>
   <form id="addItemForm">
+  
+  
   <select id="category" required>
   <option value="" disabled selected>Select Category</option>
   <option value="Nutritionals">Nutritionals</option>
