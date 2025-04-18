@@ -1,4 +1,8 @@
 
+
+
+
+
                     window.addEventListener("load", () => {
                         setTimeout(() => {
         document.getElementById("loading-screen").style.animation = "fadeOut 0.5s forwards";
@@ -280,7 +284,5 @@ document.querySelectorAll('.sidebar a').forEach(link => {
         link.classList.add('active');
     }
 });
-
-
 
 

@@ -11,16 +11,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USANA BC Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="Firebasenameandlogout.js"></script>
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
                     <div id="loading-screen">
+                    <!-- Loader -->
                     <div id="loader" class="loader-overlay">
                     <div class="loader-spinner"></div>
                     </div>
                     </div>
+                    
+                    
+                    
 
 
 <!-- Topbar Icons -->
@@ -28,7 +37,11 @@
 <a href="dashboard.html" class="active"  title="BC Tracker"><i class="fas fa-sitemap"></i></a>
 <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
 <a href="blueguide.html"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
-<a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+<a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+<!-- Logout Button in Sidebar -->
+<a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+<i class="fas fa-sign-out-alt"></i>
+</a>
 </div>
     <div class="header">
     <div class="logo">
@@ -47,12 +60,21 @@
     <a href="dashboard.html" class="active"  title="BC Tracker"><i class="fas fa-sitemap"></i></a>
     <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
     <a href="blueguide.html"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
-    <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
-
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+    <i class="fas fa-sign-out-alt"></i>
+    </a>
     </div>
     
     <!-- Content Area -->
     <div class="content">
+    <!-- Header with ID instead of class -->
+    <header id="mainHeader">
+    <p id="greeting" class="greeting-text">Hi, User</p>
+    </header>
+    
+    
     <div class="main-content">
     <!-- Left Section -->
     <div class="left-section">
@@ -140,6 +162,9 @@
     </div> <!-- End Content -->
     </div> <!-- End Dashboard -->
 
-    <script src="script.js"></script>                                                                                            
+    <script src="script.js">
+    </script>           
+                                                                                 
+
 </body>
 </html>

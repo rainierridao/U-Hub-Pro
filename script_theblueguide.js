@@ -68,3 +68,5 @@ dropdown.addEventListener('change', () => {
     minimalTable.appendChild(createRow(item));
   });
 });
+
+

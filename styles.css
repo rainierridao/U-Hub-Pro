@@ -35,6 +35,26 @@ body {
     top: 0;
 }
 
+
+
+/* Replace .header with #mainHeader */
+#mainHeader {
+background-color: #424242;
+color: white;
+padding: 1rem;
+border-radius: 0.25rem;
+box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.greeting-text {
+    font-size: 0.875rem;
+    line-height: 0.1rem;
+}
+
+
 .logo {
     font-size: 30px;
     font-weight: bold;
@@ -93,6 +113,7 @@ body {
 }
 
 
+/* Default sidebar link styles (keep existing) */
 .sidebar a {
     text-decoration: none;
     color: #999;
@@ -114,9 +135,39 @@ body {
     border-radius: 10px;
 }
 
-.sidebar a.active i {
-    color: white;
-}
+/* Override ONLY for the logout button */
+    /* Shared styles for BOTH logout buttons */
+        #sidebarLogoutBtn,
+        #topbarLogoutBtn {
+        color: #ff5252 !important;
+        cursor: pointer;
+        position: relative;
+        z-index: 100;
+        }
+        
+        /* Sidebar-specific adjustments */
+        #sidebarLogoutBtn {
+                }
+        
+        /* Topbar-specific adjustments (if needed) */
+        #topbarLogoutBtn {
+        /* Add topbar-specific styles here */
+        /* Example: padding: 8px; */
+        }
+        
+        /* Hover states for both */
+            #sidebarLogoutBtn:hover,
+            #topbarLogoutBtn:hover {
+            color: #ff0000 !important;
+            background: transparent !important;
+            }
+            
+            /* Icon styles for both */
+                #sidebarLogoutBtn i,
+                #topbarLogoutBtn i {
+                pointer-events: none; /* Let parent handle clicks */
+                }
+
 
 /* ========== CONTENT ========== */
 .content {
@@ -502,7 +553,7 @@ td[contenteditable="true"] {
             justify-content: space-around;
             align-items: center;
             position: sticky;
-            top: 55px; /* or adjust based on header height */
+            top: 55px;
             background-color: #ffffff;
             border-top: 1px solid #ddd;
             padding: 10px 0;
@@ -523,8 +574,39 @@ td[contenteditable="true"] {
             border-radius: 5px;
         }
         
+        /* Override for top bar logout button */
+            .topbar #sidebarLogoutBtn {
+            color: #ff5252 !important;
+            }
             
-    }        
+            .topbar #sidebarLogoutBtn:hover {
+            color: #ff0000 !important;
+            background-color: rgba(255, 82, 82, 0.1) !important;
+            }
+            
+            .topbar #sidebarLogoutBtn i {
+            color: inherit !important;
+            }
+            
+            /* Sidebar logout styles (keep if you also have a sidebar logout) */
+                .sidebar #sidebarLogoutBtn,
+                .sidebar a.sidebar-logout {
+                    color: #ff5252 !important;
+                    margin-top: auto;
+                }
+                
+                .sidebar #sidebarLogoutBtn:hover,
+                .sidebar a.sidebar-logout:hover {
+                    color: #ff0000 !important;
+                    background-color: transparent !important;
+                }
+                
+                .sidebar #sidebarLogoutBtn i,
+                .sidebar a.sidebar-logout i {
+                    color: inherit !important;
+                }
+                
+}
         
         /* ========== CONTENT ========== */
         .content {
@@ -1029,6 +1111,7 @@ td[contenteditable="true"] {
             justify-content: center;
             align-items: center;
             z-index: 9999;
+            transition: opacity 0.5s ease;
         }
         
         .loader-spinner {
@@ -1436,4 +1519,7 @@ td[contenteditable="true"] {
                                                                                                                         }
 
                                 }
+                                
+                                
+                                
                                 

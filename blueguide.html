@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="Firebasenameandlogout.js"></script>
 </head>
 <style>
 /* Remove all horizontal scrolling */
@@ -56,7 +61,11 @@ table {
     <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
     <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
     <a href="blueguide.html" class="active"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
-    <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+    <i class="fas fa-sign-out-alt"></i>
+    </a>
     </div>
 
 <div class="header">
@@ -75,13 +84,20 @@ table {
     <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
     <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
     <a href="blueguide.html" class="active"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
-    <a href="#" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
-
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+    <i class="fas fa-sign-out-alt"></i>
+    </a>
     </div>
     
     
     <!-- Content -->
     <div class="content">
+    <!-- Header with ID instead of class -->
+    <header id="mainHeader">
+    <p id="greeting" class="greeting-text">Hi, User</p>
+    </header>
     <div class="main-content blue-guide" style="background-color: #fff; display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
     
     <!-- Illness Dropdown -->
@@ -159,6 +175,11 @@ table {
 
         <script src="script.js" defer></script>
         <script src="script_theblueguide.js" defer></script>
+
+<script>
+        
+        
+</script>
 
 </body>
 </html>
