@@ -208,6 +208,7 @@
     <div class="signup-container">
         <form id="signupForm">
             <input type="text" placeholder="Username" id="username" name="username" required>
+            <input type="text" placeholder="Full Name" id="fullname" name="fullname" required>
             <input type="email" placeholder="Email Address" id="email" name="email" required>
                     <div class="birthday-container">
                     <div class="select-wrapper">
@@ -362,6 +363,7 @@
                     event.preventDefault();
                     
                     const username = document.getElementById('username').value.trim();
+                    const fullname = document.getElementById('fullname').value.trim();
                     const email = document.getElementById('email').value.trim();
                     const birthMonth = document.getElementById('birthMonth').value;
                     const birthDay = document.getElementById('birthDay').value;
@@ -389,6 +391,7 @@
             // Save additional user data to Firestore
             return db.collection('users').doc(user.uid).set({
                 username: username,
+                fullname: fullname,
                 email: email,
                 birthday: birthday,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()

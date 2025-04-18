@@ -24,7 +24,8 @@ const db = firebase.firestore();
         if (doc.exists) {
             const data = doc.data();
             const username = data.username || "User";
-            document.getElementById("greeting").innerText = `Hi, ${username}!`;
+            const fullname = data.fullname || "User";
+            document.getElementById("greeting").innerText = `Hi, ${fullname}!`;
         }
         // Hide loader after username is set and inventory is loaded
         loadInventory().then(() => {
