@@ -52,8 +52,19 @@ html, body {
     }
 }
 
-
-</style>
+.product-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.product-quantity {
+    order: 1; /* Moves quantity to bottom */
+}
+.remove-btn {
+    order: 2; /* Moves button to top */
+    padding: 0 4px;
+}</style>
 <body>
 
 
