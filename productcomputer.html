@@ -38,6 +38,7 @@ html, body {
 }
 
 
+
 /* Optional: make sure sidebar doesnt push layout */
     .sidebar {
         max-width: 80px;
@@ -66,7 +67,23 @@ html, body {
 display: inline-block; /* Show fee input when toggled */
 }
 
+.product-quantity {
+    position:absolute;
+    margin-top: -10px;
+    margin-right: -8px;
 
+}
+
+.remove-btn {
+    position:relative !important;
+    margin-top: 36px !important;
+    margin-right: 341px !important;
+    line-height: 2 !important;
+
+    
+    
+    
+}
 
 
 @media (max-width: 600px) {
@@ -81,24 +98,44 @@ display: inline-block; /* Show fee input when toggled */
     select {
         margin-left: 5px;
     }
-    
+        .product-quantity {
+            position:relative;
+            margin-top: -4px;
+            margin-right: 0px;
+            
+            
+        }       .remove-btn {
+            position:relative !important;
+            margin-top: 0px !important;
+            margin-right: -2px !important;
+            line-height: 1.5 !important;
+
+            
+        }    
 }
 
-.product-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-.product-quantity {
-    order: 1; /* Moves quantity to bottom */
-}
-.remove-btn {
-    order: 2; /* Moves button to top */
-    padding: 0 4px;
-}
+        .product-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .product-quantity {
+            order: 1; /* Moves quantity to bottom */
+        }
+        .remove-btn {
+            order: 2; /* Moves button to top */
+            padding: 0 4px;
+        }
 
-
+        .package-contents {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .toggle-contents.active + .package-contents {
+            max-height: 1000px; /* Adjust based on content size */
+        }
 
 
 </style>
@@ -161,6 +198,10 @@ display: inline-block; /* Show fee input when toggled */
         <span class="full-text">Celavive</span>
         <span class="short-text">C</span>
         </button>
+        <button onclick="setCategory('packages')">
+        <span class="full-text">Packages</span>
+        <span class="short-text">P</span>
+        </button>
         </div>
         
         <div class="controls-right-group">
@@ -173,7 +214,7 @@ display: inline-block; /* Show fee input when toggled */
         </select>
         </label>
         <div>
-        <button id="sortButton" onclick="toggleSort()" style="padding: 5px 10px; background: #e0e0e0; border-radius: 4px; width:65px;">
+        <button id="sortButton" onclick="toggleSort()" style="padding: 5px 10px; background: #e0e0e0; border-radius: 4px; width:70px;">
         <i class="fas fa-random"></i>
         </button>
         </div>
@@ -225,7 +266,7 @@ display: inline-block; /* Show fee input when toggled */
         function updateSortButtonText() {
             const sortButton = document.getElementById('sortButton');
             const icons = [];
-            const texts = ['A-Z', 'PHP ↓', 'SVP ↓'];
+            const texts = ['A-Z', 'PHP↓', 'SVP↓'];
             
             // Remove all icon classes and add the current one
             sortButton.querySelector('i').className = 'fas ' + icons[currentSortMode];
@@ -295,9 +336,51 @@ const products = {
         "Replenishing Night Gel": { member: 1900, srp: 2280, ao: 1900, svp: 16, unitCount: 70, unitType: "application" },
         "Resurfacing 4-in-1 Serum": { member: 5500, srp: 6600, ao: 5500, svp: 60, unitCount: 70, unitType: "application" }
 
+    },
+    packages: {
+        "Healthy Lifestyle Pack 3BC": {
+            member: 52490,
+            srp: 52490,
+            ao: 52490,
+            svp: 500,
+            contents: [
+                "4 CellSentials",
+                "3 Proflavanol C100",
+                "4 BiOmega",
+                "2 CoQuinone 30",
+                "3 MagneCal D",
+                "1 Visionex",
+                "2 Hepasil DTX",
+                "1 Nutrimeal Dutch Chocolate",
+                "1 Nutrimeal French Vanilla",
+                "1 Small Blender Bottle",
+                "2 Usanimals",
+                "1 Proglucamune",
+                "10 Cycles of Business Accelerator Suite",
+                "1 Business Development System"
+            ],
+            description: "By enrolling in this exclusive package, you gain access to premium USANA products worth ₱75,000 (SRP) at the significantly reduced cost of ₱52,490."
+        },
+        "Healthy Foundation Pack 1BC": {
+            member: 30490,
+            srp: 30490,
+            ao: 30490,
+            svp: 300,
+            contents: [
+                "4 CellSentials",
+                "3 Proflavanol C100",
+                "2 MagneCal D",
+                "2 BiOmega",
+                "2 CoQuinone 30",
+                "1 Whitening Toothpaste",
+                "5 Cycles of Business Accelerator Suite",
+                "1 Business Development System"
+            ],
+            description: "Get ₱47,000 (SRP) worth of USANA products for only ₱30,490 - premium nutrition and business tools at outstanding value."
+        }
     }
 };
-
+                    
 let selectedCategory = 'supplements';
 let selectedPrice = 'member';
 const cart = {};
@@ -344,25 +427,88 @@ function addToCart(name) {
         const div = document.createElement("div");
         div.className = "product";
         
+        // Determine the unit price display based on product type
+        let unitPriceDisplay = '';
+    if (product.contents) {
+        // Package product display with toggle functionality
+        unitPriceDisplay = `
+                <div class="product-unit-price" style="font-size: 0.8em; color: #666; text-align: left;">
+                        <span class="toggle-contents" 
+                                    style="cursor: pointer; color: #0066cc; font-weight: bold;"
+                                    onclick="togglePackageDetails(this, event)">
+                                ► Show Contents
+                        </span>
+                        <div class="package-contents" style="display: none;">
+                                <ul style="margin: 5px 0 0 15px; padding: 0; font-size: 0.75em;">
+                                        ${product.contents.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                                ${product.description ? `
+                                <div style="font-style: italic; margin-top: 5px;">
+                                        ${product.description}
+                                </div>` : ''}
+                        </div>
+                </div>
+        `;
+}
+
+else if (product.unitCount && product.unitType) {
+            // Regular product display
+            unitPriceDisplay = `
+                <div class="product-unit-price" style="font-size: 0.8em; color: #666; text-align: left;">
+                    (₱${Math.round(product[selectedPrice]/product.unitCount)} per ${product.unitType})
+                </div>
+            `;
+        }
+        
         div.innerHTML = `
             <div style="display: flex; justify-content: space-between; width: 100%;">
                 <div style="flex: 1; min-width: 0; padding-right: 10px;">
                     <div class="product-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         ${name}
                     </div>
-                    <div class="product-unit-price" style="font-size: 0.8em; color: #666; text-align: left;">
-    (₱${Math.round(product[selectedPrice]/product.unitCount)} per ${product.unitType})
-</div>
-</div>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                    ${unitPriceDisplay}
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; position: relative;">
                     <div style="text-align: right;">
                         <div class="product-price" style="font-weight: 600;">₱${product[selectedPrice]}</div>
                         <div class="product-svp" style="color: #666; font-size: 0.9em;">SVP: ${product.svp}</div>
                     </div>
                     ${qty > 0 ? `
-                    <div class="product-controls" style="display: flex; flex-direction: column; align-items: center; min-width: 30px;">
-                        <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart('${name}')">-</button>
-                        <div class="product-quantity">${qty}</div>
+                    <div class="product-controls" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        height: 45px;
+                        width: 40px;
+                        min-width: 40px;
+                        text-align: center;
+                        gap: 2px;
+                        ${window.innerWidth >= 768 ? `
+                            position: relative;
+                            padding-left: 30px;
+                        ` : ''}
+                    ">
+                        <div class="product-quantity" style="
+                            font-size: 0.85em;
+                            ${window.innerWidth >= 768 ? 'margin-left: 10px;' : ''}
+                        ">${qty}</div>
+                        <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart('${name}')" style="
+                            width: 24px;
+                            height: 24px;
+                            font-size: 16px;
+                            padding: 0;
+                            line-height: 1;
+                            border: none;
+                            background: #ccc;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            ${window.innerWidth >= 768 ? `
+                                position: absolute;
+                                left: 0px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                            ` : ''}
+                        ">−</button>
                     </div>
                     ` : ''}
                 </div>
@@ -376,12 +522,12 @@ function addToCart(name) {
     updateTotal();
 }
 
-                            
+
                             function updateTotal() {
                                 let total = 0;
                                 let svpTotal = 0;
                                 for (let name in cart) {
-                                    const product = products.supplements[name] || products.skincare[name];
+                                    const product = products.supplements[name] || products.skincare[name] || products.packages[name];
                                     total += product[selectedPrice] * cart[name];
                                     svpTotal += product.svp * cart[name];
                                 }
@@ -397,7 +543,7 @@ function addToCart(name) {
     
     // Calculate product totals
     for (let name in cart) {
-        const product = products.supplements[name] || products.skincare[name];
+        const product = products.supplements[name] || products.skincare[name] || products.packages[name];
         subtotal += product[selectedPrice] * cart[name];
         svpTotal += product.svp * cart[name];
     }
@@ -420,7 +566,7 @@ function addToCart(name) {
 }
                         
                                     
-                        function copySummary() {
+                    function copySummary() {
     // Calculate totals including delivery fee
     const { subtotal, deliveryFee, total, svpTotal } = updateTotal();
     
@@ -430,13 +576,26 @@ function addToCart(name) {
     
     // Products
     for (let name in cart) {
-        const product = products.supplements[name] || products.skincare[name];
+        const product = products.supplements[name] || products.skincare[name] || products.packages[name];
         const qty = cart[name];
         if (qty > 0) {
             const itemTotal = product[selectedPrice] * qty;
             text += `➤ ${name}\n`;
             text += `   ${qty} × ₱${product[selectedPrice].toLocaleString()} = ₱${itemTotal.toLocaleString()}\n`;
-            text += `   (${product.svp * qty} SVP)\n\n`;
+            text += `   (${product.svp * qty} SVP)\n`;
+            
+            // Add package contents if this is a package
+            if (product.contents) {
+                text += `   📦 Package includes:\n`;
+                product.contents.forEach(item => {
+                    text += `      • ${item}\n`;
+                });
+                if (product.description) {
+                    text += `\n   ℹ️ ${product.description}\n`;
+                }
+            }
+            
+            text += `\n`;
         }
     }
     
@@ -479,6 +638,24 @@ renderProducts();
         renderProducts();
 
 
+
+
+function togglePackageDetails(element, event) {
+    event.stopPropagation(); // Prevent the click from bubbling up to the product div
+    const contentsDiv = element.nextElementSibling;
+    const isHidden = contentsDiv.style.display === 'none';
+    
+    contentsDiv.style.display = isHidden ? 'block' : 'none';
+    element.textContent = isHidden ? '▼ Hide Contents' : '► Show Contents';
+}
+
+
+div.onclick = (e) => {
+    // Only add to cart if the click wasn't on the toggle
+    if (!e.target.classList.contains('toggle-contents')) {
+                                    addToCart(name);
+                                }
+                            };
 
 
     </script>
