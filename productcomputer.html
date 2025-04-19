@@ -44,6 +44,31 @@ html, body {
         overflow-x: hidden;
     }
 
+
+/* Delivery toggle styles */
+.delivery-toggle {
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.delivery-toggle label {
+    cursor: pointer;
+    color: #666;
+}
+.delivery-toggle input[type="number"] {
+    padding: 2px 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: none; /* Hidden by default */
+}
+#deliveryToggle:checked ~ input[type="number"] {
+display: inline-block; /* Show fee input when toggled */
+}
+
+
+
+
 @media (max-width: 600px) {
     .content {
         margin-top: 60px;
@@ -161,13 +186,22 @@ html, body {
         <div class="total-info">
         <span class="total-label">Total: ₱<span id="totalAmount">0</span></span>
         <span class="svp-label">SVP: <span id="svpAmount">0</span></span>
+        
+        <!-- Compact delivery toggle -->
+        <span class="delivery-toggle">
+        <label title="Add delivery fee">
+        <i class="fas fa-truck"></i>
+        <input type="checkbox" id="deliveryToggle" hidden>
+        </label>
+        <input type="number" id="feeAmount" placeholder="₱" min="0" style="width: 70px; color:black;">
+        </span>
         </div>
+        
         <div class="button-container">
         <button class="btn-clear" onclick="clearAll()">Clear</button>
         <button class="btn-clear copy-summary" onclick="copySummary()">Copy Summary</button>
         </div>
-        </div>
-        
+        </div>        
         
         
     </div>
@@ -355,16 +389,46 @@ function addToCart(name) {
                                     document.getElementById("svpAmount").innerText = svpTotal;
                                     }
                                     
-                                    function copySummary() {
-    // Header
+                                    
+                                    
+    function updateTotal() {
+    let subtotal = 0;
+    let svpTotal = 0;
+    
+    // Calculate product totals
+    for (let name in cart) {
+        const product = products.supplements[name] || products.skincare[name];
+        subtotal += product[selectedPrice] * cart[name];
+        svpTotal += product.svp * cart[name];
+    }
+
+    // Apply delivery fee if enabled
+    let deliveryFee = 0;
+    const deliveryToggle = document.getElementById("deliveryToggle");
+    if (deliveryToggle.checked) {
+        deliveryFee = parseFloat(document.getElementById("feeAmount").value) || 0;
+    }
+
+    const total = subtotal + deliveryFee;
+    
+    // Update UI
+    document.getElementById("totalAmount").innerText = total.toLocaleString();
+    document.getElementById("svpAmount").innerText = svpTotal;
+    
+    // Return values for copySummary
+    return { subtotal, deliveryFee, total, svpTotal };
+}
+                        
+                                    
+                        function copySummary() {
+    // Calculate totals including delivery fee
+    const { subtotal, deliveryFee, total, svpTotal } = updateTotal();
+    
     let text = `🛒 Order Summary\n`;
     text += `📅 ${new Date().toLocaleDateString()}\n`;
     text += `💰 ${document.getElementById('priceType').value.toUpperCase()} Price\n\n`;
     
     // Products
-    let total = 0;
-    let svpTotal = 0;
-    
     for (let name in cart) {
         const product = products.supplements[name] || products.skincare[name];
         const qty = cart[name];
@@ -373,23 +437,42 @@ function addToCart(name) {
             text += `➤ ${name}\n`;
             text += `   ${qty} × ₱${product[selectedPrice].toLocaleString()} = ₱${itemTotal.toLocaleString()}\n`;
             text += `   (${product.svp * qty} SVP)\n\n`;
-            total += itemTotal;
-            svpTotal += product.svp * qty;
         }
     }
     
-    // Footer
+    // Delivery fee
+    const deliveryToggle = document.getElementById("deliveryToggle");
+    if (deliveryToggle.checked && deliveryFee > 0) {
+        text += `🚚 Delivery Fee: ₱${deliveryFee.toLocaleString()}\n\n`;
+    }
+    
+    // Totals
     text += `───────────\n`;
-    text += `Subtotal: ₱${total.toLocaleString()}\n`;
+    text += `Subtotal: ₱${subtotal.toLocaleString()}\n`;
+    if (deliveryToggle.checked && deliveryFee > 0) {
+        text += `Delivery Fee: ₱${deliveryFee.toLocaleString()}\n`;
+    }
     text += `Total SVP: ${svpTotal}\n`;
     text += `───────────\n`;
-    text += `TOTAL: ₱${total.toLocaleString()}`;
+    text += `TOTAL: ₱${total.toLocaleString()}\n`;
     
     navigator.clipboard.writeText(text).then(() => {
-        alert("Messenger-ready summary copied!");
+        alert("Order summary copied to clipboard!");
     });
-}        
-        
+}
+
+// Initialize delivery toggle
+document.getElementById("deliveryToggle").addEventListener("change", function() {
+    const feeInput = document.getElementById("feeAmount");
+    feeInput.style.display = this.checked ? "inline-block" : "none";
+    if (this.checked) feeInput.focus();
+    updateTotal();
+});
+
+// Update total when delivery fee amount changes
+document.getElementById("feeAmount").addEventListener("input", updateTotal);
+
+
         // Initialize the sort button text
 updateSortButtonText();
 renderProducts();
