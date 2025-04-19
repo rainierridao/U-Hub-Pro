@@ -1198,14 +1198,22 @@ td[contenteditable="true"] {
                         background: #fff;
                         padding: 15px 20px;
                         display: flex;
-                        justify-content: space-between;
+                        justify-content: space-between; /* This will push left and right groups apart */
                         align-items: center;
                         flex-wrap: wrap;
                         border-bottom: 1px solid #ccc;
                         z-index: 999;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
                     }
                     
+                    /* Add this new rule */
+                    .controls-right-group {
+                        display: flex;
+                        align-items: center;
+                        gap: 5px; /* Space between price type and sort button */
+                    }
+                    
+
                     .controls button, .controls select {
                         margin: 5px;
                         padding: 8px 15px;
