@@ -356,50 +356,37 @@ function addToCart(name) {
                                     }
                                     
                                     function copySummary() {
-    let text = `========================
-        ORDER SUMMARY
-========================\n\n`;
+    // Header
+    let text = `🛒 Order Summary\n`;
+    text += `📅 ${new Date().toLocaleDateString()}\n`;
+    text += `💰 ${document.getElementById('priceType').value.toUpperCase()} Price\n\n`;
     
+    // Products
     let total = 0;
     let svpTotal = 0;
-    const date = new Date().toLocaleDateString('en-US', {
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric'
-    });
-
-    // Header with date
-    text += `Date: ${date}\n`;
-    text += `Price Type: ${document.getElementById('priceType').value.toUpperCase()}\n\n`;
-    
-    // Product listing
-    text += `PRODUCTS:\n`;
-    text += `--------------------------------\n`;
     
     for (let name in cart) {
         const product = products.supplements[name] || products.skincare[name];
         const qty = cart[name];
         if (qty > 0) {
             const itemTotal = product[selectedPrice] * qty;
-            text += `• ${name}\n`;
-            text += `  Qty: ${qty} × ₱${product[selectedPrice].toLocaleString()} = ₱${itemTotal.toLocaleString()}\n`;
-            text += `  SVP: ${product.svp * qty}\n\n`;
+            text += `➤ ${name}\n`;
+            text += `   ${qty} × ₱${product[selectedPrice].toLocaleString()} = ₱${itemTotal.toLocaleString()}\n`;
+            text += `   (${product.svp * qty} SVP)\n\n`;
             total += itemTotal;
             svpTotal += product.svp * qty;
         }
     }
     
-    // Summary
-    text += `--------------------------------\n`;
-    text += `SUBTOTAL:    ₱${total.toLocaleString()}\n`;
-    text += `TOTAL SVP:   ${svpTotal}\n`;
-    text += `========================\n`;
-    text += `GRAND TOTAL: ₱${total.toLocaleString()}\n`;
-    text += `========================\n\n`;
-    text += `Thank you for your order!`;
-
+    // Footer
+    text += `──────────────\n`;
+    text += `Subtotal: ₱${total.toLocaleString()}\n`;
+    text += `Total SVP: ${svpTotal}\n`;
+    text += `──────────────\n`;
+    text += `TOTAL: ₱${total.toLocaleString()}`;
+    
     navigator.clipboard.writeText(text).then(() => {
-        alert("Professional order summary copied to clipboard!");
+        alert("Messenger-ready summary copied!");
     });
 }        
         
