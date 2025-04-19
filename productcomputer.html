@@ -78,7 +78,7 @@ html, body {
         .product-content {
             display: flex;
             width: 100%;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease 0.1s;
         }
         
         .remove-swipe-area {
@@ -98,6 +98,10 @@ html, body {
         
         .swiping .remove-swipe-area {
             transform: translateX(0);
+        }
+        .remove-swipe-area {
+            width: 70px; /* was 80px */
+            transition: transform 0.3s ease 0.1s; /* 100ms delay */
         }
 
 
@@ -411,7 +415,56 @@ function addToCart(name) {
         
         renderProducts();
 
+// In your renderProducts function:
+let startX, startY, currentX, startTime, canSwipe = false;
 
+div.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    currentX = startX;
+    startTime = Date.now();
+    canSwipe = false;
+    
+    swipeTimeout = setTimeout(() => {
+        canSwipe = true;
+    }, 100);
+}, { passive: true });
+
+div.addEventListener('touchmove', (e) => {
+    if (!canSwipe) return;
+    
+    currentX = e.touches[0].clientX;
+    const diff = startX - currentX;
+    
+    // Require primarily horizontal movement (25px vertical tolerance)
+    if (Math.abs(e.touches[0].clientY - startY) < 25 && diff > 0) {
+        div.classList.add('swiping');
+        productContent.style.transform = `translateX(-${Math.min(diff, 70)}px)`;
+    }
+}, { passive: true });
+
+div.addEventListener('touchend', () => {
+    clearTimeout(swipeTimeout);
+    const diff = startX - currentX;
+    const timeDiff = Date.now() - startTime;
+    const velocity = diff / Math.max(timeDiff, 1);
+    
+    // Require both distance and speed threshold
+    if (diff > 100 && velocity > 0.3) {
+        removeFromCart(name);
+    } else {
+        div.classList.remove('swiping');
+        productContent.style.transform = 'translateX(0)';
+    }
+    canSwipe = false;
+}, { passive: true });
+
+// Add this to prevent scrolling while swiping
+div.addEventListener('touchmove', (e) => {
+    if (div.classList.contains('swiping')) {
+                                                    e.preventDefault();
+                                                }
+                                                }, { passive: false });
 
 
     </script>
