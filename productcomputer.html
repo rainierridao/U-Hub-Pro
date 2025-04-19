@@ -379,10 +379,10 @@ function addToCart(name) {
     }
     
     // Footer
-    text += `──────────────\n`;
+    text += `───────────\n`;
     text += `Subtotal: ₱${total.toLocaleString()}\n`;
     text += `Total SVP: ${svpTotal}\n`;
-    text += `──────────────\n`;
+    text += `───────────\n`;
     text += `TOTAL: ₱${total.toLocaleString()}`;
     
     navigator.clipboard.writeText(text).then(() => {
