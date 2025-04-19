@@ -64,7 +64,44 @@ html, body {
 .remove-btn {
     order: 2; /* Moves button to top */
     padding: 0 4px;
-}</style>
+}
+
+
+
+.product {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    touch-action: pan-y; /* Enable vertical scrolling while allowing horizontal swipe */
+        }
+        
+        .product-content {
+            display: flex;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .remove-swipe-area {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            background-color: #ff4444;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .swiping .remove-swipe-area {
+            transform: translateX(0);
+        }
+
+
+</style>
 <body>
 
 
@@ -238,14 +275,23 @@ function addToCart(name) {
                 if (cart[name] <= 0) delete cart[name];
                     renderProducts();
                     updateTotal();
-                    }
-                    }
                     
+                    // Optional: Show a confirmation message
+                    const productElement = document.querySelector(`.remove-swipe-area[data-product="${name}"]`).parentElement.parentElement;
+                    productElement.style.transform = 'translateX(-100%)';
+                    setTimeout(() => {
+            renderProducts();
+        }, 300);
+    }
+}
+
                     function clearAll() {
                         for (let item in cart) cart[item] = 0;
                             updateTotal();
                             renderProducts();
                             }
+                            
+                            
                             
                             function renderProducts() {
                                 selectedPrice = document.getElementById("priceType").value;
@@ -260,36 +306,78 @@ function addToCart(name) {
                                     div.className = "product";
                                     
                                     div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; width: 100%;">
-                <div style="flex: 1; min-width: 0; padding-right: 10px;">
-                    <div class="product-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${name}
-                    </div>
-                    <div class="product-unit-price" style="font-size: 0.65em; color: #666;">
-                        (₱${Math.round(product[selectedPrice]/product.unitCount)} per ${product.unitType})
+            <div class="product-content">
+                <div style="flex: 1; min-width: 0; padding: 10px; background: white;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <div style="flex: 1; min-width: 0; padding-right: 10px;">
+                            <div class="product-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${name}
+                            </div>
+                            <div class="product-unit-price" style="font-size: 0.65em; color: #666;">
+                                (₱${Math.round(product[selectedPrice]/product.unitCount)} per ${product.unitType})
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="text-align: right;">
+                                <div class="product-price" style="font-weight: 600;">₱${product[selectedPrice]}</div>
+                                <div class="product-svp" style="color: #666; font-size: 0.9em;">SVP: ${product.svp}</div>
+                            </div>
+                            ${qty > 0 ? `
+                            <div class="product-controls" style="display: flex; flex-direction: column; align-items: center; min-width: 30px;">
+                                <div class="product-quantity">${qty}</div>
+                            </div>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="text-align: right;">
-                        <div class="product-price" style="font-weight: 600;">₱${product[selectedPrice]}</div>
-                        <div class="product-svp" style="color: #666; font-size: 0.9em;">SVP: ${product.svp}</div>
-                    </div>
-                    ${qty > 0 ? `
-                    <div class="product-controls" style="display: flex; flex-direction: column; align-items: center; min-width: 30px;">
-                        <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart('${name}')">-</button>
-                        <div class="product-quantity">${qty}</div>
-                    </div>
-                    ` : ''}
+                <div class="remove-swipe-area" data-product="${name}">
+                    Remove
                 </div>
             </div>
         `;
                                     
-                                    div.onclick = () => addToCart(name);
-                                    grid.appendChild(div);
-                                });
-                                
-                                updateTotal();
-                            }               
+                                    // Add swipe functionality
+                                    let startX, currentX;
+                                    const productContent = div.querySelector('.product-content');
+                                    
+                                    div.addEventListener('touchstart', (e) => {
+                                        startX = e.touches[0].clientX;
+                                        currentX = startX;
+                                    }, { passive: true });
+                                    
+                                    div.addEventListener('touchmove', (e) => {
+                                        currentX = e.touches[0].clientX;
+                                        const diff = startX - currentX;
+                                        
+                                        if (diff > 0) { // Only allow swipe to left
+                                            div.classList.add('swiping');
+                                            productContent.style.transform = `translateX(-${Math.min(diff, 80)}px`;
+            }
+        }, { passive: true });
+        
+        div.addEventListener('touchend', () => {
+            const diff = startX - currentX;
+            
+            if (diff > 80) { // Swiped enough to trigger remove
+                removeFromCart(name);
+            } else { // Return to normal position
+                div.classList.remove('swiping');
+                productContent.style.transform = 'translateX(0)';
+            }
+        }, { passive: true });
+        
+        // Click to add functionality remains
+        div.onclick = (e) => {
+            if (!div.classList.contains('swiping')) {
+                addToCart(name);
+            }
+        };
+        
+        grid.appendChild(div);
+    });
+    
+    updateTotal();
+}   
                             
                             function updateTotal() {
                                 let total = 0;
