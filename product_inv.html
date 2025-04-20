@@ -174,11 +174,30 @@ select, input[type="number"], input[type="date"] {
     color: #e63946;
   }
   
+    .actions-col .action-buttons {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
     
         
   @media (max-width: 600px) {
         
+        .actions-col .action-buttons {
+            display: block;
+        }
         
+        .actions-col .action-buttons button {
+            display: block;
+            width: 100%;
+            margin-left: 0;
+            text-align: left;
+        }
+        
+        .actions-col .action-buttons button:last-child {
+            margin-bottom: 0;
+        }
+
         #expiry-view:checked ~ .toggle-highlight {
         width: calc(35.7% - 4.7px) !important;
     }
@@ -334,6 +353,7 @@ select, input[type="number"], input[type="date"] {
             width: fit-content;
             transition: background 0.3s ease;
             font-size: 13px;
+            margin-right: -10px;
         }
         
         .toggle-option {
@@ -392,6 +412,156 @@ select, input[type="number"], input[type="date"] {
         width: calc(35.7% - 6.5px);
         }
 
+
+        /* Cart button styles */
+        #cartButton {
+        transition: all 0.3s ease;
+        }
+        
+        #cartButton:hover {
+        background-color: #047857;
+        }
+        
+        /* Cart Modal Styles */
+        #salesModal {
+        transition: opacity 0.3s ease;
+        }
+        
+        #salesModal.hidden {
+        display: none;
+        }
+        
+        .cart-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+
+        .quantity-btn {
+            transition: background-color 0.2s;
+        }
+        
+        .quantity-btn:hover {
+            background-color: #d1d5db;
+        }
+        
+        #cartItemsContainer {
+        max-height: 60vh;
+        overflow-y: auto;
+        }
+
+
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        #cartButton {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        }
+        
+        #cartButton:hover {
+        background-color: #047857;
+        }
+        
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        
+        
+        /* Add to your existing styles */
+        #addNewCustomer {
+        transition: background-color 0.2s ease;
+        }
+        
+        #addNewCustomer:hover {
+        background-color: #d1d5db !important;
+        }
+        
+        #newCustomerForm {
+        transition: all 0.3s ease;
+        max-height: 0;
+        overflow: hidden;
+        }
+        
+        #newCustomerForm:not(.hidden) {
+        max-height: 500px; /* Adjust as needed */
+        }
+        
+        
+        /* Add to your existing styles */
+        .toast {
+            animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-in 1.5s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+        
+        
+        .cart-button {
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #16a34a; /* green-600 */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .cart-button i {
+            font-size: 16px;
+            margin-right: 0.5rem;
+        }
+        
+        .cart-count {
+            margin-left: 0.5rem;
+            background-color: white;
+            color: #16a34a;
+            border-radius: 9999px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        /* MOBILE VIEW - hide "Cart" text and reduce button padding */
+        @media (max-width: 640px) {
+            .cart-button i {
+                width: 8px;
+                font-size: 10px;
+                margin-right: 0.5rem;
+            }
+
+            
+            .cart-text {
+                display: none;
+            }
+            
+            .cart-button {
+                padding: 0.5rem;
+            }
+            
+            .cart-button i {
+                margin-right: 0;
+            }
+        }
+    
 </style>
 <body>
 
@@ -503,6 +673,8 @@ select, input[type="number"], input[type="date"] {
     </div>
 </div>
 
+
+
   
   <button type="submit" id="additem">Add Item</button>
   </form>
@@ -511,7 +683,11 @@ select, input[type="number"], input[type="date"] {
 
   <!-- Table Section -->
   <section class="table-section">
-  <h2>Inventory List</h2>
+  <h2>Inventory</h2>
+
+
+
+
 
 <div class="view-toggle-container">
     <div class="view-toggle">
@@ -538,6 +714,14 @@ select, input[type="number"], input[type="date"] {
         
         <div class="toggle-highlight"></div>
     </div>
+
+<button id="cartButton" class="cart-button">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-text">Cart</span>
+    <span id="cartCount" class="cart-count">0</span>
+</button>
+
+
 </div>
 
 
@@ -557,19 +741,100 @@ select, input[type="number"], input[type="date"] {
   </section>
         
         
-        
     </div>
-    
+    </div>
 
-    
+
+
+
+
+
+
+<!-- Sales Modal (keep this one) -->
+<div id="salesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-lg font-medium mb-4">Record Sale</h3>
+        <div class="grid grid-cols-1 gap-4">
+            <!-- Customer Selection Section -->
+<div>
+    <label class="block text-sm font-medium mb-1">Customer</label>
+    <div class="flex gap-2">
+        <select id="customerSelect" class="border p-2 rounded flex-grow">
+            <option value="" disabled selected>Select Customer</option>
+            <!-- Customers will be populated here -->
+        </select>
+        <button id="addNewCustomer" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">+ New</button>
     </div>
+    
+    <!-- New Customer Form -->
+    <div id="newCustomerForm" class="hidden mt-2">
+        <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="newCustomerName" placeholder="Full Name" class="border p-2 rounded">
+            <input type="text" id="newCustomerPhone" placeholder="Phone" class="border p-2 rounded">
+        </div>
+        <div class="mt-2">
+            <input type="text" id="newCustomerAddress" placeholder="Address" class="border p-2 rounded w-full">
+        </div>
+    </div>
+</div>            
+
+
+
+
+                <!-- Cart Items -->
+                        <div id="cartItemsContainer" class="mb-4 max-h-60 overflow-y-auto">
+                                <!-- Cart items populated dynamically -->
+                        </div>
+                        
+                        <!-- Cart Total -->
+                        <div id="cartTotal" class="cart-total">
+                                Total: ₱0
+                        </div>
+
+
+            
+            <!-- Payment Type -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Payment</label>
+                <select id="paymentType" class="border p-2 rounded w-full">
+                    <option value="full">Full Payment</option>
+                    <option value="partial">Partial Payment</option>
+                </select>
+            </div>
+            
+            <!-- Amount Paid -->
+            <div id="amountPaidContainer" class="hidden">
+                <label class="block text-sm font-medium mb-1">Amount Paid</label>
+                <input type="number" id="amountPaid" class="border p-2 rounded w-full" min="0">
+            </div>
+        </div>
+        
+        <div class="mt-4 flex justify-end space-x-2">
+            <button id="cancelSale" class="px-4 py-2 border rounded">Cancel</button>
+            <button id="confirmSale" class="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 <!-- Loader -->
 <div id="loader" class="loader-overlay">
 <div class="loader-spinner"></div>
 </div>
 
+
+
+
+
 <script>
+
+
+
+
 
 
 function generateTableHeaders(viewMode) {
@@ -689,6 +954,9 @@ function saveViewPreference(viewMode) {
 document.addEventListener('DOMContentLoaded', function() {
     const savedView = localStorage.getItem('inventoryViewMode') || 'full';
     const radio = document.querySelector(`input[value="${savedView}"]`);
+
+
+
     if (radio) {
         radio.checked = true;
         updateTableView(savedView);
@@ -1056,12 +1324,15 @@ function addRowToTable(id, data) {
         tr.classList.add("bg-yellow-50");
     }
 
-    // Create cells for all possible columns (they'll be hidden/shown by updateTableView)
-        tr.innerHTML = `
+    // Get the price (default to member price if available)
+    const price = data.priceInfo?.member || 0;
+    
+    // Create cells for all possible columns
+    tr.innerHTML = `
         <td class="product-col">${data.productName}</td>
         <td class="category-col">${data.category}</td>
         <td class="quantity-col">${data.quantity}</td>
-        <td class="price-col">₱${data.priceInfo?.member || 'N/A'}</td>
+        <td class="price-col">₱${price}</td>
         <td class="expiry-col">
             ${data.expiryDate ? formatExpiryDates(data.expiryDate) : 
                 `<span class="text-gray-400 italic">${data.status === 'onhand' ? 'Required' : 'Not set'}</span>`}
@@ -1080,21 +1351,27 @@ function addRowToTable(id, data) {
             ` : 'N/A'}
         </td>
         <td class="actions-col">
-            <button class="text-blue-600 hover:text-blue-800" onclick="editItem('${id}')">Edit</button>
-            <button class="text-red-600 hover:text-red-800 ml-2" onclick="deleteItem('${id}')">Delete</button>
-            ${(data.status && data.status !== 'onhand') ? 
-                `<button class="text-green-600 hover:text-green-800 ml-2" onclick="markAsReceived('${id}')">Received</button>` : 
-                ''}
+            <div class="action-buttons">
+                ${data.status === 'onhand' ? 
+                    `<button onclick="addToCart('${id.replace(/'/g, "\\'")}', '${data.productName.replace(/'/g, "\\'")}', ${price}, ${data.quantity})" 
+        class="add-to-cart-btn bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+    <i class="fas fa-cart-plus mr-1"></i> Add
+</button>` : ''}
+                
+                <button class="delete-btn text-red-600 hover:text-red-800" onclick="deleteItem('${id}')">Delete</button>
+                ${(data.status && data.status !== 'onhand') ? 
+                    `<button class="received-btn text-green-600 hover:text-green-800" onclick="markAsReceived('${id}')">Received</button>` : 
+                    ''}
+            </div>
         </td>
     `;
-        
-        inventoryTable.appendChild(tr);
-        
-        // Apply current view mode
-        const currentView = document.querySelector('input[name="view-mode"]:checked')?.value || 'full';
-        updateTableView(currentView);
-        }
-
+    
+    inventoryTable.appendChild(tr);
+    
+    // Apply current view mode
+    const currentView = document.querySelector('input[name="view-mode"]:checked')?.value || 'full';
+    updateTableView(currentView);
+}
 
 
 function formatExpiryDates(datesString) {
@@ -1131,11 +1408,7 @@ function formatExpiryDates(datesString) {
                         }
                         }
                         
-                        // Edit item (you'll need to implement this)
-async function editItem(itemId) {
-// You'll need to implement the edit functionality
-                            alert("Edit functionality to be implemented");
-                            }
+                    
                             
 
 
@@ -1306,6 +1579,702 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
     document.getElementById("expiryModal").classList.add("hidden");
     document.getElementById("stockStatus").value = "";
 });
+
+
+
+
+
+
+
+
+
+
+
+// ==================== CART SYSTEM ====================
+        let shoppingCart = [];
+        
+        // Initialize cart system
+        function initCartSystem() {
+            // Cart button click handler
+            document.getElementById('cartButton').addEventListener('click', renderCartModal);
+            
+            // Payment type change handler
+            document.getElementById('paymentType').addEventListener('change', function() {
+                document.getElementById('amountPaidContainer').classList.toggle('hidden', this.value !== 'partial');
+            });
+            
+            // Cancel sale button
+            document.getElementById('cancelSale').addEventListener('click', function() {
+                document.getElementById('salesModal').classList.add('hidden');
+            });
+            
+            // Confirm sale button
+            document.getElementById('confirmSale').addEventListener('click', processSale);
+        }
+        
+        // Render the cart modal with current items
+        function renderCartModal() {
+            const container = document.getElementById('cartItemsContainer');
+            const totalElement = document.getElementById('cartTotal');
+            
+            // Clear previous content
+            container.innerHTML = '';
+            
+            if (shoppingCart.length === 0) {
+                container.innerHTML = '<p class="text-center py-4 text-gray-500">Your cart is empty</p>';
+                totalElement.textContent = 'Total: ₱0';
+                return;
+            }
+            
+            // Add each cart item
+            shoppingCart.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">
+    <!-- Product Info -->
+    <div style="flex: 1; min-width: 0;">
+        <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</div>
+        <div style="color: #6b7280; font-size: 12px;">₱${item.price.toLocaleString()}</div>
+    </div>
+
+    <!-- Quantity Controls -->
+    <div style="display: flex; align-items: center; gap: 4px;">
+        <button style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid #d1d5db; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;" 
+                class="minus-btn" data-id="${item.id}">−</button>
+        <input type="number" value="${item.quantity}" min="1" max="${item.maxQuantity}"
+                style="width: 36px; text-align: center; padding: 2px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px; -moz-appearance: textfield;">
+        <button style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid #d1d5db; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;" 
+                class="plus-btn" data-id="${item.id}">+</button>
+    </div>
+
+    <!-- Total & Remove -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="font-weight: 500; white-space: nowrap;">₱${(item.price * item.quantity).toLocaleString()}</div>
+        <button style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px;"
+                class="remove-btn" data-id="${item.id}">
+            <i class="fas fa-trash" style="font-size: 14px;"></i>
+        </button>
+    </div>
+</div>
+       `;
+                container.appendChild(itemElement);
+            });
+            
+            // Calculate and display total
+            const total = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalElement.textContent = `Total: ₱${total.toLocaleString()}`;
+            
+            // Add event listeners to the new elements
+            addCartItemEventListeners();
+            
+            // Show the modal
+            document.getElementById('salesModal').classList.remove('hidden');
+        }
+        
+        // Add event listeners to cart item controls
+        function addCartItemEventListeners() {
+            // Plus buttons
+            document.querySelectorAll('.plus-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    updateCartItemQuantity(itemId, 1);
+                });
+            });
+            
+            // Minus buttons
+            document.querySelectorAll('.minus-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    updateCartItemQuantity(itemId, -1);
+                });
+            });
+            
+            // Quantity inputs
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const itemId = this.getAttribute('data-id');
+                    const newQuantity = parseInt(this.value);
+                    
+                    if (isNaN(newQuantity)) {
+                        this.value = 1;
+                        return;
+                    }
+                    
+                    setCartItemQuantity(itemId, newQuantity);
+                });
+            });
+            
+            // Remove buttons
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    removeCartItem(itemId);
+                });
+            });
+        }
+        
+        // Update cart item quantity by increment/decrement
+        function updateCartItemQuantity(itemId, change) {
+            const item = shoppingCart.find(item => item.id === itemId);
+            if (!item) return;
+            
+            const newQuantity = item.quantity + change;
+            
+            if (newQuantity < 1) {
+                removeCartItem(itemId);
+            } else if (newQuantity > item.maxQuantity) {
+                alert(`Only ${item.maxQuantity} available in stock`);
+            } else {
+                item.quantity = newQuantity;
+                updateCartDisplay();
+            }
+        }
+        
+        // Set cart item quantity directly
+        function setCartItemQuantity(itemId, quantity) {
+            const item = shoppingCart.find(item => item.id === itemId);
+            if (!item) return;
+            
+            const newQuantity = parseInt(quantity);
+            
+            if (isNaN(newQuantity)) {
+                alert('Please enter a valid quantity');
+                return;
+            }
+            
+            if (newQuantity < 1) {
+                removeCartItem(itemId);
+            } else if (newQuantity > item.maxQuantity) {
+                alert(`Only ${item.maxQuantity} available in stock`);
+                item.quantity = item.maxQuantity;
+                updateCartDisplay();
+            } else {
+                item.quantity = newQuantity;
+                updateCartDisplay();
+            }
+        }
+        
+        // Remove item from cart
+        function removeCartItem(itemId) {
+            shoppingCart = shoppingCart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+        }
+        
+        // Update all cart-related displays
+        function updateCartDisplay() {
+            updateCartCount();
+            renderCartModal();
+        }
+        
+        // Update the cart count badge
+        function updateCartCount() {
+            const count = shoppingCart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+        
+        // Add item to cart
+        function addToCart(productId, productName, price, maxQuantity = 999) {
+            const existingItem = shoppingCart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                if (existingItem.quantity < maxQuantity) {
+                    existingItem.quantity += 1;
+                } else {
+                    alert(`Cannot add more. Maximum available: ${maxQuantity}`);
+                    return;
+                }
+            } else {
+                shoppingCart.push({
+                    id: productId,
+                    name: productName,
+                    price: price,
+                    quantity: 1,
+                    maxQuantity: maxQuantity
+                });
+            }
+            
+            updateCartDisplay();
+            showToast(`${productName} added to cart`);
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+        
+        // Process sale (your existing implementation)
+        async function processSale() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        showToast('Please log in to process sales', 'error');
+        return;
+    }
+
+    if (shoppingCart.length === 0) {
+        showToast('Your cart is empty', 'error');
+        return;
+    }
+
+    const confirmBtn = document.getElementById('confirmSale');
+    try {
+        // Disable button during processing
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+
+        // 1. Get customer data safely
+        let customerId = '';
+        let customerName = 'Walk-in Customer';
+        
+        const customerSelect = document.getElementById('customerSelect');
+        if (customerSelect && customerSelect.value) {
+            customerId = customerSelect.value;
+            customerName = customerSelect.options[customerSelect.selectedIndex]?.text || customerName;
+        }
+
+        // 2. Get payment data
+        const paymentType = document.getElementById('paymentType').value;
+        const totalAmount = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let amountPaid = totalAmount;
+        
+        if (paymentType === 'partial') {
+            const paidInput = parseFloat(document.getElementById('amountPaid').value) || 0;
+            amountPaid = Math.min(paidInput, totalAmount);
+        }
+
+        // 3. Prepare clean sale data
+        const saleData = {
+            customerId: customerId, 
+            customerName: customerName,
+            items: shoppingCart.map(item => ({
+                productId: String(item.id),
+                name: String(item.name),
+                price: Number(item.price),
+                quantity: Number(item.quantity)
+            })),
+            totalAmount: totalAmount,
+            amountPaid: amountPaid,
+            paymentType: paymentType,
+            saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'completed',
+            processedBy: user.uid
+        };
+
+        // 4. Sanitize data before sending
+        const cleanSaleData = JSON.parse(JSON.stringify(saleData));
+
+        // 5. Save to Firestore
+        await db.collection('users').doc(user.uid).collection('sales').add(cleanSaleData);
+
+        // 6. Update inventory
+        await updateInventoryAfterSale();
+
+        // 7. Reset and show success
+        shoppingCart = [];
+        updateCartDisplay();
+        document.getElementById('salesModal').classList.add('hidden');
+        
+        showToast('Sale processed successfully!');
+        loadInventory();
+
+    } catch (error) {
+        console.error('Error processing sale:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm Sale';
+        }
+    }
+}
+
+
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initCartSystem);
+
+
+
+
+
+
+
+// ==================== CUSTOMER MANAGEMENT ====================
+
+function initCustomerSystem() {
+    setupCustomerFormToggle();
+    setupCustomerSave();
+    loadCustomers();
+    setupPaymentTypeListener();
+}
+
+function setupCustomerFormToggle() {
+    const addNewCustomerBtn = document.getElementById('addNewCustomer');
+    const newCustomerForm = document.getElementById('newCustomerForm');
+    const customerSelect = document.getElementById('customerSelect');
+
+    if (addNewCustomerBtn && newCustomerForm && customerSelect) {
+        addNewCustomerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            newCustomerForm.classList.toggle('hidden');
+            customerSelect.disabled = !newCustomerForm.classList.contains('hidden');
+            
+            // Clear form when showing
+            if (!newCustomerForm.classList.contains('hidden')) {
+                document.getElementById('newCustomerName').value = '';
+                document.getElementById('newCustomerPhone').value = '';
+                document.getElementById('newCustomerAddress').value = '';
+                customerSelect.value = '';
+            }
+        });
+    }
+}
+
+function setupPaymentTypeListener() {
+    const paymentTypeSelect = document.getElementById('paymentType');
+    const amountPaidContainer = document.getElementById('amountPaidContainer');
+    
+    if (paymentTypeSelect && amountPaidContainer) {
+        paymentTypeSelect.addEventListener('change', function() {
+            amountPaidContainer.classList.toggle('hidden', this.value !== 'partial');
+        });
+    }
+}
+
+async function saveNewCustomer() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert('Please log in to add customers');
+        return null;
+    }
+
+    const name = document.getElementById('newCustomerName').value.trim();
+    const phone = document.getElementById('newCustomerPhone').value.trim();
+    const address = document.getElementById('newCustomerAddress').value.trim();
+
+    if (!name) {
+        alert('Please enter customer name');
+        return null;
+    }
+
+    try {
+        const docRef = await db.collection('users')
+            .doc(user.uid)
+            .collection('customers')
+            .add({
+                name,
+                phone: phone || 'Not provided',
+                address: address || 'Not provided',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        
+        // Add to dropdown immediately
+        await loadCustomers();
+        
+        // Select the new customer
+        const customerSelect = document.getElementById('customerSelect');
+        customerSelect.value = docRef.id;
+        
+        return docRef.id;
+    } catch (error) {
+        console.error('Error saving customer:', error);
+        alert('Error saving customer: ' + error.message);
+        return null;
+    }
+}
+
+// Modified loadCustomers that works with auth state
+async function loadCustomers() {
+    return new Promise((resolve) => {
+        const authListener = firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const customerSelect = document.getElementById('customerSelect');
+                    customerSelect.disabled = true;
+                    customerSelect.innerHTML = '<option value="">Loading customers...</option>';
+
+                    const snapshot = await db.collection('users')
+                        .doc(user.uid)
+                        .collection('customers')
+                        .orderBy('createdAt', 'desc')
+                        .get();
+
+                    customerSelect.innerHTML = '<option value="" disabled selected>Select Customer</option>';
+
+                    if (snapshot.empty) {
+                        customerSelect.innerHTML += '<option value="" disabled>No customers found</option>';
+                    } else {
+                        snapshot.forEach(doc => {
+                            const customer = doc.data();
+                            const option = document.createElement('option');
+                            option.value = doc.id;
+                            option.textContent = customer.name || `Customer ${doc.id.substring(0, 5)}`;
+                            customerSelect.appendChild(option);
+                        });
+                    }
+                    resolve(); // Resolve the promise when done
+                } catch (error) {
+                    console.error("Error loading customers:", error);
+                    const customerSelect = document.getElementById('customerSelect');
+                    customerSelect.innerHTML = '<option value="" disabled>Error loading customers</option>';
+                    resolve();
+                } finally {
+                    const customerSelect = document.getElementById('customerSelect');
+                    if (customerSelect) {
+                        customerSelect.disabled = false;
+                    }
+                }
+            } else {
+                console.log("User not authenticated, can't load customers");
+                resolve();
+            }
+            // Remove the auth listener after the first check
+            authListener();
+        });
+    });
+}
+
+
+
+function setupCustomerSave() {
+    const confirmSaleBtn = document.getElementById('confirmSale');
+    if (confirmSaleBtn) {
+        confirmSaleBtn.addEventListener('click', async function() {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert('Please log in to complete sale');
+                return;
+            }
+
+            // Check if we're adding a new customer
+    let customerId = '';
+    let customerName = '';
+    const newCustomerForm = document.getElementById('newCustomerForm');
+    
+    if (!newCustomerForm.classList.contains('hidden')) {
+        // Save new customer first
+        customerId = await saveNewCustomer();
+        if (!customerId) return; // Stop if customer save failed
+            
+            customerName = document.getElementById('newCustomerName').value.trim();
+        } else {
+            // Get selected customer
+            const customerSelect = document.getElementById('customerSelect');
+            customerId = customerSelect.value;
+            customerName = customerSelect.options[customerSelect.selectedIndex]?.text;
+            
+            if (!customerId || customerId === '') {
+                alert('Please select a customer or add a new one');
+                return;
+            }
+                }
+                
+                // Proceed with sale processing
+                await processSale(customerId, customerName);
+                });
+                }
+                }
+                
+                async function processSale(customerId, customerName) {
+                    const user = firebase.auth().currentUser;
+                    if (!user) {
+                        alert('Please log in to process sales');
+                        return;
+                    }
+                        
+                        if (shoppingCart.length === 0) {
+                            alert('Your cart is empty');
+                            return;
+                        }
+                            
+                            try {
+                                const confirmBtn = document.getElementById('confirmSale');
+                                confirmBtn.disabled = true;
+                                confirmBtn.textContent = 'Processing...';
+                                
+                                // Get payment details
+                                const paymentType = document.getElementById('paymentType').value;
+                                const amountPaid = paymentType === 'partial' 
+                                ? parseFloat(document.getElementById('amountPaid').value) || 0
+                                : shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        // Prepare sale data
+        const saleData = {
+            customerId: customerId || 'walk-in',
+            customerName: customerName || 'Walk-in Customer',
+            items: shoppingCart.map(item => ({
+                productId: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            })),
+                                totalAmount: shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            amountPaid,
+            paymentType,
+            saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'completed'
+        };
+
+        // Save sale to Firestore
+        await db.collection('users').doc(user.uid).collection('sales').add(saleData);
+        
+        // Update inventory
+        await updateInventoryAfterSale();
+        
+        // Reset UI
+        shoppingCart = [];
+        updateCartCount();
+        document.getElementById('salesModal').classList.add('hidden');
+        document.getElementById('newCustomerForm').classList.add('hidden');
+        
+        alert('Sale processed successfully!');
+        loadInventory();
+    } catch (error) {
+        console.error('Error processing sale:', error);
+        alert('Error processing sale: ' + error.message);
+    } finally {
+        const confirmBtn = document.getElementById('confirmSale');
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm Sale';
+        }
+    }
+}
+
+
+
+
+
+// ==================== INITIALIZATION ====================
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadCustomers().then(() => {
+            initCartSystem();
+            initCustomerSystem();
+    }).catch(error => {
+        console.error("Failed to load customers:", error);
+    });
+});
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    initCartSystem();
+});
+
+
+
+
+
+
+                        async function updateInventoryAfterSale() {
+    const user = firebase.auth().currentUser;
+    if (!user || shoppingCart.length === 0) return;
+
+    const batch = db.batch();
+    
+    for (const item of shoppingCart) {
+        const inventoryRef = db.collection('users')
+            .doc(user.uid)
+            .collection('inventory')
+            .doc(item.id);
+        
+        const doc = await inventoryRef.get();
+        
+        if (doc.exists) {
+            const currentQty = doc.data().quantity;
+            const newQty = currentQty - item.quantity;
+            
+            if (newQty > 0) {
+                batch.update(inventoryRef, { quantity: newQty });
+            } else {
+                batch.delete(inventoryRef);
+            }
+        }
+    }
+    
+    await batch.commit();
+}                
+
+
+
+                                            // Helper function to find inventory item by ID
+                                            async function getInventoryItem(itemId) {
+                                                const user = auth.currentUser;
+                                                if (!user) return null;
+                                                    
+                                                    try {
+                                                        const doc = await db.collection("users")
+                                                        .doc(user.uid)
+                                                        .collection("inventory")
+                                                        .doc(itemId)
+                                                        .get();
+                                                        
+                                                        return doc.exists ? doc.data() : null;
+                                                    } catch (error) {
+                                                        console.error("Error getting inventory item:", error);
+                                                        return null;
+                                                    }
+                                                    }
+                                                    
+                                                    // Function to clear cart after successful sale
+                                                    function clearCart() {
+                                                        cartItems = [];
+                                                        updateCartCount();
+                                                        document.getElementById('cartItemsContainer').innerHTML = '';
+                                                    }
+
+
+
+// Initialize customer form toggle
+function initCustomerForm() {
+    const addNewCustomerBtn = document.getElementById('addNewCustomer');
+    const newCustomerForm = document.getElementById('newCustomerForm');
+    const customerSelect = document.getElementById('customerSelect');
+    
+    if (addNewCustomerBtn && newCustomerForm && customerSelect) {
+        addNewCustomerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            newCustomerForm.classList.toggle('hidden');
+            customerSelect.disabled = !newCustomerForm.classList.contains('hidden');
+        });
+    }
+}
+
+
+
+
+
+
+function showCartModal() {
+    console.log('showCartModal called');
+    const modal = document.getElementById('salesModal');
+    console.log('Modal element:', modal);
+    if (modal) {
+        console.log('Modal class list:', modal.classList);
+        modal.classList.remove('hidden');
+        console.log('Modal should be visible now');
+    }
+}
+
+
+
+console.log('Initializing customer system...');
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    initCartSystem();
+
+    
+});
+
 
 
 </script>
