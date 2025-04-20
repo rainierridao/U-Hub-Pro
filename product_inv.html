@@ -141,6 +141,7 @@ select, input[type="number"], input[type="date"] {
   
   .overflow-x-auto {
     overflow-x: auto;
+    margin-top: -40px;
   }
   
   table {
@@ -176,6 +177,28 @@ select, input[type="number"], input[type="date"] {
     
         
   @media (max-width: 600px) {
+        
+        
+        #expiry-view:checked ~ .toggle-highlight {
+        width: calc(35.7% - 4.7px) !important;
+    }
+    
+        /* Highlight movement */
+        #full-view:checked ~ .toggle-highlight {
+        transform: translateX(0%);
+        width: calc(33.3% - 4px);
+    }
+    
+    #simple-view:checked ~ .toggle-highlight {
+    transform: translateX(100%);
+    width: calc(33.3% - 4px);
+    }
+    
+    #expiry-view:checked ~ .toggle-highlight {
+    transform: translateX(200%);
+    width: calc(35.7% - 6.5px);
+    }
+
     .content {
       max-width: 390px;
       margin-top: 60px;
@@ -188,8 +211,25 @@ select, input[type="number"], input[type="date"] {
         #stock {
         grid-column: 1;
         
+        .toggle-option {
+            padding: 6px 8px;
+        }
+        
+        .toggle-option .full-text {
+            display: none;
+        }
+        
+        .toggle-option .short-text {
+            display: inline;
+        }
+        
+        
         
     }
+    
+    
+        
+    
     
     #expiry {
     grid-column: 2;
@@ -276,55 +316,56 @@ select, input[type="number"], input[type="date"] {
         
         
         
-        
         .view-toggle-container {
+            position: relative;
+            top: -3rem;
             display: flex;
-            justify-content: center;
-            margin: 1rem 0;
-        }
+            justify-content: flex-end;
+            z-index: 10;    
+    }
         
         .view-toggle {
-            position: relative;
             display: flex;
-            background: #f3f4f6;
-            border-radius: 50px;
-            padding: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            padding: 2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            width: fit-content;
+            transition: background 0.3s ease;
+            font-size: 13px;
         }
         
         .toggle-option {
             position: relative;
             z-index: 2;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 16px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #6b7280;
         }
         
         .toggle-option i {
-            margin-right: 6px;
-            font-size: 14px;
-        }
-        
-        .toggle-option span {
-            font-size: 14px;
-            font-weight: 500;
+            margin-right: 4px;
+            font-size: 12px;
         }
         
         .toggle-highlight {
             position: absolute;
+            top: 2px;
+            left: 2px;
+            height: calc(100% - 4px);
+            background-color: #ffffff;
+            border-radius: 9999px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease, width 0.3s ease;
             z-index: 1;
-            top: 4px;
-            left: 4px;
-            height: calc(100% - 8px);
-            border-radius: 50px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
         }
         
         input[type="radio"] {
@@ -332,24 +373,25 @@ select, input[type="number"], input[type="date"] {
         }
         
         input[type="radio"]:checked + label {
-            color: #3b82f6;
+            color: #2563eb;
         }
         
+        /* Highlight movement */
         #full-view:checked ~ .toggle-highlight {
-        transform: translateX(0);
-        width: calc(33.33% - 8px);
+        transform: translateX(0%);
+        width: calc(33.3% - 4px);
         }
         
         #simple-view:checked ~ .toggle-highlight {
         transform: translateX(100%);
-        width: calc(33.33% - 8px);
+        width: calc(33.3% - 4px);
         }
         
         #expiry-view:checked ~ .toggle-highlight {
         transform: translateX(200%);
-        width: calc(35.7% - 9px);
+        width: calc(35.7% - 6.5px);
         }
-        
+
 </style>
 <body>
 
@@ -466,33 +508,40 @@ select, input[type="number"], input[type="date"] {
   </form>
   </section>
   
+
+  <!-- Table Section -->
+  <section class="table-section">
+  <h2>Inventory List</h2>
+
 <div class="view-toggle-container">
     <div class="view-toggle">
         <input type="radio" id="full-view" name="view-mode" value="full" checked>
         <label for="full-view" class="toggle-option">
             <i class="fas fa-table"></i>
-            <span>Full</span>
+            <span class="full-text">Full</span>
+            <span class="short-text">F</span>
         </label>
         
         <input type="radio" id="simple-view" name="view-mode" value="simple">
         <label for="simple-view" class="toggle-option">
             <i class="fas fa-list"></i>
-            <span>Simple</span>
+            <span class="full-text">Simple</span>
+            <span class="short-text">S</span>
         </label>
         
         <input type="radio" id="expiry-view" name="view-mode" value="expiry">
         <label for="expiry-view" class="toggle-option">
             <i class="fas fa-calendar-alt"></i>
-            <span>Expiry</span>
+            <span class="full-text">Expiry</span>
+            <span class="short-text">E</span>
         </label>
         
         <div class="toggle-highlight"></div>
     </div>
 </div>
 
-  <!-- Table Section -->
-  <section class="table-section">
-  <h2>Inventory List</h2>
+
+
   <div class="overflow-x-auto">
 
     <table>
@@ -537,7 +586,6 @@ function generateTableHeaders(viewMode) {
         ],
         'simple': [
             { id: 'product', label: 'Product' },
-            { id: 'category', label: 'Category' },
             { id: 'quantity', label: 'Qty' },
             { id: 'status', label: 'Status' },
             { id: 'actions', label: 'Actions' }
@@ -546,7 +594,6 @@ function generateTableHeaders(viewMode) {
             { id: 'product', label: 'Product' },
             { id: 'quantity', label: 'Qty' },
             { id: 'expiry', label: 'Expiry' },
-            { id: 'status', label: 'Status' },
             { id: 'actions', label: 'Actions' }
         ]
     };
@@ -597,8 +644,8 @@ function updateTableView(viewMode) {
     // Then update the content visibility
     const viewConfig = {
         'full': ['product', 'category', 'quantity', 'price', 'expiry', 'status', 'account', 'actions'],
-        'simple': ['product', 'category', 'quantity', 'status', 'actions'],
-        'expiry': ['product', 'quantity', 'expiry', 'status', 'actions']
+        'simple': ['product', 'quantity', 'status', 'actions'],
+        'expiry': ['product', 'quantity', 'expiry', 'actions']
     };
 
 
