@@ -532,8 +532,8 @@ select, input[type="number"], input[type="date"] {
             background-color: white;
             color: #16a34a;
             border-radius: 9999px;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -561,7 +561,121 @@ select, input[type="number"], input[type="date"] {
                 margin-right: 0;
             }
         }
-    
+        
+        
+        
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+        
+        .loader-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3f86f9;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        
+        
+        
+        
+        
+        .micro-toggle-container {
+            display: inline-block;
+            margin-left: 13px;
+            vertical-align: middle;
+        }
+        
+        .micro-toggle-checkbox {
+            display: none;
+        }
+        
+        .micro-toggle {
+            position: relative;
+            margin-right: -13px;
+            display: block;
+            width: 20px;
+            height: 40px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .micro-toggle-handle {
+            position: absolute;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            overflow: hidden;
+        }
+        
+        .toggle-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 16px;
+            transition: opacity 0.2s;
+        }
+        
+        .toggle-text:first-child { /* O */
+            opacity: 1;
+            color: #2563eb; /* Blue for On Hand */
+        }
+        
+        .toggle-text:last-child { /* P */
+            opacity: 0;
+            color: #d97706; /* Amber for Pending */
+        }
+        
+        /* On state (Pending) */
+        .micro-toggle-checkbox:checked + .micro-toggle {
+            background: #fee2e2; /* Light red for pending */
+        }
+        
+        .micro-toggle-checkbox:checked + .micro-toggle .micro-toggle-handle {
+            transform: translateY(24px);
+        }
+        
+        .micro-toggle-checkbox:checked + .micro-toggle .toggle-text:first-child {
+            opacity: 0;
+        }
+        
+        .micro-toggle-checkbox:checked + .micro-toggle .toggle-text:last-child {
+            opacity: 1;
+        }
+        
+        
 </style>
 <body>
 
@@ -609,6 +723,10 @@ select, input[type="number"], input[type="date"] {
     <p id="greeting" class="greeting-text">Hi, User</p>
     </header>
 
+        <!-- Loader -->
+        <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        </div>
 
     <!-- Form: Add Inventory -->
   <section class="form-section">
@@ -689,6 +807,7 @@ select, input[type="number"], input[type="date"] {
 
 
 
+
 <div class="view-toggle-container">
     <div class="view-toggle">
         <input type="radio" id="full-view" name="view-mode" value="full" checked>
@@ -714,6 +833,19 @@ select, input[type="number"], input[type="date"] {
         
         <div class="toggle-highlight"></div>
     </div>
+
+
+<div class="micro-toggle-container">
+    <input type="checkbox" id="status-toggle" class="micro-toggle-checkbox">
+    <label for="status-toggle" class="micro-toggle">
+        <span class="micro-toggle-handle">
+            <span class="toggle-text">O</span>
+            <span class="toggle-text">P</span>
+        </span>
+    </label>
+</div>
+
+
 
 <button id="cartButton" class="cart-button">
     <i class="fas fa-shopping-cart"></i>
@@ -821,10 +953,7 @@ select, input[type="number"], input[type="date"] {
 
 
 
-<!-- Loader -->
-<div id="loader" class="loader-overlay">
-<div class="loader-spinner"></div>
-</div>
+
 
 
 
@@ -832,6 +961,17 @@ select, input[type="number"], input[type="date"] {
 
 <script>
 
+
+
+document.getElementById('status-toggle').addEventListener('change', function() {
+    const showPending = this.checked;
+    document.querySelectorAll('#inventoryTable tr').forEach(row => {
+        const status = row.querySelector('.status-col')?.textContent.toLowerCase();
+        row.style.display = (showPending && (status?.includes('pickup') || status?.includes('delivery'))) || 
+                                                (!showPending && !status?.includes('pickup') && !status?.includes('delivery')) 
+                                                ? '' : 'none';
+    });
+});
 
 
 
@@ -902,7 +1042,39 @@ viewModeRadios.forEach(radio => {
 // Update table view function
 function updateTableView(viewMode) {
 
-    // First generate the appropriate headers
+    
+// Listen for status toggle changes
+document.querySelectorAll('input[name="status-filter"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        filterTableByStatus(this.value);
+    });
+});
+
+
+
+// Function to filter rows based on status
+function filterTableByStatus(statusFilter) {
+    const rows = document.querySelectorAll('#inventoryTable tr');
+    
+    rows.forEach(row => {
+        const statusCell = row.querySelector('.status-col');
+        if (!statusCell) return;
+        
+        const status = statusCell.textContent.toLowerCase().trim();
+        const isPending = status.includes('pickup') || status.includes('delivery');
+        
+        if (statusFilter === 'onhand') {
+            row.style.display = isPending ? 'none' : '';
+        } 
+        else if (statusFilter === 'pending') {
+            row.style.display = isPending ? '' : 'none';
+        }
+    });
+}
+
+
+
+// First generate the appropriate headers
     generateTableHeaders(viewMode);
     
 
@@ -1147,115 +1319,16 @@ function showExpiryModal() {
 
 
 
-        
-        // Form submission
-addItemForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Get current user
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Please log in to add items");
-        return;
-    }
-
-    // Get all form values
-    const category = categorySelect.value;
-    const productName = itemSelect.value;
-    const quantity = parseInt(document.getElementById("stock").value);
-    const stockStatus = stockStatusSelect.value;
-    const expiryDate = document.getElementById("expiry").value;
-    const accountId = document.getElementById("accountId").value.trim();
-    const accountName = document.getElementById("accountName").value.trim();
-
-    // Validate category
-    if (!category) {
-        alert("Please select a category");
-        categorySelect.focus();
-        return;
-    }
-
-    // Validate product name
-    if (!productName) {
-        alert("Please select an item");
-        itemSelect.focus();
-        return;
-    }
-
-    // Validate quantity
-    if (isNaN(quantity)) {
-        alert("Please enter a valid quantity");
-        document.getElementById("stock").focus();
-        return;
-    }
-
-    // Validate stock status
-    if (!stockStatus) {
-        alert("Please select a stock status");
-        stockStatusSelect.focus();
-        return;
-    }
-
-    // Validate based on stock status
-    if (stockStatus === "onhand") {
-        if (!expiryDate) {
-            alert("Please set an expiry date for On Hand items");
-            document.getElementById("expiryModal").classList.remove("hidden");
-            return;
-        }
-    } else { // pickup or delivery
-        if (!accountId || !accountName) {
-            alert("Please enter account details");
-            accountModal.classList.remove("hidden");
-            return;
-        }
-    }
-
-    // Prepare data for submission
-    const formData = {
-        category,
-        productName,
-        quantity,
-        status: stockStatus,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    // Add conditional fields
-    if (expiryDate) formData.expiryDate = expiryDate;
-    if (accountId) formData.accountId = accountId;
-    if (accountName) formData.accountName = accountName;
-
-    try {
-        // Add price info from productData
-        if (productData[category] && productData[category][productName]) {
-            formData.priceInfo = productData[category][productName];
-        }
-
-        await db.collection("users").doc(user.uid).collection("inventory").add(formData);
-        
-        // Reset form
-        addItemForm.reset();
-        document.getElementById("expiry").value = "";
-        document.getElementById("accountId").value = "";
-        document.getElementById("accountName").value = "";
-        
-        // Reload inventory
-        loadInventory();
-        alert("Item added successfully!");
-    } catch (error) {
-        console.error("Error adding item:", error);
-        alert("Error adding item. Please try again.");
-    }
-});
-
+let isLoadingInventory = false;
 
                     // Load inventory
-                    async function loadInventory() {
+async function loadInventory() {
     const user = auth.currentUser;
     if (!user) return;
 
-    inventoryTable.innerHTML = "";
-    
+    // Show loading state
+    inventoryTable.innerHTML = '<tr><td colspan="6" class="p-4 text-center">Loading inventory...</td></tr>';
+
     try {
         const snapshot = await db.collection("users")
             .doc(user.uid)
@@ -1263,48 +1336,112 @@ addItemForm.addEventListener('submit', async (e) => {
             .orderBy("lastUpdated", "desc")
             .get();
 
+        inventoryTable.innerHTML = ''; // Clear table
+
         if (snapshot.empty) {
             inventoryTable.innerHTML = '<tr><td colspan="6" class="p-4 text-center">No inventory items found</td></tr>';
             return;
         }
 
-        // Group items by product name
         const productMap = new Map();
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            const key = `${data.category}-${data.productName}`;
-            
-            if (data.status === 'onhand') {
-                if (!productMap.has(key)) {
-                    productMap.set(key, {
-                        ...data,
-                        ids: [doc.id],
-                        quantities: [data.quantity],
-                        expiryDates: data.expiryDate ? [data.expiryDate] : []
-                    });
-                } else {
-                    const existing = productMap.get(key);
-                    existing.quantities.push(data.quantity);
-                    if (data.expiryDate) existing.expiryDates.push(data.expiryDate);
-                    existing.ids.push(doc.id);
-                }
+            if (!data || typeof data.quantity !== 'number' || data.quantity <= 0) return;
+
+            // Get status with proper case handling
+            const status = data.status || 'on hand'; // Default to 'on hand'
+            const normalizedStatus = status.toLowerCase();
+
+            // Force expiry to null for home delivery
+            const expiryDate = normalizedStatus === 'home delivery' ? null : (data.expiryDate || null);
+
+            // ===== SPECIAL ITEMS (no grouping) =====
+            if (normalizedStatus === "pickup" || normalizedStatus === "delivery") {
+                productMap.set(doc.id, {
+                    ...data,
+                    expiryDate: null, // Force no expiry for home delivery
+                    ids: [doc.id],
+                    quantities: [data.quantity],
+                    expiryDates: [null], // Set as null for home delivery
+                    statuses: [status],
+                    accountInfo: data.accountId ? [{ id: data.accountId, name: data.accountName }] : [],
+                    category: data.category || '',
+                    productName: data.productName || '',
+                    price: data.price || 0
+                });
+                return;
+            }
+
+            // ===== NORMAL GROUPING =====
+            const groupKey = `${data.category}-${data.productName}-${normalizedStatus}`.toLowerCase();
+
+            if (!productMap.has(groupKey)) {
+                productMap.set(groupKey, {
+                    ...data,
+                    ids: [doc.id],
+                    quantities: [data.quantity],
+                    expiryDates: expiryDate ? [expiryDate] : [],
+                    statuses: [status],
+                    accountInfo: data.accountId ? [{ id: data.accountId, name: data.accountName }] : []
+                });
             } else {
-                // For non-onhand items, show as individual rows
-                addRowToTable(doc.id, data);
+                const existingGroup = productMap.get(groupKey);
+                existingGroup.ids.push(doc.id);
+                existingGroup.quantities.push(data.quantity);
+                if (expiryDate) existingGroup.expiryDates.push(expiryDate);
+                existingGroup.statuses.push(status);
+                if (data.accountId) {
+                    existingGroup.accountInfo.push({
+                        id: data.accountId,
+                        name: data.accountName
+                    });
+                }
             }
         });
 
-        // Add aggregated onhand items to table
-        productMap.forEach((product, key) => {
+        // ===== GENERATE TABLE ROWS =====
+        productMap.forEach((product) => {
+            const isSpecialItem = ['pickup', 'home delivery'].includes(product.statuses[0].toLowerCase());
+            
+            if (isSpecialItem) {
+                addRowToTable(
+                    product.ids[0],
+                    {
+                        ...product,
+                        quantity: product.quantities[0],
+                        expiryDate: 'N/A', // Force N/A for home delivery/pickup
+                        accountInfo: product.accountInfo[0] ? 
+                            `${product.accountInfo[0].id} - ${product.accountInfo[0].name}` : '',
+                        ids: product.ids[0],
+                        status: product.statuses[0]
+                    }
+                );
+                return;
+            }
+
+            // Handle grouped items
             const totalQuantity = product.quantities.reduce((sum, q) => sum + q, 0);
-            const combinedData = {
-                ...product,
-                quantity: totalQuantity,
-                expiryDate: product.expiryDates.join(', '),
-                ids: product.ids.join(',') // Store all document IDs
-            };
-            addRowToTable(product.ids[0], combinedData); // Use first ID as primary
+            const expiryText = product.expiryDates.join(', ') || 'N/A';
+            
+            let accountText = '';
+            if (product.accountInfo?.length > 0) {
+                accountText = [...new Set(
+                    product.accountInfo.map(acc => `${acc.id} - ${acc.name}`)
+                )].join('; ');
+            }
+
+            addRowToTable(
+                product.ids[0],
+                {
+                    ...product,
+                    quantity: totalQuantity,
+                    expiryDate: expiryText,
+                    accountInfo: accountText,
+                    ids: product.ids.join(','),
+                    status: getCombinedStatus(product.statuses)
+                }
+            );
         });
 
     } catch (error) {
@@ -1313,12 +1450,34 @@ addItemForm.addEventListener('submit', async (e) => {
     }
 }
 
+
+
+// Helper function to determine combined status
+function getCombinedStatus(statuses) {
+    if (statuses.includes('pickup')) return 'pickup';
+    if (statuses.includes('delivery')) return 'delivery';
+    return 'onhand';
+}
+
+
 function addRowToTable(id, data) {
+    const tr = document.createElement("tr");
+        tr.dataset.id = id;  // Primary ID
+    tr.dataset.ids = data.ids;  // ALL document IDs (comma-separated)
+
+
     const expiryDate = data.expiryDate ? new Date(data.expiryDate.split(',')[0]) : null;
     const today = new Date();
     const diffDays = expiryDate ? Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24)) : null;
 
-    const tr = document.createElement("tr");
+
+    console.log('Creating table row:', {
+        product: data.productName,
+        primaryId: id,
+        allIds: data.ids
+    });
+
+
 
     if (diffDays && diffDays <= 30) {
         tr.classList.add("bg-yellow-50");
@@ -1523,40 +1682,125 @@ saveAccountBtn.addEventListener("click", function() {
 
 
 
-addItemForm.addEventListener('submit', async (e) => {
+        
+        addItemForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Add your custom validation logic here
-    if (!validateForm()) {
-        return;
-    }
+    const loader = document.getElementById('loader');
     
-    // Rest of your submission code
-});
+    // Show loader
+    loader.classList.remove('hidden');
+    // Force reflow to ensure animation starts
+    void loader.offsetWidth;
 
-function validateForm() {
-    let isValid = true;
+const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent; // Store original text
     
-    // Basic validation
-    if (!categorySelect.value) {
-        alert("Please select a category");
-        isValid = false;
-    }
-    
-    // Add validation for account details when needed
-    if (stockStatusSelect.value !== 'onhand') {
-        const accountId = document.getElementById('accountId').value;
-        const accountName = document.getElementById('accountName').value;
-        
-        if (!accountId || !accountName) {
-            alert("Please enter account details");
-            isValid = false;
+    // Change button text to "Processing..."
+    submitButton.textContent = "Processing...";
+    submitButton.disabled = true; // Disable button during processing
+
+    try {
+        // Get current user
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            alert("Please log in to add items");
+            return;
         }
-    }
-    
-    return isValid;
-}
 
+        // Get all form values
+        const category = categorySelect.value;
+        const productName = itemSelect.value;
+        const quantity = parseInt(document.getElementById("stock").value);
+        const stockStatus = stockStatusSelect.value;
+        const expiryDate = document.getElementById("expiry").value;
+        const accountId = document.getElementById("accountId").value.trim();
+        const accountName = document.getElementById("accountName").value.trim();
+
+        // Validate category
+        if (!category) {
+            alert("Please select a category");
+            categorySelect.focus();
+            return;
+        }
+
+        // Validate product name
+        if (!productName) {
+            alert("Please select an item");
+            itemSelect.focus();
+            return;
+        }
+
+        // Validate quantity
+        if (isNaN(quantity)) {
+            alert("Please enter a valid quantity");
+            document.getElementById("stock").focus();
+            return;
+        }
+
+        // Validate stock status
+        if (!stockStatus) {
+            alert("Please select a stock status");
+            stockStatusSelect.focus();
+            return;
+        }
+
+        // Validate based on stock status
+        if (stockStatus === "onhand") {
+            if (!expiryDate) {
+                alert("Please set an expiry date for On Hand items");
+                document.getElementById("expiryModal").classList.remove("hidden");
+                return;
+            }
+        } else { // pickup or delivery
+            if (!accountId || !accountName) {
+                alert("Please enter account details");
+                accountModal.classList.remove("hidden");
+                return;
+            }
+        }
+
+        // Prepare data for submission
+        const formData = {
+            category,
+            productName,
+            quantity,
+            status: stockStatus,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // Add conditional fields
+        if (expiryDate) formData.expiryDate = expiryDate;
+        if (accountId) formData.accountId = accountId;
+        if (accountName) formData.accountName = accountName;
+
+        // Add price info from productData
+        if (productData[category] && productData[category][productName]) {
+            formData.priceInfo = productData[category][productName];
+        }
+
+        await db.collection("users").doc(user.uid).collection("inventory").add(formData);
+        
+        // Reset form
+        addItemForm.reset();
+        document.getElementById("expiry").value = "";
+        document.getElementById("accountId").value = "";
+        document.getElementById("accountName").value = "";
+        
+        // Reload inventory
+        await loadInventory();
+
+    } catch (error) {
+        console.error("Error adding item:", error);
+        alert("Error adding item. Please try again.");
+    } finally {
+        // Hide loader when operation is complete
+        loader.classList.add('hidden');
+// Restore original button text and enable it
+    submitButton.textContent = originalButtonText;
+    submitButton.disabled = false;
+    }
+});
 
 
 
@@ -1775,6 +2019,21 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
         
         // Add item to cart
         function addToCart(productId, productName, price, maxQuantity = 999) {
+
+    console.log('--- Adding to Cart ---');
+    console.log('Initial productId:', productId);
+    
+    // Get the table row that contains this product
+    // NEW: Better row selection that finds rows containing any of the IDs
+    const row = document.querySelector(`tr[data-ids*="${productId}"]`);
+    console.log('Found table row:', row);
+    
+    // Get all document IDs from the row's data attribute
+    const allIds = row ? row.dataset.ids.split(',') : [productId];
+    console.log('All document IDs:', allIds);
+
+
+            
             const existingItem = shoppingCart.find(item => item.id === productId);
             
             if (existingItem) {
@@ -1786,7 +2045,7 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
                 }
             } else {
                 shoppingCart.push({
-                    id: productId,
+                    id: allIds.join(','), // Store ALL document IDs as a comma-separated string                
                     name: productName,
                     price: price,
                     quantity: 1,
@@ -1811,89 +2070,193 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
         }
         
         // Process sale (your existing implementation)
-        async function processSale() {
+async function processSale(customerId, customerName) {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+                showToast('Please log in to process sales', 'error');
+                return;
+        }
+
+        if (!Array.isArray(shoppingCart) || shoppingCart.length === 0) {
+                showToast('Your cart is empty', 'error');
+                return;
+        }
+
+        const confirmBtn = document.getElementById('confirmSale');
+        const salesModal = document.getElementById('salesModal');
+        
+        try {
+                // Show processing state
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Processing...';
+
+                // Sanitize customer data
+                customerId = typeof customerId === 'string' ? customerId.trim() : '';
+                customerName = typeof customerName === 'string' ? customerName.trim() : 'Walk-in Customer';
+
+                // Process payment
+                const paymentType = document.getElementById('paymentType').value || 'full';
+                const totalAmount = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                let amountPaid = totalAmount;
+
+                if (paymentType === 'partial') {
+                        const paidInput = parseFloat(document.getElementById('amountPaid').value) || 0;
+                        amountPaid = Math.min(Math.max(0, paidInput), totalAmount);
+                }
+
+                // Save sale record
+                const saleData = {
+                        customerId,
+                        customerName: customerName.substring(0, 100),
+                        items: shoppingCart.map(item => ({
+                                    productId: String(item.id.split(',')[0]).substring(0, 100), // Use first ID as main product ID
+                                name: String(item.name).substring(0, 100),
+                                price: Number(item.price),
+                                quantity: Number(item.quantity),
+                                documentIds: item.id.split(',') // Store ALL document IDs
+                        })),
+                        totalAmount,
+                        amountPaid,
+                        paymentType,
+                        saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'completed',
+                        processedBy: user.uid
+                };
+
+                // First save the sale record
+                const saleRef = await db.collection('users')
+                        .doc(user.uid)
+                        .collection('sales')
+                        .add(saleData);
+
+                // Then update inventory with proper distribution across documents
+                const batch = db.batch();
+                
+                for (const item of shoppingCart) {
+                        const docIds = item.id.split(',');
+                        let remainingQty = item.quantity;
+                        
+                        // Get all documents first to check quantities
+                        const docs = await Promise.all(
+                                docIds.map(docId => 
+                                        db.collection('users')
+                                            .doc(user.uid)
+                                            .collection('inventory')
+                                            .doc(docId)
+                                            .get()
+                                )
+                        );
+                        
+                        // Process documents in order until we've accounted for the full quantity
+                        for (let i = 0; i < docs.length && remainingQty > 0; i++) {
+                                const doc = docs[i];
+                                if (!doc.exists) continue;
+                                
+                                const currentQty = doc.data().quantity;
+                                const deductQty = Math.min(remainingQty, currentQty);
+                                
+                                if (deductQty > 0) {
+                                        const docRef = db.collection('users')
+                                                .doc(user.uid)
+                                                .collection('inventory')
+                                                .doc(docIds[i]);
+                                        
+                                        if (currentQty > deductQty) {
+                                                batch.update(docRef, {
+                                                        quantity: currentQty - deductQty,
+                                                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                                                });
+                                        } else {
+                                                batch.delete(docRef);
+                                        }
+                                        
+                                        remainingQty -= deductQty;
+                                }
+                        }
+                        
+                        if (remainingQty > 0) {
+                                console.warn(`Couldn't fulfill full quantity for ${item.name}`);
+                                // You might want to log this in the sale record
+                        }
+                }
+                
+                await batch.commit();
+
+                // Show success message
+                showToast('Sale completed successfully!');
+                
+        } catch (error) {
+                console.error('Sale Error:', error);
+                showToast(`Error processing sale: ${error.message}`, 'error');
+                throw error; // Re-throw to prevent further processing
+        } finally {
+                // Reset everything
+                shoppingCart = [];
+                updateCartDisplay();
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirm Sale';
+                salesModal.classList.add('hidden');
+                
+                // Reset form fields
+                document.getElementById('customerSelect').value = '';
+                document.getElementById('paymentType').value = 'full';
+                document.getElementById('amountPaid').value = '';
+                document.getElementById('amountPaidContainer').classList.add('hidden');
+                
+                // Hide new customer form if visible
+                document.getElementById('newCustomerForm').classList.add('hidden');
+                
+                // Refresh all data after sale
+                await Promise.all([
+                        loadCustomers(),
+                        loadInventory()
+                ]);
+        }
+}
+
+
+// Helper function to load customers
+async function loadCustomers() {
     const user = firebase.auth().currentUser;
-    if (!user) {
-        showToast('Please log in to process sales', 'error');
-        return;
-    }
+    if (!user) return;
 
-    if (shoppingCart.length === 0) {
-        showToast('Your cart is empty', 'error');
-        return;
-    }
+    const customerSelect = document.getElementById('customerSelect');
+    customerSelect.innerHTML = '<option value="" disabled selected>Select Customer</option>';
 
-    const confirmBtn = document.getElementById('confirmSale');
     try {
-        // Disable button during processing
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Processing...';
+        const snapshot = await db.collection('users')
+            .doc(user.uid)
+            .collection('customers')
+            .orderBy('name')
+            .get();
 
-        // 1. Get customer data safely
-        let customerId = '';
-        let customerName = 'Walk-in Customer';
-        
-        const customerSelect = document.getElementById('customerSelect');
-        if (customerSelect && customerSelect.value) {
-            customerId = customerSelect.value;
-            customerName = customerSelect.options[customerSelect.selectedIndex]?.text || customerName;
-        }
+        snapshot.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = doc.data().name;
+            customerSelect.appendChild(option);
+        });
 
-        // 2. Get payment data
-        const paymentType = document.getElementById('paymentType').value;
-        const totalAmount = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        let amountPaid = totalAmount;
-        
-        if (paymentType === 'partial') {
-            const paidInput = parseFloat(document.getElementById('amountPaid').value) || 0;
-            amountPaid = Math.min(paidInput, totalAmount);
-        }
-
-        // 3. Prepare clean sale data
-        const saleData = {
-            customerId: customerId, 
-            customerName: customerName,
-            items: shoppingCart.map(item => ({
-                productId: String(item.id),
-                name: String(item.name),
-                price: Number(item.price),
-                quantity: Number(item.quantity)
-            })),
-            totalAmount: totalAmount,
-            amountPaid: amountPaid,
-            paymentType: paymentType,
-            saleDate: firebase.firestore.FieldValue.serverTimestamp(),
-            status: 'completed',
-            processedBy: user.uid
-        };
-
-        // 4. Sanitize data before sending
-        const cleanSaleData = JSON.parse(JSON.stringify(saleData));
-
-        // 5. Save to Firestore
-        await db.collection('users').doc(user.uid).collection('sales').add(cleanSaleData);
-
-        // 6. Update inventory
-        await updateInventoryAfterSale();
-
-        // 7. Reset and show success
-        shoppingCart = [];
-        updateCartDisplay();
-        document.getElementById('salesModal').classList.add('hidden');
-        
-        showToast('Sale processed successfully!');
-        loadInventory();
-
+        // Add walk-in option
+        const walkInOption = document.createElement('option');
+        walkInOption.value = '';
+        walkInOption.textContent = 'Walk-in Customer';
+        customerSelect.appendChild(walkInOption);
     } catch (error) {
-        console.error('Error processing sale:', error);
-        showToast('Error: ' + error.message, 'error');
-    } finally {
-        if (confirmBtn) {
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = 'Confirm Sale';
-        }
+        console.error('Error loading customers:', error);
+        showToast('Error loading customers', 'error');
     }
 }
+
+// Add event listener for payment type change
+document.getElementById('paymentType').addEventListener('change', function() {
+    const amountPaidContainer = document.getElementById('amountPaidContainer');
+    if (this.value === 'partial') {
+        amountPaidContainer.classList.remove('hidden');
+    } else {
+        amountPaidContainer.classList.add('hidden');
+    }
+});
 
 
         
@@ -2046,7 +2409,9 @@ async function loadCustomers() {
 function setupCustomerSave() {
     const confirmSaleBtn = document.getElementById('confirmSale');
     if (confirmSaleBtn) {
-        confirmSaleBtn.addEventListener('click', async function() {
+        confirmSaleBtn.addEventListener('click', async function(e) {
+            e.preventDefault(); // Prevent default form submission behavior
+            
             const user = firebase.auth().currentUser;
             if (!user) {
                 alert('Please log in to complete sale');
@@ -2054,101 +2419,41 @@ function setupCustomerSave() {
             }
 
             // Check if we're adding a new customer
-    let customerId = '';
-    let customerName = '';
-    const newCustomerForm = document.getElementById('newCustomerForm');
-    
-    if (!newCustomerForm.classList.contains('hidden')) {
-        // Save new customer first
-        customerId = await saveNewCustomer();
-        if (!customerId) return; // Stop if customer save failed
+            let customerId = '';
+            let customerName = '';
+            const newCustomerForm = document.getElementById('newCustomerForm');
             
-            customerName = document.getElementById('newCustomerName').value.trim();
-        } else {
-            // Get selected customer
-            const customerSelect = document.getElementById('customerSelect');
-            customerId = customerSelect.value;
-            customerName = customerSelect.options[customerSelect.selectedIndex]?.text;
-            
-            if (!customerId || customerId === '') {
-                alert('Please select a customer or add a new one');
-                return;
-            }
-                }
-                
-                // Proceed with sale processing
-                await processSale(customerId, customerName);
-                });
-                }
-                }
-                
-                async function processSale(customerId, customerName) {
-                    const user = firebase.auth().currentUser;
-                    if (!user) {
-                        alert('Please log in to process sales');
-                        return;
-                    }
+            if (newCustomerForm && !newCustomerForm.classList.contains('hidden')) {
+                // Save new customer first
+                customerId = await saveNewCustomer();
+                if (!customerId) return; // Stop if customer save failed
+                    
+                    customerName = document.getElementById('newCustomerName').value.trim();
+                } else {
+                    // Get selected customer
+                    const customerSelect = document.getElementById('customerSelect');
+                    if (customerSelect) {
+                        customerId = customerSelect.value;
+                        const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+                        customerName = selectedOption ? selectedOption.text : 'Walk-in Customer';
                         
-                        if (shoppingCart.length === 0) {
-                            alert('Your cart is empty');
+                        if (!customerId) {
+                            alert('Please select a customer or add a new one');
                             return;
                         }
+                            }
+                            }
                             
-                            try {
-                                const confirmBtn = document.getElementById('confirmSale');
-                                confirmBtn.disabled = true;
-                                confirmBtn.textContent = 'Processing...';
-                                
-                                // Get payment details
-                                const paymentType = document.getElementById('paymentType').value;
-                                const amountPaid = paymentType === 'partial' 
-                                ? parseFloat(document.getElementById('amountPaid').value) || 0
-                                : shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-        // Prepare sale data
-        const saleData = {
-            customerId: customerId || 'walk-in',
-            customerName: customerName || 'Walk-in Customer',
-            items: shoppingCart.map(item => ({
-                productId: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity
-            })),
-                                totalAmount: shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-            amountPaid,
-            paymentType,
-            saleDate: firebase.firestore.FieldValue.serverTimestamp(),
-            status: 'completed'
-        };
-
-        // Save sale to Firestore
-        await db.collection('users').doc(user.uid).collection('sales').add(saleData);
-        
-        // Update inventory
-        await updateInventoryAfterSale();
-        
-        // Reset UI
-        shoppingCart = [];
-        updateCartCount();
-        document.getElementById('salesModal').classList.add('hidden');
-        document.getElementById('newCustomerForm').classList.add('hidden');
-        
-        alert('Sale processed successfully!');
-        loadInventory();
-    } catch (error) {
-        console.error('Error processing sale:', error);
-        alert('Error processing sale: ' + error.message);
-    } finally {
-        const confirmBtn = document.getElementById('confirmSale');
-        if (confirmBtn) {
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = 'Confirm Sale';
-        }
-    }
-}
+                            // Proceed with sale processing
+                            await processSale(customerId, customerName);
+                            });
+                            }
+                            }
 
 
+                            
+
+            
 
 
 
@@ -2173,8 +2478,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-                        async function updateInventoryAfterSale() {
+async function updateInventoryAfterSale() {
     const user = firebase.auth().currentUser;
     if (!user || shoppingCart.length === 0) return;
 
@@ -2193,15 +2497,23 @@ window.addEventListener('DOMContentLoaded', () => {
             const newQty = currentQty - item.quantity;
             
             if (newQty > 0) {
-                batch.update(inventoryRef, { quantity: newQty });
+                batch.update(inventoryRef, { 
+                    quantity: newQty,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
             } else {
                 batch.delete(inventoryRef);
             }
         }
     }
-    
+
     await batch.commit();
-}                
+    // Add a small delay to ensure Firestore updates are propagated
+    await new Promise(resolve => setTimeout(resolve, 500));
+}
+
+
+    
 
 
 
@@ -2275,6 +2587,9 @@ window.addEventListener('DOMContentLoaded', () => {
     
 });
 
+
+
+                                
 
 
 </script>
