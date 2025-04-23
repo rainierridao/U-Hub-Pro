@@ -1323,6 +1323,10 @@ let isLoadingInventory = false;
 
                     // Load inventory
 async function loadInventory() {
+        const toggle = document.getElementById('status-toggle');
+    toggle.checked = false;
+    
+
     const user = auth.currentUser;
     if (!user) return;
 
@@ -1398,6 +1402,7 @@ async function loadInventory() {
                     });
                 }
             }
+
         });
 
         // ===== GENERATE TABLE ROWS =====
@@ -1444,11 +1449,32 @@ async function loadInventory() {
             );
         });
 
+    // ADD THIS RIGHT HERE - after all rows are generated but before catch
+        filterPendingItems(false); // Hide pending items by default
+
     } catch (error) {
         console.error("Error loading inventory:", error);
         inventoryTable.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Error loading inventory</td></tr>';
+        
+
     }
+
 }
+
+
+
+
+// Don't forget to add this function (place it outside loadInventory)
+        function filterPendingItems(showPending) {
+            document.querySelectorAll('#inventoryTable tr').forEach(row => {
+                const status = row.querySelector('.status-col')?.textContent.toLowerCase();
+                row.style.display = (showPending && (status?.includes('pickup') || status?.includes('delivery'))) || 
+                (!showPending && !status?.includes('pickup') && !status?.includes('delivery')) 
+                ? '' : 'none';
+            });
+        }
+
+
 
 
 
