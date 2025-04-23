@@ -337,7 +337,7 @@ select, input[type="number"], input[type="date"] {
         
         .view-toggle-container {
             position: relative;
-            top: -3rem;
+            top: -2.65rem;
             display: flex;
             justify-content: flex-end;
             z-index: 10;    
@@ -675,6 +675,88 @@ select, input[type="number"], input[type="date"] {
             opacity: 1;
         }
         
+        .tab-button {
+            @apply px-4 py-2 text-sm font-semibold rounded bg-gray-100 hover:bg-gray-200 transition;
+        }
+        
+        .active-tab {
+            @apply bg-blue-600 text-white;
+        }
+        
+        
+        
+        /* Perfectly Synced Line Tabs Style */
+        .line-tabs {
+            --tab-size: 20px;
+            --active-color: #3b82f6;
+            display: flex;
+            position: relative;
+            height: var(--tab-size);
+            padding: 0 2px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+            z-index: 99;
+        }
+        
+        .line-tabs .tab {
+            width: var(--tab-size);
+            height: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        .line-tabs .tab.active {
+            opacity: 1;
+            color: var(--active-color);
+        }
+        
+        .line-tabs .indicator {
+            position: absolute;
+            bottom: -5px;
+            left: 5px; /* Initial position - will be overwritten by JS */
+            width: 10px; /* Initial width - will be overwritten by JS */
+            height: 3px;
+            background: var(--active-color);
+            transition: left 0.3s ease, width 0.3s ease;
+            z-index: 3;
+            border-radius: 2px;
+        }
+        
+        /* Remove the ::after pseudo-element as we're using JS indicator */
+.line-tabs .tab::after {
+    display: none;
+}
+
+/* Rest of your existing CSS remains the same */
+.tab-contents {
+    position: relative;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
         
 </style>
 <body>
@@ -799,167 +881,190 @@ select, input[type="number"], input[type="date"] {
   </section>
   
 
-  <!-- Table Section -->
-  <section class="table-section">
-  <h2>Inventory</h2>
-
-
-
-
-
-
-<div class="view-toggle-container">
-    <div class="view-toggle">
-        <input type="radio" id="full-view" name="view-mode" value="full" checked>
-        <label for="full-view" class="toggle-option">
-            <i class="fas fa-table"></i>
-            <span class="full-text">Full</span>
-            <span class="short-text">F</span>
-        </label>
-        
-        <input type="radio" id="simple-view" name="view-mode" value="simple">
-        <label for="simple-view" class="toggle-option">
-            <i class="fas fa-list"></i>
-            <span class="full-text">Simple</span>
-            <span class="short-text">S</span>
-        </label>
-        
-        <input type="radio" id="expiry-view" name="view-mode" value="expiry">
-        <label for="expiry-view" class="toggle-option">
-            <i class="fas fa-calendar-alt"></i>
-            <span class="full-text">Expiry</span>
-            <span class="short-text">E</span>
-        </label>
-        
-        <div class="toggle-highlight"></div>
+<!-- Table Section -->
+<section class="table-section">
+    <!-- Mini Tab Navigation -->
+    <div class="line-tabs">
+        <button class="tab active" data-tab="inventory">I</button>
+        <button class="tab" data-tab="sales">S</button>
+        <button class="tab" data-tab="payments">P</button>
+        <div class="indicator"></div>
     </div>
 
+    <!-- Tab Contents -->
+    <div class="tab-contents">
+        <!-- Inventory Tab (default active) -->
+        <div id="inventory-tab" class="tab-content active">
+            <div class="view-toggle-container">
+                <div class="view-toggle">
+                    <input type="radio" id="full-view" name="view-mode" value="full" checked>
+                    <label for="full-view" class="toggle-option">
+                        <i class="fas fa-table"></i>
+                        <span class="full-text">Full</span>
+                        <span class="short-text">F</span>
+                    </label>
+                    
+                    <input type="radio" id="simple-view" name="view-mode" value="simple">
+                    <label for="simple-view" class="toggle-option">
+                        <i class="fas fa-list"></i>
+                        <span class="full-text">Simple</span>
+                        <span class="short-text">S</span>
+                    </label>
+                    
+                    <input type="radio" id="expiry-view" name="view-mode" value="expiry">
+                    <label for="expiry-view" class="toggle-option">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="full-text">Expiry</span>
+                        <span class="short-text">E</span>
+                    </label>
+                    
+                    <div class="toggle-highlight"></div>
+                </div>
 
-<div class="micro-toggle-container">
-    <input type="checkbox" id="status-toggle" class="micro-toggle-checkbox">
-    <label for="status-toggle" class="micro-toggle">
-        <span class="micro-toggle-handle">
-            <span class="toggle-text">O</span>
-            <span class="toggle-text">P</span>
-        </span>
-    </label>
-</div>
+                <div class="micro-toggle-container">
+                    <input type="checkbox" id="status-toggle" class="micro-toggle-checkbox">
+                    <label for="status-toggle" class="micro-toggle">
+                        <span class="micro-toggle-handle">
+                            <span class="toggle-text">O</span>
+                            <span class="toggle-text">P</span>
+                        </span>
+                    </label>
+                </div>
 
-
-
-<button id="cartButton" class="cart-button">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-text">Cart</span>
-    <span id="cartCount" class="cart-count">0</span>
-</button>
-
-
-</div>
-
-
-
-  <div class="overflow-x-auto">
-
-    <table>
-    <thead id="inventoryHeaders">
-        <!-- Headers will be generated dynamically -->
-    </thead>
-    <tbody id="inventoryTable">
-        <!-- Dynamic content will go here -->
-    </tbody>
-</table>
-  
-</div>
-  </section>
-        
-        
-    </div>
-    </div>
-
-
-
-
-
-
-
-<!-- Sales Modal (keep this one) -->
-<div id="salesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <h3 class="text-lg font-medium mb-4">Record Sale</h3>
-        <div class="grid grid-cols-1 gap-4">
-            <!-- Customer Selection Section -->
-<div>
-    <label class="block text-sm font-medium mb-1">Customer</label>
-    <div class="flex gap-2">
-        <select id="customerSelect" class="border p-2 rounded flex-grow">
-            <option value="" disabled selected>Select Customer</option>
-            <!-- Customers will be populated here -->
-        </select>
-        <button id="addNewCustomer" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">+ New</button>
-    </div>
-    
-    <!-- New Customer Form -->
-    <div id="newCustomerForm" class="hidden mt-2">
-        <div class="grid grid-cols-2 gap-2">
-            <input type="text" id="newCustomerName" placeholder="Full Name" class="border p-2 rounded">
-            <input type="text" id="newCustomerPhone" placeholder="Phone" class="border p-2 rounded">
-        </div>
-        <div class="mt-2">
-            <input type="text" id="newCustomerAddress" placeholder="Address" class="border p-2 rounded w-full">
-        </div>
-    </div>
-</div>            
-
-
-
-
-                <!-- Cart Items -->
-                        <div id="cartItemsContainer" class="mb-4 max-h-60 overflow-y-auto">
-                                <!-- Cart items populated dynamically -->
-                        </div>
-                        
-                        <!-- Cart Total -->
-                        <div id="cartTotal" class="cart-total">
-                                Total: ₱0
-                        </div>
-
-
-            
-            <!-- Payment Type -->
-            <div>
-                <label class="block text-sm font-medium mb-1">Payment</label>
-                <select id="paymentType" class="border p-2 rounded w-full">
-                    <option value="full">Full Payment</option>
-                    <option value="partial">Partial Payment</option>
-                </select>
+                <button id="cartButton" class="cart-button">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-text">Cart</span>
+                    <span id="cartCount" class="cart-count">0</span>
+                </button>
             </div>
-            
-            <!-- Amount Paid -->
-            <div id="amountPaidContainer" class="hidden">
-                <label class="block text-sm font-medium mb-1">Amount Paid</label>
-                <input type="number" id="amountPaid" class="border p-2 rounded w-full" min="0">
+
+            <div class="overflow-x-auto">
+                <table>
+                    <thead id="inventoryHeaders">
+                        <!-- Headers will be generated dynamically -->
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <!-- Dynamic content will go here -->
+                    </tbody>
+                </table>
             </div>
         </div>
-        
-        <div class="mt-4 flex justify-end space-x-2">
-            <button id="cancelSale" class="px-4 py-2 border rounded">Cancel</button>
-            <button id="confirmSale" class="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
+
+        <!-- Sales Tab -->
+        <div id="sales-tab" class="tab-content" style="margin-top: 2rem;">>
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesHistoryBody">
+                        <!-- Sales data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payments Tab -->
+        <div id="payments-tab" class="tab-content" style="margin-top: 2rem;">>
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Due</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentStatusBody">
+                        <!-- Payment data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-
-
-
-
-
-
-
-
-
+</section>
 
 
 
 <script>
+
+                        // Perfectly Synced Tab Switching Functionality
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const tabs = document.querySelectorAll('.line-tabs .tab');
+                            const indicator = document.querySelector('.line-tabs .indicator');
+                            const tabContents = document.querySelectorAll('.tab-content');
+                            
+                            // Initialize first tab
+                            if (tabs.length > 0) {
+                                const activeTab = document.querySelector('.line-tabs .tab.active');
+                                if (activeTab) {
+                                    // Set initial indicator position (matches CSS exactly)
+                                    updateIndicator(activeTab);
+                                    
+                                    // Load initial tab content
+                                    const tabId = activeTab.getAttribute('data-tab');
+                                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                                }
+                                    
+                                    tabs.forEach(tab => {
+                                        tab.addEventListener('click', function() {
+                                            // Remove active classes
+                                            tabs.forEach(t => t.classList.remove('active'));
+                                            tabContents.forEach(c => c.classList.remove('active'));
+                                            
+                                            // Add active class to clicked tab
+                                            this.classList.add('active');
+                                            const tabId = this.getAttribute('data-tab');
+                                            document.getElementById(`${tabId}-tab`).classList.add('active');
+                                            
+                                            // Update indicator position with perfect alignment
+                                            updateIndicator(this);
+                                            
+                                            // Load content dynamically if needed
+                                                if (tabId === 'sales') loadSalesHistory();
+                                                    if (tabId === 'payments') loadPaymentStatus();
+                                                        });
+                                                        });
+                                                        }
+                                                        
+                                                        // Precise indicator positioning function
+                                                        function updateIndicator(tab) {
+                                                            const leftPadding = 5; // Must match CSS (left: 5px in .tab::after)
+                                                            const rightPadding = 5; // Must match CSS (right: 5px in .tab::after)
+                                                            
+                                                            indicator.style.left = `${tab.offsetLeft + leftPadding}px`;
+                                                            indicator.style.width = `${tab.offsetWidth - leftPadding - rightPadding}px`;
+                                                        }
+                                                        
+                                                        // Handle window resize with perfect realignment
+                                                        let resizeTimer;
+                                                        window.addEventListener('resize', function() {
+                                                            clearTimeout(resizeTimer);
+                                                            resizeTimer = setTimeout(function() {
+                                                                const activeTab = document.querySelector('.line-tabs .tab.active');
+                                                                if (activeTab) {
+                                                                    // Temporarily disable transition for instant repositioning
+                                                                        indicator.style.transition = 'none';
+                                                                        updateIndicator(activeTab);
+                                                                        
+                                                                        // Re-enable transition after repositioning
+                                                                        setTimeout(() => {
+                    indicator.style.transition = 'left 0.3s ease, width 0.3s ease';
+                }, 10);
+            }
+        }, 100);
+    });
+});
 
 
 
