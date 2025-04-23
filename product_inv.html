@@ -337,10 +337,11 @@ select, input[type="number"], input[type="date"] {
         
         .view-toggle-container {
             position: relative;
-            top: -2.65rem;
+            top: -3rem;
             display: flex;
             justify-content: flex-end;
             z-index: 10;    
+            pointer-events: none; /* Allows clicks to pass through */
     }
         
         .view-toggle {
@@ -354,6 +355,11 @@ select, input[type="number"], input[type="date"] {
             transition: background 0.3s ease;
             font-size: 13px;
             margin-right: -10px;
+        }
+        
+        
+        .view-toggle-container > * {
+            pointer-events: auto; /* But keep children clickable */
         }
         
         .toggle-option {
@@ -520,6 +526,7 @@ select, input[type="number"], input[type="date"] {
             align-items: center;
             cursor: pointer;
             font-size: 14px;
+            
         }
         
         .cart-button i {
@@ -546,6 +553,7 @@ select, input[type="number"], input[type="date"] {
                 width: 8px;
                 font-size: 10px;
                 margin-right: 0.5rem;
+                
             }
 
             
@@ -608,6 +616,7 @@ select, input[type="number"], input[type="date"] {
             display: inline-block;
             margin-left: 13px;
             vertical-align: middle;
+
         }
         
         .micro-toggle-checkbox {
@@ -675,13 +684,6 @@ select, input[type="number"], input[type="date"] {
             opacity: 1;
         }
         
-        .tab-button {
-            @apply px-4 py-2 text-sm font-semibold rounded bg-gray-100 hover:bg-gray-200 transition;
-        }
-        
-        .active-tab {
-            @apply bg-blue-600 text-white;
-        }
         
         
         
@@ -695,7 +697,9 @@ select, input[type="number"], input[type="date"] {
             padding: 0 2px;
             margin-bottom: 15px;
             align-items: flex-start;
-            z-index: 99;
+            isolation: isolate; /* New - prevents z-index interference */
+            pointer-events: auto !important;
+            
         }
         
         .line-tabs .tab {
@@ -715,6 +719,7 @@ select, input[type="number"], input[type="date"] {
             font-size: 12px;
             font-weight: 500;
             color: #64748b;
+            pointer-events: auto; /* Ensures clicks work */
         }
         
         .line-tabs .tab.active {
@@ -730,8 +735,9 @@ select, input[type="number"], input[type="date"] {
             height: 3px;
             background: var(--active-color);
             transition: left 0.3s ease, width 0.3s ease;
-            z-index: 3;
+            z-index: 1; /* Indicator below tabs */
             border-radius: 2px;
+            pointer-events: none; /* Allows clicks through to tabs */
         }
         
         /* Remove the ::after pseudo-element as we're using JS indicator */
@@ -757,6 +763,8 @@ select, input[type="number"], input[type="date"] {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
         
 </style>
 <body>
@@ -881,100 +889,116 @@ select, input[type="number"], input[type="date"] {
   </section>
   
 
-<!-- Table Section -->
-<section class="table-section">
+
+
+    <!-- Table Section -->
+    <section class="table-section">
     <!-- Mini Tab Navigation -->
     <div class="line-tabs">
-        <button class="tab active" data-tab="inventory">I</button>
-        <button class="tab" data-tab="sales">S</button>
-        <button class="tab" data-tab="payments">P</button>
-        <div class="indicator"></div>
+    <button class="tab active" data-tab="inventory">I</button>
+    <button class="tab" data-tab="sales">S</button>
+    <button class="tab" data-tab="payments">P</button>
+    <div class="indicator"></div>
     </div>
-
-    <!-- Tab Contents -->
+    
+    <!-- Tab Contents - All tabs inside this container -->
     <div class="tab-contents">
-        <!-- Inventory Tab (default active) -->
-        <div id="inventory-tab" class="tab-content active">
-            <div class="view-toggle-container">
-                <div class="view-toggle">
-                    <input type="radio" id="full-view" name="view-mode" value="full" checked>
-                    <label for="full-view" class="toggle-option">
-                        <i class="fas fa-table"></i>
-                        <span class="full-text">Full</span>
-                        <span class="short-text">F</span>
-                    </label>
-                    
-                    <input type="radio" id="simple-view" name="view-mode" value="simple">
-                    <label for="simple-view" class="toggle-option">
-                        <i class="fas fa-list"></i>
-                        <span class="full-text">Simple</span>
-                        <span class="short-text">S</span>
-                    </label>
-                    
-                    <input type="radio" id="expiry-view" name="view-mode" value="expiry">
-                    <label for="expiry-view" class="toggle-option">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span class="full-text">Expiry</span>
-                        <span class="short-text">E</span>
-                    </label>
-                    
-                    <div class="toggle-highlight"></div>
+    <!-- Inventory Tab (default active) -->
+    <div id="inventory-tab" class="tab-content active">
+    <div class="view-toggle-container">
+    <div class="view-toggle">
+    <input type="radio" id="full-view" name="view-mode" value="full" checked>
+    <label for="full-view" class="toggle-option">
+        <i class="fas fa-table"></i>
+        <span class="full-text">Full</span>
+        <span class="short-text">F</span>
+        </label>
+        
+        <input type="radio" id="simple-view" name="view-mode" value="simple">
+        <label for="simple-view" class="toggle-option">
+            <i class="fas fa-list"></i>
+            <span class="full-text">Simple</span>
+            <span class="short-text">S</span>
+            </label>
+            
+            <input type="radio" id="expiry-view" name="view-mode" value="expiry">
+            <label for="expiry-view" class="toggle-option">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="full-text">Expiry</span>
+                <span class="short-text">E</span>
+                </label>
+                
+                <div class="toggle-highlight"></div>
                 </div>
-
+                
                 <div class="micro-toggle-container">
-                    <input type="checkbox" id="status-toggle" class="micro-toggle-checkbox">
-                    <label for="status-toggle" class="micro-toggle">
-                        <span class="micro-toggle-handle">
-                            <span class="toggle-text">O</span>
-                            <span class="toggle-text">P</span>
-                        </span>
+                <input type="checkbox" id="status-toggle" class="micro-toggle-checkbox">
+                <label for="status-toggle" class="micro-toggle">
+                    <span class="micro-toggle-handle">
+                    <span class="toggle-text">O</span>
+                    <span class="toggle-text">P</span>
+                    </span>
                     </label>
-                </div>
-
-                <button id="cartButton" class="cart-button">
+                    </div>
+                    
+                    <button id="cartButton" class="cart-button">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-text">Cart</span>
                     <span id="cartCount" class="cart-count">0</span>
-                </button>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table>
+                    </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                    <table>
                     <thead id="inventoryHeaders">
-                        <!-- Headers will be generated dynamically -->
+                    <!-- Headers will be generated dynamically -->
                     </thead>
                     <tbody id="inventoryTable">
-                        <!-- Dynamic content will go here -->
+                    <!-- Dynamic content will go here -->
                     </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Sales Tab -->
-        <div id="sales-tab" class="tab-content" style="margin-top: 2rem;">>
-            <div class="overflow-x-auto">
-                <table>
-                    <thead>
+                    </table>
+                    </div>
+                    </div>
+                    
+                    <!-- Sales Tab -->
+                    <div id="sales-tab" class="tab-content">
+                    <div class="view-toggle-container" style="margin-bottom: 2.65rem;">
+                    <!-- Sales-specific view toggles can go here if needed -->
+                        <div class="sales-filters">
+                        <!-- Add any sales-specific filter controls -->
+                        </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                        <table>
+                        <thead>
                         <tr>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Qty</th>
-                            <th>Date</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Date</th>
                         </tr>
-                    </thead>
-                    <tbody id="salesHistoryBody">
+                        </thead>
+                        <tbody id="salesHistoryBody">
                         <!-- Sales data will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Payments Tab -->
-        <div id="payments-tab" class="tab-content" style="margin-top: 2rem;">>
-            <div class="overflow-x-auto">
-                <table>
-                    <thead>
-                        <tr>
+                        </tbody>
+                        </table>
+                        </div>
+                        </div>
+                        
+                        <!-- Payments Tab -->
+                        <div id="payments-tab" class="tab-content">
+                        <div class="view-toggle-container" style="margin-bottom: 2.65rem;">
+                        <!-- Payments-specific view toggles can go here if needed -->
+                            <div class="payments-filters">
+                            <!-- Add any payments-specific filter controls -->
+                            </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                            <table>
+                            <thead>
+                            <tr>
                             <th>Customer</th>
                             <th>Product</th>
                             <th>Qty</th>
@@ -983,89 +1007,200 @@ select, input[type="number"], input[type="date"] {
                             <th>Due</th>
                             <th>Date</th>
                             <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paymentStatusBody">
-                        <!-- Payment data will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</section>
-
-
+                            </tr>
+                            </thead>
+                            <tbody id="paymentStatusBody">
+                            <!-- Payment data will be loaded here -->
+                            </tbody>
+                            </table>
+                            </div>
+                            </div>
+                            </div>
+                            </section>
+                            
+                            <!-- Sales Modal (outside the table section) -->
+                            <div id="salesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                            <h3 class="text-lg font-medium mb-4">Record Sale</h3>
+                            <div class="grid grid-cols-1 gap-4">
+                            <!-- Customer Selection Section -->
+                            <div>
+                            <label class="block text-sm font-medium mb-1">Customer</label>
+                            <div class="flex gap-2">
+                            <select id="customerSelect" class="border p-2 rounded flex-grow">
+                            <option value="" disabled selected>Select Customer</option>
+                            <!-- Customers will be populated here -->
+                            </select>
+                            <button id="addNewCustomer" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">+ New</button>
+                            </div>
+                            
+                            <!-- New Customer Form -->
+                            <div id="newCustomerForm" class="hidden mt-2">
+                            <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="newCustomerName" placeholder="Full Name" class="border p-2 rounded">
+                            <input type="text" id="newCustomerPhone" placeholder="Phone" class="border p-2 rounded">
+                            </div>
+                            <div class="mt-2">
+                            <input type="text" id="newCustomerAddress" placeholder="Address" class="border p-2 rounded w-full">
+                            </div>
+                            </div>
+                            </div>
+                            
+                            <!-- Cart Items -->
+                            <div id="cartItemsContainer" class="mb-4 max-h-60 overflow-y-auto">
+                            <!-- Cart items populated dynamically -->
+                            </div>
+                            
+                            <!-- Cart Total -->
+                            <div id="cartTotal" class="cart-total">
+                            Total: ₱0
+                            </div>
+                            
+                            <!-- Payment Type -->
+                            <div>
+                            <label class="block text-sm font-medium mb-1">Payment</label>
+                            <select id="paymentType" class="border p-2 rounded w-full">
+                            <option value="full">Full Payment</option>
+                            <option value="partial">Partial Payment</option>
+                            </select>
+                            </div>
+                            
+                            <!-- Amount Paid -->
+                            <div id="amountPaidContainer" class="hidden">
+                            <label class="block text-sm font-medium mb-1">Amount Paid</label>
+                            <input type="number" id="amountPaid" class="border p-2 rounded w-full" min="0">
+                            </div>
+                            </div>
+                            
+                            <div class="mt-4 flex justify-end space-x-2">
+                            <button id="cancelSale" class="px-4 py-2 border rounded">Cancel</button>
+                            <button id="confirmSale" class="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
+                            </div>
+                            </div>
+                            </div>
 
 <script>
 
-                        // Perfectly Synced Tab Switching Functionality
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const tabs = document.querySelectorAll('.line-tabs .tab');
-                            const indicator = document.querySelector('.line-tabs .indicator');
-                            const tabContents = document.querySelectorAll('.tab-content');
-                            
-                            // Initialize first tab
-                            if (tabs.length > 0) {
-                                const activeTab = document.querySelector('.line-tabs .tab.active');
-                                if (activeTab) {
-                                    // Set initial indicator position (matches CSS exactly)
-                                    updateIndicator(activeTab);
-                                    
-                                    // Load initial tab content
-                                    const tabId = activeTab.getAttribute('data-tab');
-                                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                                }
-                                    
-                                    tabs.forEach(tab => {
-                                        tab.addEventListener('click', function() {
-                                            // Remove active classes
-                                            tabs.forEach(t => t.classList.remove('active'));
-                                            tabContents.forEach(c => c.classList.remove('active'));
-                                            
-                                            // Add active class to clicked tab
-                                            this.classList.add('active');
-                                            const tabId = this.getAttribute('data-tab');
-                                            document.getElementById(`${tabId}-tab`).classList.add('active');
-                                            
-                                            // Update indicator position with perfect alignment
-                                            updateIndicator(this);
-                                            
-                                            // Load content dynamically if needed
-                                                if (tabId === 'sales') loadSalesHistory();
-                                                    if (tabId === 'payments') loadPaymentStatus();
-                                                        });
-                                                        });
-                                                        }
-                                                        
-                                                        // Precise indicator positioning function
-                                                        function updateIndicator(tab) {
-                                                            const leftPadding = 5; // Must match CSS (left: 5px in .tab::after)
-                                                            const rightPadding = 5; // Must match CSS (right: 5px in .tab::after)
-                                                            
-                                                            indicator.style.left = `${tab.offsetLeft + leftPadding}px`;
-                                                            indicator.style.width = `${tab.offsetWidth - leftPadding - rightPadding}px`;
-                                                        }
-                                                        
-                                                        // Handle window resize with perfect realignment
-                                                        let resizeTimer;
-                                                        window.addEventListener('resize', function() {
-                                                            clearTimeout(resizeTimer);
-                                                            resizeTimer = setTimeout(function() {
-                                                                const activeTab = document.querySelector('.line-tabs .tab.active');
-                                                                if (activeTab) {
-                                                                    // Temporarily disable transition for instant repositioning
-                                                                        indicator.style.transition = 'none';
-                                                                        updateIndicator(activeTab);
-                                                                        
-                                                                        // Re-enable transition after repositioning
-                                                                        setTimeout(() => {
-                    indicator.style.transition = 'left 0.3s ease, width 0.3s ease';
-                }, 10);
-            }
-        }, 100);
-    });
-});
 
+
+// Tab Switching and Dynamic Content Creation
+document.addEventListener('DOMContentLoaded', function() {
+    const tabsContainer = document.querySelector('.line-tabs');
+    const tabContents = document.querySelector('.tab-contents');
+    
+    // Tab configurations
+    const tabConfig = [
+        { id: 'inventory', label: 'I', content: null }, // Keep existing inventory
+        { 
+            id: 'sales', 
+            label: 'S',
+            columns: ['Customer', 'Product', 'Qty', 'Date'],
+            dataId: 'salesHistoryBody'
+        },
+        { 
+            id: 'payments', 
+            label: 'P',
+            columns: ['Customer', 'Product', 'Qty', 'Total', 'Paid', 'Due', 'Date', 'Action'],
+            dataId: 'paymentStatusBody'
+        }
+    ];
+
+    // Create tabs and content areas dynamically
+    tabConfig.forEach((tab, index) => {
+        // Create tab button if it doesn't exist
+        if (!document.querySelector(`.tab[data-tab="${tab.id}"]`)) {
+            const tabBtn = document.createElement('button');
+            tabBtn.className = `tab ${index === 0 ? 'active' : ''}`;
+            tabBtn.dataset.tab = tab.id;
+            tabBtn.textContent = tab.label;
+            tabsContainer.insertBefore(tabBtn, tabsContainer.lastElementChild);
+        }
+            
+            // Create content area if it doesn't exist (skip inventory)
+        if (tab.id !== 'inventory' && !document.getElementById(`${tab.id}-tab`)) {
+            const tabContent = document.createElement('div');
+            tabContent.id = `${tab.id}-tab`;
+            tabContent.className = 'tab-content';
+            tabContent.innerHTML = `
+                <div class="overflow-x-auto" style="margin-top: 1rem;">
+                    <table>
+                        <thead>
+                            <tr>
+                                ${tab.columns.map(col => `<th>${col}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody id="${tab.dataId}">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            tabContents.appendChild(tabContent);
+        }
+    });
+
+    // Initialize tab functionality
+    const tabs = document.querySelectorAll('.line-tabs .tab');
+    const indicator = document.querySelector('.line-tabs .indicator');
+
+    if (tabs.length > 0) {
+        const activeTab = document.querySelector('.line-tabs .tab.active');
+        if (activeTab) {
+            updateIndicator(activeTab);
+            const tabId = activeTab.getAttribute('data-tab');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                updateIndicator(this);
+                
+                // Load data when tab is clicked
+                if (tabId === 'sales') loadSalesHistory();
+                if (tabId === 'payments') loadPaymentStatus();
+            });
+        });
+    }
+
+    function updateIndicator(tab) {
+        const leftPadding = 5;
+        const rightPadding = 5;
+        indicator.style.left = `${tab.offsetLeft + leftPadding}px`;
+        indicator.style.width = `${tab.offsetWidth - leftPadding - rightPadding}px`;
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const activeTab = document.querySelector('.line-tabs .tab.active');
+        if (activeTab) {
+            indicator.style.transition = 'none';
+            updateIndicator(activeTab);
+            setTimeout(() => {
+                indicator.style.transition = 'left 0.3s ease, width 0.3s ease';
+            }, 10);
+        }
+    });
+
+    // Data loading functions
+    function loadSalesHistory() {
+        // Your sales history loading logic
+        console.log('Loading sales data...');
+        // Example: fetchSalesData().then(renderSalesData);
+    }
+
+    function loadPaymentStatus() {
+        // Your payment status loading logic
+        console.log('Loading payments data...');
+        // Example: fetchPaymentsData().then(renderPaymentsData);
+    }
+});
 
 
 document.getElementById('status-toggle').addEventListener('change', function() {
@@ -1578,9 +1713,6 @@ async function loadInventory() {
                 ? '' : 'none';
             });
         }
-
-
-
 
 
 // Helper function to determine combined status
@@ -2202,149 +2334,155 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
         
         // Process sale (your existing implementation)
 async function processSale(customerId, customerName) {
-        const user = firebase.auth().currentUser;
-        if (!user) {
-                showToast('Please log in to process sales', 'error');
-                return;
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        showToast('Please log in to process sales', 'error');
+        return;
+    }
+
+    if (!Array.isArray(shoppingCart) || shoppingCart.length === 0) {
+        showToast('Your cart is empty', 'error');
+        return;
+    }
+
+    // Enforce customer requirement - no walk-in customers allowed
+    if (!customerId || typeof customerId !== 'string' || customerId.trim() === '') {
+        showToast('Please select a valid customer', 'error');
+        return;
+    }
+
+    // Ensure customerName is provided and valid
+    if (!customerName || typeof customerName !== 'string' || customerName.trim() === '') {
+        showToast('Please provide a valid customer name', 'error');
+        return;
+    }
+
+    const confirmBtn = document.getElementById('confirmSale');
+    const salesModal = document.getElementById('salesModal');
+    
+    // Prevent multiple executions
+    if (confirmBtn.disabled) {
+        console.log('Sale already in progress');
+        return;
+    }
+    
+    try {
+        // Show processing state
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+
+        // Sanitize customer data
+        customerId = customerId.trim();
+        customerName = customerName.trim();
+
+        // Process payment
+        const paymentType = document.getElementById('paymentType').value || 'full';
+        const totalAmount = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let amountPaid = totalAmount;
+
+        if (paymentType === 'partial') {
+            const paidInput = parseFloat(document.getElementById('amountPaid').value) || 0;
+            amountPaid = Math.min(Math.max(0, paidInput), totalAmount);
         }
 
-        if (!Array.isArray(shoppingCart) || shoppingCart.length === 0) {
-                showToast('Your cart is empty', 'error');
-                return;
-        }
+        // Save sale record
+        const saleData = {
+            customerId,
+            customerName: customerName.substring(0, 100),
+            items: shoppingCart.map(item => ({
+                productId: String(item.id.split(',')[0]).substring(0, 100),
+                name: String(item.name).substring(0, 100),
+                price: Number(item.price),
+                quantity: Number(item.quantity),
+                documentIds: item.id.split(',')
+            })),
+            totalAmount,
+            amountPaid,
+            paymentType,
+            saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'completed',
+            processedBy: user.uid
+        };
 
-        const confirmBtn = document.getElementById('confirmSale');
-        const salesModal = document.getElementById('salesModal');
+        const saleRef = await db.collection('users')
+            .doc(user.uid)
+            .collection('sales')
+            .add(saleData);
+
+        // Update inventory
+        const batch = db.batch();
         
-        try {
-                // Show processing state
-                confirmBtn.disabled = true;
-                confirmBtn.textContent = 'Processing...';
-
-                // Sanitize customer data
-                customerId = typeof customerId === 'string' ? customerId.trim() : '';
-                customerName = typeof customerName === 'string' ? customerName.trim() : 'Walk-in Customer';
-
-                // Process payment
-                const paymentType = document.getElementById('paymentType').value || 'full';
-                const totalAmount = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                let amountPaid = totalAmount;
-
-                if (paymentType === 'partial') {
-                        const paidInput = parseFloat(document.getElementById('amountPaid').value) || 0;
-                        amountPaid = Math.min(Math.max(0, paidInput), totalAmount);
-                }
-
-                // Save sale record
-                const saleData = {
-                        customerId,
-                        customerName: customerName.substring(0, 100),
-                        items: shoppingCart.map(item => ({
-                                    productId: String(item.id.split(',')[0]).substring(0, 100), // Use first ID as main product ID
-                                name: String(item.name).substring(0, 100),
-                                price: Number(item.price),
-                                quantity: Number(item.quantity),
-                                documentIds: item.id.split(',') // Store ALL document IDs
-                        })),
-                        totalAmount,
-                        amountPaid,
-                        paymentType,
-                        saleDate: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'completed',
-                        processedBy: user.uid
-                };
-
-                // First save the sale record
-                const saleRef = await db.collection('users')
+        for (const item of shoppingCart) {
+            const docIds = item.id.split(',');
+            let remainingQty = item.quantity;
+            
+            const docs = await Promise.all(
+                docIds.map(docId => 
+                    db.collection('users')
                         .doc(user.uid)
-                        .collection('sales')
-                        .add(saleData);
-
-                // Then update inventory with proper distribution across documents
-                const batch = db.batch();
+                        .collection('inventory')
+                        .doc(docId)
+                        .get()
+                )
+            );
+            
+            for (let i = 0; i < docs.length && remainingQty > 0; i++) {
+                const doc = docs[i];
+                if (!doc.exists) continue;
                 
-                for (const item of shoppingCart) {
-                        const docIds = item.id.split(',');
-                        let remainingQty = item.quantity;
-                        
-                        // Get all documents first to check quantities
-                        const docs = await Promise.all(
-                                docIds.map(docId => 
-                                        db.collection('users')
-                                            .doc(user.uid)
-                                            .collection('inventory')
-                                            .doc(docId)
-                                            .get()
-                                )
-                        );
-                        
-                        // Process documents in order until we've accounted for the full quantity
-                        for (let i = 0; i < docs.length && remainingQty > 0; i++) {
-                                const doc = docs[i];
-                                if (!doc.exists) continue;
-                                
-                                const currentQty = doc.data().quantity;
-                                const deductQty = Math.min(remainingQty, currentQty);
-                                
-                                if (deductQty > 0) {
-                                        const docRef = db.collection('users')
-                                                .doc(user.uid)
-                                                .collection('inventory')
-                                                .doc(docIds[i]);
-                                        
-                                        if (currentQty > deductQty) {
-                                                batch.update(docRef, {
-                                                        quantity: currentQty - deductQty,
-                                                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                                                });
-                                        } else {
-                                                batch.delete(docRef);
-                                        }
-                                        
-                                        remainingQty -= deductQty;
-                                }
-                        }
-                        
-                        if (remainingQty > 0) {
-                                console.warn(`Couldn't fulfill full quantity for ${item.name}`);
-                                // You might want to log this in the sale record
-                        }
+                const currentQty = doc.data().quantity;
+                const deductQty = Math.min(remainingQty, currentQty);
+                
+                if (deductQty > 0) {
+                    const docRef = db.collection('users')
+                            .doc(user.uid)
+                            .collection('inventory')
+                            .doc(docIds[i]);
+                    
+                    if (currentQty > deductQty) {
+                        batch.update(docRef, {
+                            quantity: currentQty - deductQty,
+                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        batch.delete(docRef);
+                    }
+                    
+                    remainingQty -= deductQty;
                 }
-                
-                await batch.commit();
-
-                // Show success message
-                showToast('Sale completed successfully!');
-                
-        } catch (error) {
-                console.error('Sale Error:', error);
-                showToast(`Error processing sale: ${error.message}`, 'error');
-                throw error; // Re-throw to prevent further processing
-        } finally {
-                // Reset everything
-                shoppingCart = [];
-                updateCartDisplay();
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Confirm Sale';
-                salesModal.classList.add('hidden');
-                
-                // Reset form fields
-                document.getElementById('customerSelect').value = '';
-                document.getElementById('paymentType').value = 'full';
-                document.getElementById('amountPaid').value = '';
-                document.getElementById('amountPaidContainer').classList.add('hidden');
-                
-                // Hide new customer form if visible
-                document.getElementById('newCustomerForm').classList.add('hidden');
-                
-                // Refresh all data after sale
-                await Promise.all([
-                        loadCustomers(),
-                        loadInventory()
-                ]);
+            }
+            
+            if (remainingQty > 0) {
+                console.warn(`Couldn't fulfill full quantity for ${item.name}`);
+            }
         }
+        
+        await batch.commit();
+        showToast('Sale completed successfully!');
+        
+    } catch (error) {
+        console.error('Sale Error:', error);
+        showToast(`Error processing sale: ${error.message}`, 'error');
+        throw error;
+    } finally {
+        shoppingCart = [];
+        updateCartDisplay();
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Sale';
+        salesModal.classList.add('hidden');
+        
+        document.getElementById('customerSelect').value = '';
+        document.getElementById('paymentType').value = 'full';
+        document.getElementById('amountPaid').value = '';
+        document.getElementById('amountPaidContainer').classList.add('hidden');
+        document.getElementById('newCustomerForm').classList.add('hidden');
+        
+        await Promise.all([
+            loadCustomers(),
+            loadInventory()
+        ]);
+    }
 }
-
 
 // Helper function to load customers
 async function loadCustomers() {
