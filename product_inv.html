@@ -1081,6 +1081,14 @@ select, input[type="number"], input[type="date"] {
 
 <script>
 
+                        
+
+
+
+
+
+
+
 
 
 // Tab Switching and Dynamic Content Creation
@@ -1164,7 +1172,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Load data when tab is clicked
                 if (tabId === 'sales') loadSalesHistory();
-                if (tabId === 'payments') loadPaymentStatus();
+                if (tabId === 'payments') loadPartialPayments();
             });
         });
     }
@@ -1189,18 +1197,200 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Data loading functions
-    function loadSalesHistory() {
-        // Your sales history loading logic
-        console.log('Loading sales data...');
-        // Example: fetchSalesData().then(renderSalesData);
+                                
+                            // Data loading function
+                            async function loadSalesHistory() {
+                                const salesHistoryBody = document.getElementById('salesHistoryBody');
+                                if (!salesHistoryBody) return;
+                                    
+                                    const user = auth.currentUser;
+                                    if (!user) return;
+                                        
+                                        // Show loading state
+                                        salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading sales history...</td></tr>';
+                                        
+                                        try {
+                                            const snapshot = await db.collection('users')
+                                            .doc(user.uid)
+                                            .collection('sales')
+                                            .orderBy('saleDate', 'desc')
+                                            .get();
+                                            
+                                            salesHistoryBody.innerHTML = ''; // Clear existing rows
+                                            
+                                            if (snapshot.empty) {
+                                                salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">No sales found</td></tr>';
+                                                return;
+                                            }
+                                                
+                                                snapshot.forEach((doc) => {
+            const sale = doc.data();
+            const customerName = sale.customerName || 'Unknown';
+            const saleDate = sale.saleDate.toDate().toLocaleDateString();
+
+            (sale.items || []).forEach((item) => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td class="p-2">${customerName}</td>
+                    <td class="p-2">${item.name || 'Unnamed Product'}</td>
+                    <td class="p-2 text-center">${item.quantity || 0}</td>
+                    <td class="p-2">${saleDate}</td>
+                `;
+
+                salesHistoryBody.appendChild(row);
+            });
+        });
+    } catch (error) {
+        console.error('Error loading sales history:', error);
+        salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
+    }
+}
+
+
+
+    // Load Partial Payments
+async function loadPartialPayments() {
+    const paymentStatusBody = document.getElementById('paymentStatusBody');
+    if (!paymentStatusBody) return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Show loading state
+    paymentStatusBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center">Loading payments...</td></tr>';
+
+    try {
+        const snapshot = await db.collection('users')
+            .doc(user.uid)
+            .collection('sales')
+            .orderBy('saleDate', 'desc')
+            .get();
+
+        paymentStatusBody.innerHTML = ''; // Clear existing rows
+
+        if (snapshot.empty) {
+            paymentStatusBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center">No partial payments found</td></tr>';
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const sale = doc.data();
+
+            if (sale.paymentType !== 'partial') {
+                return; // Only show partial payments
+            }
+
+            const customerName = sale.customerName || 'Unknown';
+            const saleDate = sale.saleDate?.toDate().toLocaleDateString() || '';
+            const totalAmount = sale.totalAmount || 0;
+            const amountPaid = sale.amountPaid || 0;
+            const dueAmount = totalAmount - amountPaid;
+
+            // Combine all product names into one string
+            const productNames = (sale.items || [])
+                .map(item => item.name || 'Unnamed Product')
+                .join(', ');
+
+            const totalQty = (sale.items || [])
+                .reduce((sum, item) => sum + (item.quantity || 0), 0);
+
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td class="p-2">${customerName}</td>
+                <td class="p-2">${productNames}</td>
+                <td class="p-2 text-center">${totalQty}</td>
+                <td class="p-2">${totalAmount.toFixed(2)}</td>
+                <td class="p-2">${amountPaid.toFixed(2)}</td>
+                <td class="p-2">${dueAmount.toFixed(2)}</td>
+                <td class="p-2">${saleDate}</td>
+                <td class="p-2">
+                    <button class="text-blue-500 hover:underline" onclick="openPaymentModal('${doc.id}', ${amountPaid}, ${totalAmount})">Pay</button>
+                </td>
+            `;
+
+            paymentStatusBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error loading partial payments:', error);
+        paymentStatusBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-red-500">Error loading payments</td></tr>';
+    }
+}
+
+window.loadPartialPayments = loadPartialPayments;
+
+});
+
+
+
+
+
+
+
+async function openPaymentModal(saleId, currentPaid, totalAmount) {
+    const payInput = prompt(`Enter payment amount (Remaining: ₱${(totalAmount - currentPaid).toFixed(2)}):`, '');
+
+    if (payInput === null) {
+        // User cancelled
+        return;
     }
 
-    function loadPaymentStatus() {
-        // Your payment status loading logic
-        console.log('Loading payments data...');
-        // Example: fetchPaymentsData().then(renderPaymentsData);
+    const additionalPayment = parseFloat(payInput);
+
+    if (isNaN(additionalPayment) || additionalPayment <= 0) {
+        alert('Please enter a valid payment amount.');
+        return;
     }
-});
+
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Not authenticated.');
+            return;
+        }
+
+        const saleRef = db.collection('users')
+            .doc(user.uid)
+            .collection('sales')
+            .doc(saleId);
+
+        const saleDoc = await saleRef.get();
+
+        if (!saleDoc.exists) {
+            alert('Sale record not found.');
+            return;
+        }
+
+        const saleData = saleDoc.data();
+        const updatedAmountPaid = (saleData.amountPaid || 0) + additionalPayment;
+        const totalAmount = saleData.totalAmount || 0;
+
+        let updateFields = {
+            amountPaid: updatedAmountPaid,
+        };
+
+        // If fully paid, change paymentType to 'full'
+        if (updatedAmountPaid >= totalAmount) {
+            updateFields.paymentType = 'full';
+        }
+
+        await saleRef.update(updateFields);
+
+        alert('Payment updated successfully!');
+        loadPartialPayments(); // Reload table to reflect changes
+    } catch (error) {
+        console.error('Error updating payment:', error);
+        alert('Error updating payment: ' + error.message);
+    }
+}
+
+
+
+
+
+
+
 
 
 document.getElementById('status-toggle').addEventListener('change', function() {
@@ -2332,8 +2522,7 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
             }, 2000);
         }
         
-        // Process sale (your existing implementation)
-async function processSale(customerId, customerName) {
+    async function processSale(customerId, customerName) {
     const user = firebase.auth().currentUser;
     if (!user) {
         showToast('Please log in to process sales', 'error');
@@ -2345,35 +2534,22 @@ async function processSale(customerId, customerName) {
         return;
     }
 
-    // Enforce customer requirement - no walk-in customers allowed
-    if (!customerId || typeof customerId !== 'string' || customerId.trim() === '') {
-        showToast('Please select a valid customer', 'error');
-        return;
-    }
+    // Strict customer validation
+    customerId = typeof customerId === 'string' ? customerId.trim() : '';
+    customerName = typeof customerName === 'string' ? customerName.trim() : '';
 
-    // Ensure customerName is provided and valid
-    if (!customerName || typeof customerName !== 'string' || customerName.trim() === '') {
-        showToast('Please provide a valid customer name', 'error');
-        return;
+    if (!customerId || !customerName) {
+        showToast('Please select a valid customer before confirming the sale.', 'error');
+        return; // Stop if customer info is missing
     }
 
     const confirmBtn = document.getElementById('confirmSale');
     const salesModal = document.getElementById('salesModal');
-    
-    // Prevent multiple executions
-    if (confirmBtn.disabled) {
-        console.log('Sale already in progress');
-        return;
-    }
-    
+
     try {
         // Show processing state
         confirmBtn.disabled = true;
         confirmBtn.textContent = 'Processing...';
-
-        // Sanitize customer data
-        customerId = customerId.trim();
-        customerName = customerName.trim();
 
         // Process payment
         const paymentType = document.getElementById('paymentType').value || 'full';
@@ -2385,7 +2561,7 @@ async function processSale(customerId, customerName) {
             amountPaid = Math.min(Math.max(0, paidInput), totalAmount);
         }
 
-        // Save sale record
+        // Prepare sale data
         const saleData = {
             customerId,
             customerName: customerName.substring(0, 100),
@@ -2404,6 +2580,7 @@ async function processSale(customerId, customerName) {
             processedBy: user.uid
         };
 
+        // Save the sale record
         const saleRef = await db.collection('users')
             .doc(user.uid)
             .collection('sales')
@@ -2411,13 +2588,13 @@ async function processSale(customerId, customerName) {
 
         // Update inventory
         const batch = db.batch();
-        
+
         for (const item of shoppingCart) {
             const docIds = item.id.split(',');
             let remainingQty = item.quantity;
-            
+
             const docs = await Promise.all(
-                docIds.map(docId => 
+                docIds.map(docId =>
                     db.collection('users')
                         .doc(user.uid)
                         .collection('inventory')
@@ -2425,20 +2602,20 @@ async function processSale(customerId, customerName) {
                         .get()
                 )
             );
-            
+
             for (let i = 0; i < docs.length && remainingQty > 0; i++) {
                 const doc = docs[i];
                 if (!doc.exists) continue;
-                
+
                 const currentQty = doc.data().quantity;
                 const deductQty = Math.min(remainingQty, currentQty);
-                
+
                 if (deductQty > 0) {
                     const docRef = db.collection('users')
-                            .doc(user.uid)
-                            .collection('inventory')
-                            .doc(docIds[i]);
-                    
+                        .doc(user.uid)
+                        .collection('inventory')
+                        .doc(docIds[i]);
+
                     if (currentQty > deductQty) {
                         batch.update(docRef, {
                             quantity: currentQty - deductQty,
@@ -2447,42 +2624,47 @@ async function processSale(customerId, customerName) {
                     } else {
                         batch.delete(docRef);
                     }
-                    
+
                     remainingQty -= deductQty;
                 }
             }
-            
+
             if (remainingQty > 0) {
                 console.warn(`Couldn't fulfill full quantity for ${item.name}`);
             }
         }
-        
+
         await batch.commit();
+
         showToast('Sale completed successfully!');
-        
+
     } catch (error) {
         console.error('Sale Error:', error);
         showToast(`Error processing sale: ${error.message}`, 'error');
         throw error;
     } finally {
+        // Reset everything
         shoppingCart = [];
         updateCartDisplay();
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Confirm Sale';
         salesModal.classList.add('hidden');
-        
+
+        // Reset form fields
         document.getElementById('customerSelect').value = '';
         document.getElementById('paymentType').value = 'full';
         document.getElementById('amountPaid').value = '';
         document.getElementById('amountPaidContainer').classList.add('hidden');
         document.getElementById('newCustomerForm').classList.add('hidden');
-        
+
+        // Reload customers and inventory
         await Promise.all([
             loadCustomers(),
             loadInventory()
         ]);
     }
 }
+
 
 // Helper function to load customers
 async function loadCustomers() {
