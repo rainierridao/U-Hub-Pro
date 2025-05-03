@@ -2701,8 +2701,7 @@ async function processSale(customerId, customerName) {
     customerName = typeof customerName === 'string' ? customerName.trim() : '';
 
     if (!customerId || !customerName) {
-        showToast('Please select a valid customer before confirming the sale.', 'error');
-        return;
+            return;
     }
 
     const confirmBtn = document.getElementById('confirmSale');
@@ -3065,6 +3064,7 @@ function setupCustomerSave() {
                         
                         if (!customerId) {
                             alert('Please select a customer or add a new one');
+                            showToast('Please select a valid customer or add a new one.', 'error');
                             return;
                         }
                             }
