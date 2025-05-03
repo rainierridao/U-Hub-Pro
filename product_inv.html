@@ -431,6 +431,7 @@ select, input[type="number"], input[type="date"] {
         /* Cart Modal Styles */
         #salesModal {
         transition: opacity 0.3s ease;
+        z-index: 999;
         }
         
         #salesModal.hidden {
@@ -764,6 +765,23 @@ select, input[type="number"], input[type="date"] {
     to { opacity: 1; transform: translateY(0); }
 }
 
+
+
+
+.cart-item {
+    transition: all 0.3s ease;
+    opacity: 1;
+    max-height: 100px;
+    overflow: hidden;
+}
+
+.cart-item.removing {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
 
         
 </style>
@@ -2099,6 +2117,59 @@ async function markAsReceived(itemId) {
 
 
 
+// Add this in your initialization code (runs once when page loads)
+document.addEventListener('click', function(e) {
+    // Handle remove buttons
+    const removeBtn = e.target.closest('.remove-btn');
+    if (removeBtn) {
+        const itemId = removeBtn.getAttribute('data-id');
+        removeCartItem(itemId);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+    
+    // Handle clicking on the trash icon directly
+    if (e.target.classList.contains('fa-trash') && e.target.closest('.remove-btn')) {
+        const btn = e.target.closest('.remove-btn');
+        const itemId = btn.getAttribute('data-id');
+        removeCartItem(itemId);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+    
+    // Handle plus buttons
+    const plusBtn = e.target.closest('.plus-btn');
+    if (plusBtn) {
+        const itemId = plusBtn.getAttribute('data-id');
+        updateCartItemQuantity(itemId, 1);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+    
+    // Handle minus buttons
+    const minusBtn = e.target.closest('.minus-btn');
+    if (minusBtn) {
+        const itemId = minusBtn.getAttribute('data-id');
+        updateCartItemQuantity(itemId, -1);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+    
+    // Handle quantity input changes
+    const quantityInput = e.target.closest('.quantity-input');
+    if (quantityInput) {
+        const itemId = quantityInput.getAttribute('data-id');
+        const newQuantity = parseInt(quantityInput.value);
+        setCartItemQuantity(itemId, newQuantity);
+        return;
+    }
+});
+
+
 
 
     // Event Listeners
@@ -2311,64 +2382,111 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
         }
         
         // Render the cart modal with current items
-        function renderCartModal() {
-            const container = document.getElementById('cartItemsContainer');
-            const totalElement = document.getElementById('cartTotal');
-            
-            // Clear previous content
-            container.innerHTML = '';
-            
-            if (shoppingCart.length === 0) {
-                container.innerHTML = '<p class="text-center py-4 text-gray-500">Your cart is empty</p>';
-                totalElement.textContent = 'Total: ₱0';
+    function renderCartModal() {
+    const container = document.getElementById('cartItemsContainer');
+    const totalElement = document.getElementById('cartTotal');
+    
+    container.innerHTML = '';
+
+    if (shoppingCart.length === 0) {
+        container.innerHTML = '<p class="text-center py-4 text-gray-500">Your cart is empty</p>';
+        totalElement.textContent = 'Total: ₱0';
+        return;
+    }
+
+    const scrollWrapper = document.createElement('div');
+// Scroll wrapper styling
+scrollWrapper.style.maxHeight = '190px';
+scrollWrapper.style.overflowY = 'auto';
+scrollWrapper.style.backgroundColor = '#f9fafb'; // Light gray background
+scrollWrapper.style.border = '1px solid #e5e7eb'; // Light border
+scrollWrapper.style.borderRadius = '6px';
+scrollWrapper.style.padding = '8px';
+scrollWrapper.style.margin = '8px 0';
+scrollWrapper.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.05)';
+scrollWrapper.style.scrollbarWidth = 'thin'; // For Firefox
+scrollWrapper.style.scrollbarColor = '#d1d5db transparent'; // For Firefox
+scrollWrapper.classList.add('custom-scrollbar');
+
+shoppingCart.forEach(item => {
+    const itemElement = document.createElement('div');
+    itemElement.className = 'cart-item';
+    itemElement.style.marginBottom = '4px'; // Added margin between items
+    itemElement.style.padding = '4px'; // Added padding inside each item
+    itemElement.style.backgroundColor = '#ffffff'; // White background for each item
+    itemElement.style.borderRadius = '4px'; // Rounded corners
+    itemElement.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'; // Subtle shadow
+    
+    itemElement.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px;">
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</div>
+                <div style="color: #6b7280; font-size: 12px;">₱${item.price.toLocaleString()}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <button class="minus-btn" data-id="${item.id}" style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid #d1d5db; background: white; cursor: pointer; transition: all 0.2s;">
+                    −
+                </button>
+                <input type="number" class="quantity-input" data-id="${item.id}" value="${item.quantity}" min="1" max="${item.maxQuantity}"
+                    style="width: 36px; text-align: center; padding: 2px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                <button class="plus-btn" data-id="${item.id}" style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid #d1d5db; background: white; cursor: pointer; transition: all 0.2s;">
+                    +
+                </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="font-weight: 500; white-space: nowrap;">₱${(item.price * item.quantity).toLocaleString()}</div>
+                <button class="remove-btn" data-id="${item.id}" style="background: none; border: none; color: #ef4444; cursor: pointer; transition: all 0.2s;">
+                    <i class="fas fa-trash" style="font-size: 14px;"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    scrollWrapper.appendChild(itemElement);
+});
+
+container.appendChild(scrollWrapper);
+
+    const total = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    totalElement.textContent = `Total: ₱${total.toLocaleString()}`;
+    
+    // Attach event listeners dynamically after rendering
+    container.querySelectorAll('.plus-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-id');
+            updateCartItemQuantity(itemId, 1);
+        });
+    });
+
+    container.querySelectorAll('.minus-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-id');
+            updateCartItemQuantity(itemId, -1);
+        });
+    });
+
+    container.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const itemId = this.getAttribute('data-id');
+            const newQuantity = parseInt(this.value);
+            if (isNaN(newQuantity)) {
+                this.value = 1;
                 return;
             }
-            
-            // Add each cart item
-            shoppingCart.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'cart-item';
-                itemElement.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">
-    <!-- Product Info -->
-    <div style="flex: 1; min-width: 0;">
-        <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</div>
-        <div style="color: #6b7280; font-size: 12px;">₱${item.price.toLocaleString()}</div>
-    </div>
+            setCartItemQuantity(itemId, newQuantity);
+        });
+    });
 
-    <!-- Quantity Controls -->
-    <div style="display: flex; align-items: center; gap: 4px;">
-        <button style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid #d1d5db; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;" 
-                class="minus-btn" data-id="${item.id}">−</button>
-        <input type="number" value="${item.quantity}" min="1" max="${item.maxQuantity}"
-                style="width: 36px; text-align: center; padding: 2px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px; -moz-appearance: textfield;">
-        <button style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid #d1d5db; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;" 
-                class="plus-btn" data-id="${item.id}">+</button>
-    </div>
+    container.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-id');
+            removeCartItem(itemId);
+        });
+    });
 
-    <!-- Total & Remove -->
-    <div style="display: flex; align-items: center; gap: 8px;">
-        <div style="font-weight: 500; white-space: nowrap;">₱${(item.price * item.quantity).toLocaleString()}</div>
-        <button style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px;"
-                class="remove-btn" data-id="${item.id}">
-            <i class="fas fa-trash" style="font-size: 14px;"></i>
-        </button>
-    </div>
-</div>
-       `;
-                container.appendChild(itemElement);
-            });
-            
-            // Calculate and display total
-            const total = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            totalElement.textContent = `Total: ₱${total.toLocaleString()}`;
-            
-            // Add event listeners to the new elements
-            addCartItemEventListeners();
-            
-            // Show the modal
-            document.getElementById('salesModal').classList.remove('hidden');
-        }
+    // Show the modal
+    document.getElementById('salesModal').classList.remove('hidden');
+}
+
         
         // Add event listeners to cart item controls
         function addCartItemEventListeners() {
@@ -2414,57 +2532,61 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
         
         // Update cart item quantity by increment/decrement
         function updateCartItemQuantity(itemId, change) {
-            const item = shoppingCart.find(item => item.id === itemId);
-            if (!item) return;
-            
-            const newQuantity = item.quantity + change;
-            
-            if (newQuantity < 1) {
-                removeCartItem(itemId);
-            } else if (newQuantity > item.maxQuantity) {
-                alert(`Only ${item.maxQuantity} available in stock`);
-            } else {
-                item.quantity = newQuantity;
-                updateCartDisplay();
-            }
-        }
+    const item = shoppingCart.find(item => item.id === itemId);
+    if (!item) return;
+
+    const newQuantity = item.quantity + change;
+
+    if (newQuantity < 1) {
+        removeCartItem(itemId);
+    } else if (newQuantity > item.maxQuantity) {
+        alert(`Only ${item.maxQuantity} available in stock`);
+    } else {
+        item.quantity = newQuantity;
+    }
+
+    updateCartDisplay(true);
+}
+
         
         // Set cart item quantity directly
         function setCartItemQuantity(itemId, quantity) {
-            const item = shoppingCart.find(item => item.id === itemId);
-            if (!item) return;
-            
-            const newQuantity = parseInt(quantity);
-            
-            if (isNaN(newQuantity)) {
-                alert('Please enter a valid quantity');
-                return;
-            }
-            
-            if (newQuantity < 1) {
-                removeCartItem(itemId);
-            } else if (newQuantity > item.maxQuantity) {
-                alert(`Only ${item.maxQuantity} available in stock`);
-                item.quantity = item.maxQuantity;
-                updateCartDisplay();
-            } else {
-                item.quantity = newQuantity;
-                updateCartDisplay();
-            }
-        }
+    const item = shoppingCart.find(item => item.id === itemId);
+    if (!item) return;
+
+    const newQuantity = parseInt(quantity);
+
+    if (isNaN(newQuantity)) {
+        alert('Please enter a valid quantity');
+        return;
+    }
+
+    if (newQuantity < 1) {
+        removeCartItem(itemId);
+    } else if (newQuantity > item.maxQuantity) {
+        alert(`Only ${item.maxQuantity} available in stock`);
+        item.quantity = item.maxQuantity;
+    } else {
+        item.quantity = newQuantity;
+    }
+
+    updateCartDisplay(true);
+}
         
         // Remove item from cart
         function removeCartItem(itemId) {
-            shoppingCart = shoppingCart.filter(item => item.id !== itemId);
-            updateCartDisplay();
-        }
+    shoppingCart = shoppingCart.filter(item => item.id !== itemId);
+    updateCartDisplay(true); // Pass true to re-render the modal
+    showToast('Item removed from cart');
+}
         
         // Update all cart-related displays
-        function updateCartDisplay() {
-            updateCartCount();
-            renderCartModal();
-        }
-        
+    function updateCartDisplay(showModal = false) {
+    updateCartCount();
+    if (showModal) {
+        renderCartModal();
+    }
+}
         // Update the cart count badge
         function updateCartCount() {
             const count = shoppingCart.reduce((total, item) => total + item.quantity, 0);
@@ -2486,31 +2608,45 @@ document.getElementById("cancelExpiry").addEventListener("click", function() {
     const allIds = row ? row.dataset.ids.split(',') : [productId];
     console.log('All document IDs:', allIds);
 
+    // Try to find an existing cart item by product name
+    const existingItem = shoppingCart.find(item => item.name === productName);
+
 
             
-            const existingItem = shoppingCart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                if (existingItem.quantity < maxQuantity) {
-                    existingItem.quantity += 1;
-                } else {
-                    alert(`Cannot add more. Maximum available: ${maxQuantity}`);
-                    return;
-                }
-            } else {
-                shoppingCart.push({
-                    id: allIds.join(','), // Store ALL document IDs as a comma-separated string                
-                    name: productName,
-                    price: price,
-                    quantity: 1,
-                    maxQuantity: maxQuantity
-                });
-            }
-            
-            updateCartDisplay();
-            showToast(`${productName} added to cart`);
+        if (existingItem) {
+        const totalQuantity = existingItem.quantity + 1;
+
+        if (totalQuantity > maxQuantity) {
+            alert(`Cannot add more. Maximum available: ${maxQuantity}`);
+            return;
         }
-        
+
+        // Increase quantity
+        existingItem.quantity = totalQuantity;
+
+        // Merge unique IDs
+        const currentIds = existingItem.id.split(',');
+        const newUniqueIds = allIds.filter(id => !currentIds.includes(id));
+        if (newUniqueIds.length > 0) {
+            existingItem.id = [...currentIds, ...newUniqueIds].join(',');
+        }
+
+    } else {
+        // Add as new item
+        shoppingCart.push({
+            id: allIds.join(','),
+            name: productName,
+            price: price,
+            quantity: 1,
+            maxQuantity: maxQuantity
+        });
+    }
+
+    updateCartDisplay();
+    showToast(`${productName} added to cart`);
+}
+    
+    
         // Show toast notification
         function showToast(message) {
             const toast = document.createElement('div');
