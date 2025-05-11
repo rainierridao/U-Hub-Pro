@@ -787,7 +787,10 @@ select, input[type="number"], input[type="date"] {
 .no-select {
   user-select: none;
   -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
 }
+
 
 </style>
 <body>
@@ -1193,21 +1196,20 @@ select, input[type="number"], input[type="date"] {
 <script>
 
                         
-
                           function startPress(e) {
-                            // Only apply for touchstart (mobile)
-                              if (e.type === 'mousedown' && e.button !== 0) return;
-                                if (e.type === 'touchstart') {
-                                  document.body.classList.add('no-select'); // prevent text highlight on mobile
-                                }
-                                  
-                                  currentCustomerId = cell.dataset.customerId;
-                                  innerDiv.classList.add(pressHighlightClass);
-                                  
-                                  pressTimer = setTimeout(() => {
+                            if (e.type === 'mousedown' && e.button !== 0) return;
+                              
+                              if (e.type === 'touchstart') {
+                                document.body.classList.add('no-select');
+                              }
+                                
+                                currentCustomerId = cell.dataset.customerId;
+                                innerDiv.classList.add(pressHighlightClass);
+                                
+                                pressTimer = setTimeout(() => {
     showCustomerModal(cell);
     innerDiv.classList.remove(pressHighlightClass);
-    document.body.classList.remove('no-select');
+    document.body.classList.remove('no-select'); // remove after modal opens
   }, 800);
 }
 
