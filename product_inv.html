@@ -787,8 +787,8 @@ select, input[type="number"], input[type="date"] {
 .no-select {
   user-select: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
   -ms-user-select: none;
+  -moz-user-select: none;
 }
 
 
@@ -1374,18 +1374,16 @@ async function loadSalesHistory() {
       });
     });
     
-    setupCustomerLongPress(customersMap, salesByCustomer);
+    setupCustomerClick(customersMap, salesByCustomer);
     
   } catch (error) {
     console.error('Error loading sales history:', error);
     salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
   }
 }
-function setupCustomerLongPress(customersMap, salesByCustomer) {
-  let pressTimer = null;
+
+function setupCustomerClick(customersMap, salesByCustomer) {
   let currentCustomerId = null;
-  const pressHighlightClass = 'bg-blue-50';
-  let currentlyHighlightedElement = null;
 
   const customerModal = document.getElementById('customerModal');
   const editCustomerModal = document.getElementById('editCustomerModal');
@@ -1408,53 +1406,20 @@ function setupCustomerLongPress(customersMap, salesByCustomer) {
   const deleteBtn = document.getElementById('deleteCustomerBtn');
 
   document.querySelectorAll('.customer-name').forEach(cell => {
-    const innerDiv = cell.querySelector('.customer-name-inner');
-    
-    // Mouse events
-    cell.addEventListener('mousedown', (e) => startPress(e, innerDiv));
-    cell.addEventListener('mouseup', () => endPress(innerDiv));
-    cell.addEventListener('mouseleave', () => endPress(innerDiv));
-    
-    // Touch events
-    cell.addEventListener('touchstart', (e) => startPress(e, innerDiv));
-    cell.addEventListener('touchend', () => endPress(innerDiv));
-    cell.addEventListener('touchcancel', () => endPress(innerDiv));
-  });
-
-  function startPress(e, innerDiv) {
-    if (e.type === 'mousedown' && e.button !== 0) return;
-    
-    // Clear any existing highlight
-    if (currentlyHighlightedElement) {
-      currentlyHighlightedElement.classList.remove(pressHighlightClass);
-    }
-    
-    // Prevent text selection during long press
-    if (e.type === 'touchstart') {
+    // Click event for both mouse and touch
+    cell.addEventListener('click', (e) => {
+      // Prevent text selection
       document.body.classList.add('no-select');
-    }
-    
-    currentCustomerId = e.currentTarget.dataset.customerId;
-    innerDiv.classList.add(pressHighlightClass);
-    currentlyHighlightedElement = innerDiv;
-    
-    pressTimer = setTimeout(() => {
-      showCustomerModal(e.currentTarget);
-      endPress(innerDiv);
-    }, 800);
-  }
-  
-  function endPress(innerDiv) {
-    clearTimeout(pressTimer);
-    pressTimer = null;
-    
-    if (innerDiv === currentlyHighlightedElement) {
-      innerDiv.classList.remove(pressHighlightClass);
-      currentlyHighlightedElement = null;
-    }
-    
-    document.body.classList.remove('no-select');
-  }
+      
+      currentCustomerId = cell.dataset.customerId;
+      showCustomerModal(cell);
+      
+      // Remove selection prevention after a short delay
+      setTimeout(() => {
+        document.body.classList.remove('no-select');
+      }, 100);
+    });
+  });
 
   function showCustomerModal(cell) {
     currentCustomerId = cell.dataset.customerId;
@@ -1606,7 +1571,6 @@ function showToast(message, type = 'success') {
     toast.remove();
   }, 3000);
 }
-
 
     // Load Partial Payments
 async function loadPartialPayments() {
