@@ -1003,6 +1003,8 @@ select, input[type="number"], input[type="date"] {
                         </table>
                         </div>
                         </div>
+                
+                        
                         
                         <!-- Payments Tab -->
                         <div id="payments-tab" class="tab-content">
@@ -1096,16 +1098,96 @@ select, input[type="number"], input[type="date"] {
                             </div>
                             </div>
                             </div>
+                            
+                            
+                      
+                          <div id="customerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                          <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                          <h3 class="text-lg font-medium mb-4">Customer Profile</h3>
+                          
+                          <div class="space-y-4">
+                          <div>
+                          <label class="text-sm font-medium text-gray-500">Full Name</label>
+                          <div id="modalCustomerName" class="font-medium mt-1"></div>
+                          </div>
+                          
+                          <div>
+                          <label class="text-sm font-medium text-gray-500">Contact</label>
+                          <div class="flex items-center mt-1">
+                          <span id="modalCustomerPhone" class="mr-2"></span>
+                          <a id="callCustomerBtn" href="#" class="text-blue-600 hover:text-blue-800">
+                          <i class="fas fa-phone"></i> Call
+                          </a>
+                          </div>
+                          </div>
+                          
+                          <div>
+                          <label class="text-sm font-medium text-gray-500">Address</label>
+                          <div id="modalCustomerAddress" class="mt-1"></div>
+                          </div>
+                          
+                          <div class="pt-2 border-t">
+                          <h4 class="font-medium mb-2">Purchase History</h4>
+                          <div id="purchaseHistory" class="max-h-40 overflow-y-auto">
+                          <!-- Will be populated dynamically -->
+                          </div>
+                          </div>
+                          </div>
+                          
+                          <div class="mt-6 flex justify-between">
+                          <button id="editCustomerBtn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                          <i class="fas fa-edit mr-1"></i> Edit
+                          </button>
+                          <div>
+                          <button id="closeCustomerModal" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                          Close
+                          </button>
+                          </div>
+                          </div>
+                          </div>
+                          </div>
+                          
+                          <div id="editCustomerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                          <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                          <h3 class="text-lg font-medium mb-4">Edit Customer</h3>
+                          
+                          <div class="space-y-4">
+                          <div>
+                          <label class="block text-sm font-medium mb-1">Full Name</label>
+                          <input type="text" id="editCustomerName" class="w-full border p-2 rounded">
+                          </div>
+                          
+                          <div>
+                          <label class="block text-sm font-medium mb-1">Phone</label>
+                          <input type="text" id="editCustomerPhone" class="w-full border p-2 rounded">
+                          </div>
+                          
+                          <div>
+                          <label class="block text-sm font-medium mb-1">Address</label>
+                          <textarea id="editCustomerAddress" class="w-full border p-2 rounded"></textarea>
+                          </div>
+                          </div>
+                          
+                          <div class="mt-6 flex justify-between">
+                          <button id="deleteCustomerBtn" class="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200">
+                          <i class="fas fa-trash mr-1"></i> Delete
+                          </button>
+                          <div>
+                          <button id="cancelEditCustomer" class="px-4 py-2 border rounded mr-2">
+                          Cancel
+                          </button>
+                          <button id="saveCustomerBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                          Save Changes
+                          </button>
+                          </div>
+                          </div>
+                          </div>
+                          </div>
+                          
 
 <script>
 
                         
-
-
-
-
-
-
 
 
 
@@ -1214,58 +1296,292 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Data loading functions
-                                
-                            // Data loading function
-                            async function loadSalesHistory() {
-                                const salesHistoryBody = document.getElementById('salesHistoryBody');
-                                if (!salesHistoryBody) return;
-                                    
-                                    const user = auth.currentUser;
-                                    if (!user) return;
-                                        
-                                        // Show loading state
-                                        salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading sales history...</td></tr>';
-                                        
-                                        try {
-                                            const snapshot = await db.collection('users')
-                                            .doc(user.uid)
-                                            .collection('sales')
-                                            .orderBy('saleDate', 'desc')
-                                            .get();
-                                            
-                                            salesHistoryBody.innerHTML = ''; // Clear existing rows
-                                            
-                                            if (snapshot.empty) {
-                                                salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">No sales found</td></tr>';
-                                                return;
-                                            }
-                                                
-                                                snapshot.forEach((doc) => {
-            const sale = doc.data();
-            const customerName = sale.customerName || 'Unknown';
-            const saleDate = sale.saleDate.toDate().toLocaleDateString();
-
-            (sale.items || []).forEach((item) => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td class="p-2">${customerName}</td>
-                    <td class="p-2">${item.name || 'Unnamed Product'}</td>
-                    <td class="p-2 text-center">${item.quantity || 0}</td>
-                    <td class="p-2">${saleDate}</td>
-                `;
-
-                salesHistoryBody.appendChild(row);
-            });
-        });
-    } catch (error) {
-        console.error('Error loading sales history:', error);
-        salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
+    // Data loading function (updated with all new features)
+async function loadSalesHistory() {
+  const salesHistoryBody = document.getElementById('salesHistoryBody');
+  if (!salesHistoryBody) return;
+  
+  const user = auth.currentUser;
+  if (!user) return;
+  
+  // Show loading state
+  salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading sales history...</td></tr>';
+  
+  try {
+    // Load all customers
+    const customersSnapshot = await db.collection('users')
+      .doc(user.uid)
+      .collection('customers')
+      .get();
+    
+    const customersMap = {};
+    customersSnapshot.forEach(doc => {
+      customersMap[doc.id] = { id: doc.id, ...doc.data() };
+    });
+    
+    // Load sales history
+    const snapshot = await db.collection('users')
+      .doc(user.uid)
+      .collection('sales')
+      .orderBy('saleDate', 'desc')
+      .get();
+    
+    salesHistoryBody.innerHTML = '';
+    
+    if (snapshot.empty) {
+      salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">No sales found</td></tr>';
+      return;
     }
+    
+    // Build sales by customer for purchase history
+    const salesByCustomer = {};
+    snapshot.forEach(doc => {
+      const sale = doc.data();
+      const customerId = sale.customerId || '';
+      if (!salesByCustomer[customerId]) {
+        salesByCustomer[customerId] = [];
+      }
+      salesByCustomer[customerId].push(sale);
+    });
+    
+    snapshot.forEach((doc) => {
+      const sale = doc.data();
+      const customerId = sale.customerId || '';
+      const customerData = customersMap[customerId] || {};
+      const customerName = sale.customerName || customerData.name || 'Unknown';
+      const saleDate = sale.saleDate.toDate().toLocaleDateString();
+
+      (sale.items || []).forEach((item) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="p-2 customer-name" 
+            data-customer-id="${customerId}"
+            data-customer-name="${customerName}"
+            data-customer-phone="${customerData.phone || 'Not provided'}"
+            data-customer-address="${customerData.address || 'Not provided'}">
+            <div class="customer-name-inner">${customerName}</div>
+          </td>
+          <td class="p-2">${item.name || 'Unnamed Product'}</td>
+          <td class="p-2 text-center">${item.quantity || 0}</td>
+          <td class="p-2">${saleDate}</td>
+        `;
+        salesHistoryBody.appendChild(row);
+      });
+    });
+    
+    setupCustomerLongPress(customersMap, salesByCustomer);
+    
+  } catch (error) {
+    console.error('Error loading sales history:', error);
+    salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
+  }
 }
 
 
+function setupCustomerLongPress(customersMap, salesByCustomer) {
+  let pressTimer;
+  let currentCustomerId = null;
+  const pressHighlightClass = 'bg-blue-50';
+  
+  const customerModal = document.getElementById('customerModal');
+  const editCustomerModal = document.getElementById('editCustomerModal');
+  
+  // Main modal elements
+  const modalName = document.getElementById('modalCustomerName');
+  const modalPhone = document.getElementById('modalCustomerPhone');
+  const modalAddress = document.getElementById('modalCustomerAddress');
+  const callBtn = document.getElementById('callCustomerBtn');
+  const purchaseHistory = document.getElementById('purchaseHistory');
+  const editBtn = document.getElementById('editCustomerBtn');
+  const closeBtn = document.getElementById('closeCustomerModal');
+  
+  // Edit modal elements
+  const editName = document.getElementById('editCustomerName');
+  const editPhone = document.getElementById('editCustomerPhone');
+  const editAddress = document.getElementById('editCustomerAddress');
+  const saveBtn = document.getElementById('saveCustomerBtn');
+  const cancelEditBtn = document.getElementById('cancelEditCustomer');
+  const deleteBtn = document.getElementById('deleteCustomerBtn');
+
+  document.querySelectorAll('.customer-name').forEach(cell => {
+    const innerDiv = cell.querySelector('.customer-name-inner');
+    
+    // Mouse events
+    cell.addEventListener('mousedown', startPress);
+    cell.addEventListener('mouseup', endPress);
+    cell.addEventListener('mouseleave', endPress);
+    
+    // Touch events
+    cell.addEventListener('touchstart', startPress);
+    cell.addEventListener('touchend', endPress);
+    cell.addEventListener('touchcancel', endPress);
+    
+    function startPress(e) {
+      // Prevent text selection
+      if (e.type === 'mousedown' && e.button !== 0) return;
+      
+      currentCustomerId = cell.dataset.customerId;
+      innerDiv.classList.add(pressHighlightClass);
+      
+      pressTimer = setTimeout(() => {
+        showCustomerModal(cell);
+        innerDiv.classList.remove(pressHighlightClass);
+      }, 800);
+    }
+    
+    function endPress() {
+      clearTimeout(pressTimer);
+      innerDiv.classList.remove(pressHighlightClass);
+    }
+  });
+
+  function showCustomerModal(cell) {
+    currentCustomerId = cell.dataset.customerId;
+    const phone = cell.dataset.customerPhone;
+    
+    // Set basic info
+    modalName.textContent = cell.dataset.customerName || 'Unknown';
+    modalPhone.textContent = phone || 'Not provided';
+    modalAddress.textContent = cell.dataset.customerAddress || 'Not provided';
+    
+    // Setup call button
+    if (phone && phone !== 'Not provided') {
+      callBtn.href = `tel:${phone}`;
+      callBtn.classList.remove('hidden');
+    } else {
+      callBtn.classList.add('hidden');
+    }
+    
+    // Load purchase history
+    loadPurchaseHistory(currentCustomerId, salesByCustomer);
+    
+    customerModal.classList.remove('hidden');
+  }
+  
+  function loadPurchaseHistory(customerId, salesByCustomer) {
+    purchaseHistory.innerHTML = '';
+    
+    const sales = salesByCustomer[customerId] || [];
+    if (sales.length === 0) {
+      purchaseHistory.innerHTML = '<p class="text-gray-500 text-sm">No purchase history</p>';
+      return;
+    }
+    
+    const historyList = document.createElement('div');
+    historyList.className = 'space-y-2';
+    
+    sales.forEach(sale => {
+      const saleDate = sale.saleDate.toDate().toLocaleDateString();
+      const totalAmount = sale.totalAmount || 0;
+      const paymentType = sale.paymentType || 'full';
+      
+      const saleDiv = document.createElement('div');
+      saleDiv.className = 'border-b pb-2';
+      saleDiv.innerHTML = `
+        <div class="flex justify-between">
+          <span class="font-medium">${saleDate}</span>
+          <span>₱${totalAmount.toFixed(2)}</span>
+        </div>
+        <div class="text-sm text-gray-600">
+          ${paymentType === 'partial' ? 'Partial Payment' : 'Full Payment'}
+        </div>
+      `;
+      historyList.appendChild(saleDiv);
+    });
+    
+    purchaseHistory.appendChild(historyList);
+  }
+  
+  // Edit customer functionality
+  editBtn?.addEventListener('click', () => {
+    if (!currentCustomerId) return;
+    
+    const customer = customersMap[currentCustomerId];
+    if (!customer) return;
+    
+    editName.value = customer.name || '';
+    editPhone.value = customer.phone || '';
+    editAddress.value = customer.address || '';
+    
+    customerModal.classList.add('hidden');
+    editCustomerModal.classList.remove('hidden');
+  });
+  
+  // Save edited customer
+  saveBtn?.addEventListener('click', async () => {
+    if (!currentCustomerId) return;
+    
+    try {
+      await db.collection('users')
+        .doc(auth.currentUser.uid)
+        .collection('customers')
+        .doc(currentCustomerId)
+        .update({
+          name: editName.value.trim(),
+          phone: editPhone.value.trim(),
+          address: editAddress.value.trim(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      
+      editCustomerModal.classList.add('hidden');
+      showToast('Customer updated successfully');
+      loadSalesHistory(); // Refresh data
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      showToast('Error updating customer', 'error');
+    }
+  });
+  
+  // Delete customer
+  deleteBtn?.addEventListener('click', async () => {
+    if (!currentCustomerId || !confirm('Delete this customer? This cannot be undone.')) return;
+    
+    try {
+      await db.collection('users')
+        .doc(auth.currentUser.uid)
+        .collection('customers')
+        .doc(currentCustomerId)
+        .delete();
+      
+      editCustomerModal.classList.add('hidden');
+      showToast('Customer deleted');
+      loadSalesHistory(); // Refresh data
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      showToast('Error deleting customer', 'error');
+    }
+  });
+  
+  // Modal navigation
+  closeBtn?.addEventListener('click', () => customerModal.classList.add('hidden'));
+  cancelEditBtn?.addEventListener('click', () => {
+    editCustomerModal.classList.add('hidden');
+    customerModal.classList.remove('hidden');
+  });
+  
+  // Close modals when clicking outside
+  [customerModal, editCustomerModal].forEach(modal => {
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+  });
+}
+
+// Helper function for toast notifications
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg text-white ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  }`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 
     // Load Partial Payments
 async function loadPartialPayments() {
