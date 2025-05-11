@@ -787,8 +787,8 @@ select, input[type="number"], input[type="date"] {
 .no-select {
   user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none;
   -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 
@@ -1196,30 +1196,6 @@ select, input[type="number"], input[type="date"] {
 <script>
 
                         
-                          function startPress(e) {
-                            if (e.type === 'mousedown' && e.button !== 0) return;
-                              
-                              if (e.type === 'touchstart') {
-                                document.body.classList.add('no-select');
-                              }
-                                
-                                currentCustomerId = cell.dataset.customerId;
-                                innerDiv.classList.add(pressHighlightClass);
-                                
-                                pressTimer = setTimeout(() => {
-    showCustomerModal(cell);
-    innerDiv.classList.remove(pressHighlightClass);
-    document.body.classList.remove('no-select'); // remove after modal opens
-  }, 800);
-}
-
-function endPress() {
-  clearTimeout(pressTimer);
-  innerDiv.classList.remove(pressHighlightClass);
-  document.body.classList.remove('no-select');
-}
-
-
 // Tab Switching and Dynamic Content Creation
 document.addEventListener('DOMContentLoaded', function() {
     const tabsContainer = document.querySelector('.line-tabs');
@@ -1405,13 +1381,12 @@ async function loadSalesHistory() {
     salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
   }
 }
-
-
 function setupCustomerLongPress(customersMap, salesByCustomer) {
-  let pressTimer;
+  let pressTimer = null;
   let currentCustomerId = null;
   const pressHighlightClass = 'bg-blue-50';
-  
+  let currentlyHighlightedElement = null;
+
   const customerModal = document.getElementById('customerModal');
   const editCustomerModal = document.getElementById('editCustomerModal');
   
@@ -1436,33 +1411,50 @@ function setupCustomerLongPress(customersMap, salesByCustomer) {
     const innerDiv = cell.querySelector('.customer-name-inner');
     
     // Mouse events
-    cell.addEventListener('mousedown', startPress);
-    cell.addEventListener('mouseup', endPress);
-    cell.addEventListener('mouseleave', endPress);
+    cell.addEventListener('mousedown', (e) => startPress(e, innerDiv));
+    cell.addEventListener('mouseup', () => endPress(innerDiv));
+    cell.addEventListener('mouseleave', () => endPress(innerDiv));
     
     // Touch events
-    cell.addEventListener('touchstart', startPress);
-    cell.addEventListener('touchend', endPress);
-    cell.addEventListener('touchcancel', endPress);
-    
-    function startPress(e) {
-      // Prevent text selection
-      if (e.type === 'mousedown' && e.button !== 0) return;
-      
-      currentCustomerId = cell.dataset.customerId;
-      innerDiv.classList.add(pressHighlightClass);
-      
-      pressTimer = setTimeout(() => {
-        showCustomerModal(cell);
-        innerDiv.classList.remove(pressHighlightClass);
-      }, 800);
-    }
-    
-    function endPress() {
-      clearTimeout(pressTimer);
-      innerDiv.classList.remove(pressHighlightClass);
-    }
+    cell.addEventListener('touchstart', (e) => startPress(e, innerDiv));
+    cell.addEventListener('touchend', () => endPress(innerDiv));
+    cell.addEventListener('touchcancel', () => endPress(innerDiv));
   });
+
+  function startPress(e, innerDiv) {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    
+    // Clear any existing highlight
+    if (currentlyHighlightedElement) {
+      currentlyHighlightedElement.classList.remove(pressHighlightClass);
+    }
+    
+    // Prevent text selection during long press
+    if (e.type === 'touchstart') {
+      document.body.classList.add('no-select');
+    }
+    
+    currentCustomerId = e.currentTarget.dataset.customerId;
+    innerDiv.classList.add(pressHighlightClass);
+    currentlyHighlightedElement = innerDiv;
+    
+    pressTimer = setTimeout(() => {
+      showCustomerModal(e.currentTarget);
+      endPress(innerDiv);
+    }, 800);
+  }
+  
+  function endPress(innerDiv) {
+    clearTimeout(pressTimer);
+    pressTimer = null;
+    
+    if (innerDiv === currentlyHighlightedElement) {
+      innerDiv.classList.remove(pressHighlightClass);
+      currentlyHighlightedElement = null;
+    }
+    
+    document.body.classList.remove('no-select');
+  }
 
   function showCustomerModal(cell) {
     currentCustomerId = cell.dataset.customerId;
@@ -1488,43 +1480,42 @@ function setupCustomerLongPress(customersMap, salesByCustomer) {
   }
   
   function loadPurchaseHistory(customerId, salesByCustomer) {
-  purchaseHistory.innerHTML = '';
-  
-  const sales = salesByCustomer[customerId] || [];
-  if (sales.length === 0) {
-    purchaseHistory.innerHTML = '<p class="text-gray-500 text-sm">No purchase history</p>';
-    return;
+    purchaseHistory.innerHTML = '';
+    
+    const sales = salesByCustomer[customerId] || [];
+    if (sales.length === 0) {
+      purchaseHistory.innerHTML = '<p class="text-gray-500 text-sm">No purchase history</p>';
+      return;
+    }
+
+    const historyContainer = document.createElement('div');
+    historyContainer.className = 'bg-gray-100 p-4 rounded-lg';
+
+    const historyList = document.createElement('div');
+    historyList.className = 'space-y-2';
+
+    sales.forEach(sale => {
+      const saleDate = sale.saleDate.toDate().toLocaleDateString();
+      const totalAmount = sale.totalAmount || 0;
+      const paymentType = sale.paymentType || 'full';
+
+      const saleDiv = document.createElement('div');
+      saleDiv.className = 'border-b pb-2';
+      saleDiv.innerHTML = `
+        <div class="flex justify-between">
+          <span class="font-medium">${saleDate}</span>
+          <span>₱${totalAmount.toFixed(2)}</span>
+        </div>
+        <div class="text-sm text-gray-600">
+          ${paymentType === 'partial' ? 'Partial Payment' : 'Full Payment'}
+        </div>
+      `;
+      historyList.appendChild(saleDiv);
+    });
+
+    historyContainer.appendChild(historyList);
+    purchaseHistory.appendChild(historyContainer);
   }
-
-  const historyContainer = document.createElement('div');
-  historyContainer.className = 'bg-gray-100 p-4 rounded-lg'; // Add background and padding
-
-  const historyList = document.createElement('div');
-  historyList.className = 'space-y-2';
-
-  sales.forEach(sale => {
-    const saleDate = sale.saleDate.toDate().toLocaleDateString();
-    const totalAmount = sale.totalAmount || 0;
-    const paymentType = sale.paymentType || 'full';
-
-    const saleDiv = document.createElement('div');
-    saleDiv.className = 'border-b pb-2';
-    saleDiv.innerHTML = `
-      <div class="flex justify-between">
-        <span class="font-medium">${saleDate}</span>
-        <span>₱${totalAmount.toFixed(2)}</span>
-      </div>
-      <div class="text-sm text-gray-600">
-        ${paymentType === 'partial' ? 'Partial Payment' : 'Full Payment'}
-      </div>
-    `;
-    historyList.appendChild(saleDiv);
-  });
-
-  historyContainer.appendChild(historyList);
-  purchaseHistory.appendChild(historyContainer);
-}
-
   
   // Edit customer functionality
   editBtn?.addEventListener('click', () => {
@@ -1603,7 +1594,6 @@ function setupCustomerLongPress(customersMap, salesByCustomer) {
   });
 }
 
-// Helper function for toast notifications
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg text-white ${
@@ -1616,6 +1606,7 @@ function showToast(message, type = 'success') {
     toast.remove();
   }, 3000);
 }
+
 
     // Load Partial Payments
 async function loadPartialPayments() {
