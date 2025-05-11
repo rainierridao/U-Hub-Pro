@@ -783,7 +783,12 @@ select, input[type="number"], input[type="date"] {
     border: none;
 }
 
-        
+        /* Only disable selection when the class is added */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 </style>
 <body>
 
@@ -1189,6 +1194,28 @@ select, input[type="number"], input[type="date"] {
 
                         
 
+                          function startPress(e) {
+                            // Only apply for touchstart (mobile)
+                              if (e.type === 'mousedown' && e.button !== 0) return;
+                                if (e.type === 'touchstart') {
+                                  document.body.classList.add('no-select'); // prevent text highlight on mobile
+                                }
+                                  
+                                  currentCustomerId = cell.dataset.customerId;
+                                  innerDiv.classList.add(pressHighlightClass);
+                                  
+                                  pressTimer = setTimeout(() => {
+    showCustomerModal(cell);
+    innerDiv.classList.remove(pressHighlightClass);
+    document.body.classList.remove('no-select');
+  }, 800);
+}
+
+function endPress() {
+  clearTimeout(pressTimer);
+  innerDiv.classList.remove(pressHighlightClass);
+  document.body.classList.remove('no-select');
+}
 
 
 // Tab Switching and Dynamic Content Creation
@@ -1459,38 +1486,43 @@ function setupCustomerLongPress(customersMap, salesByCustomer) {
   }
   
   function loadPurchaseHistory(customerId, salesByCustomer) {
-    purchaseHistory.innerHTML = '';
-    
-    const sales = salesByCustomer[customerId] || [];
-    if (sales.length === 0) {
-      purchaseHistory.innerHTML = '<p class="text-gray-500 text-sm">No purchase history</p>';
-      return;
-    }
-    
-    const historyList = document.createElement('div');
-    historyList.className = 'space-y-2';
-    
-    sales.forEach(sale => {
-      const saleDate = sale.saleDate.toDate().toLocaleDateString();
-      const totalAmount = sale.totalAmount || 0;
-      const paymentType = sale.paymentType || 'full';
-      
-      const saleDiv = document.createElement('div');
-      saleDiv.className = 'border-b pb-2';
-      saleDiv.innerHTML = `
-        <div class="flex justify-between">
-          <span class="font-medium">${saleDate}</span>
-          <span>₱${totalAmount.toFixed(2)}</span>
-        </div>
-        <div class="text-sm text-gray-600">
-          ${paymentType === 'partial' ? 'Partial Payment' : 'Full Payment'}
-        </div>
-      `;
-      historyList.appendChild(saleDiv);
-    });
-    
-    purchaseHistory.appendChild(historyList);
+  purchaseHistory.innerHTML = '';
+  
+  const sales = salesByCustomer[customerId] || [];
+  if (sales.length === 0) {
+    purchaseHistory.innerHTML = '<p class="text-gray-500 text-sm">No purchase history</p>';
+    return;
   }
+
+  const historyContainer = document.createElement('div');
+  historyContainer.className = 'bg-gray-100 p-4 rounded-lg'; // Add background and padding
+
+  const historyList = document.createElement('div');
+  historyList.className = 'space-y-2';
+
+  sales.forEach(sale => {
+    const saleDate = sale.saleDate.toDate().toLocaleDateString();
+    const totalAmount = sale.totalAmount || 0;
+    const paymentType = sale.paymentType || 'full';
+
+    const saleDiv = document.createElement('div');
+    saleDiv.className = 'border-b pb-2';
+    saleDiv.innerHTML = `
+      <div class="flex justify-between">
+        <span class="font-medium">${saleDate}</span>
+        <span>₱${totalAmount.toFixed(2)}</span>
+      </div>
+      <div class="text-sm text-gray-600">
+        ${paymentType === 'partial' ? 'Partial Payment' : 'Full Payment'}
+      </div>
+    `;
+    historyList.appendChild(saleDiv);
+  });
+
+  historyContainer.appendChild(historyList);
+  purchaseHistory.appendChild(historyContainer);
+}
+
   
   // Edit customer functionality
   editBtn?.addEventListener('click', () => {
