@@ -783,14 +783,22 @@ select, input[type="number"], input[type="date"] {
     border: none;
 }
 
-        /* Only disable selection when the class is added */
+      /* Add to your existing CSS */
+.customer-name-inner {
+  transition: background-color 0.2s ease;
+}
+
+.customer-name-inner:hover {
+  background-color: #eff6ff; /* light blue-50 */
+  cursor: pointer;
+}
+
 .no-select {
   user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none;
   -moz-user-select: none;
+  -ms-user-select: none;
 }
-
 
 </style>
 <body>
@@ -1406,7 +1414,18 @@ function setupCustomerClick(customersMap, salesByCustomer) {
   const deleteBtn = document.getElementById('deleteCustomerBtn');
 
   document.querySelectorAll('.customer-name').forEach(cell => {
-    // Click event for both mouse and touch
+    const innerDiv = cell.querySelector('.customer-name-inner');
+    
+    // Add hover effects
+    cell.addEventListener('mouseenter', () => {
+      innerDiv.classList.add('hover:bg-blue-50');
+    });
+    
+    cell.addEventListener('mouseleave', () => {
+      innerDiv.classList.remove('hover:bg-blue-50');
+    });
+    
+    // Click event
     cell.addEventListener('click', (e) => {
       // Prevent text selection
       document.body.classList.add('no-select');
@@ -1420,6 +1439,7 @@ function setupCustomerClick(customersMap, salesByCustomer) {
       }, 100);
     });
   });
+
 
   function showCustomerModal(cell) {
     currentCustomerId = cell.dataset.customerId;
