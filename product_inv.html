@@ -996,8 +996,20 @@ select, input[type="number"], input[type="date"] {
                     
                     <!-- Sales Tab -->
                     <div id="sales-tab" class="tab-content">
-                    <div class="view-toggle-container" style="margin-bottom: 2.65rem;">
-                    <!-- Sales-specific view toggles can go here if needed -->
+                    
+                    <div class="view-toggle-container" style="margin-top: 20px;">
+                  <div class="mb-4">
+                  <input type="text" id="customerSearch" placeholder="Search customers..." 
+                  class="p-2 border rounded w-full max-w-md">
+                  </div>
+                  <div id="customerReportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <div class="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto">
+                  <h2 id="reportCustomerName" class="text-xl font-bold mb-4"></h2>
+                  <div id="customerReportContent"></div>
+                  <button onclick="document.getElementById('customerReportModal').classList.add('hidden')" 
+                  class="mt-4 px-4 py-2 bg-gray-500 text-white rounded">Close</button>
+                  </div>
+                  </div>
                         <div class="sales-filters">
                         <!-- Add any sales-specific filter controls -->
                         </div>
@@ -1592,6 +1604,19 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Load Partial Payments
 async function loadPartialPayments() {
     const paymentStatusBody = document.getElementById('paymentStatusBody');
@@ -1976,7 +2001,7 @@ const productData = {
         "USANA Probiotic": { member: 1700, srp: 2040, ao: 1530, svp: 10 },
         "Usanimals": { member: 1400, srp: 1680, ao: 1260, svp: 8 },
         "Visionex": { member: 2730, srp: 3280, ao: 2457, svp: 25 },
-        "Whitening Toothpaste": { member: 540, srp: 580, ao: 486, svp: 3 }
+        "Whitening Toothpaste": { member: 480c, srp: 580, ao: 432, svp: 3 }
     },
     Celavive: {
     "Creamy Foam Cleanser": { member: 1890, srp: 2270, ao: 1890, svp: 14 },
