@@ -1023,6 +1023,7 @@ select, input[type="number"], input[type="date"] {
                         <th>Product</th>
                         <th>Qty</th>
                         <th>Date</th>
+                        <th>Action</th>
                         </tr>
                         </thead>
                         <tbody id="salesHistoryBody">
@@ -1321,7 +1322,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Data loading function (updated with all new features)
+  // Data loading function (updated with all new features)
 async function loadSalesHistory() {
   const salesHistoryBody = document.getElementById('salesHistoryBody');
   if (!salesHistoryBody) return;
@@ -1330,7 +1331,7 @@ async function loadSalesHistory() {
   if (!user) return;
   
   // Show loading state
-  salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Loading sales history...</td></tr>';
+  salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Loading sales history...</td></tr>';
   
   try {
     // Load all customers
@@ -1354,7 +1355,7 @@ async function loadSalesHistory() {
     salesHistoryBody.innerHTML = '';
     
     if (snapshot.empty) {
-      salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">No sales found</td></tr>';
+      salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">No sales found</td></tr>';
       return;
     }
     
@@ -1366,7 +1367,7 @@ async function loadSalesHistory() {
       if (!salesByCustomer[customerId]) {
         salesByCustomer[customerId] = [];
       }
-      salesByCustomer[customerId].push(sale);
+      salesByCustomer[customerId].push({ id: doc.id, ...sale });
     });
     
     snapshot.forEach((doc) => {
@@ -1376,8 +1377,10 @@ async function loadSalesHistory() {
       const customerName = sale.customerName || customerData.name || 'Unknown';
       const saleDate = sale.saleDate.toDate().toLocaleDateString();
 
-      (sale.items || []).forEach((item) => {
+      (sale.items || []).forEach((item, itemIndex) => {
         const row = document.createElement('tr');
+        row.dataset.saleId = doc.id;
+        row.dataset.itemIndex = itemIndex;
         row.innerHTML = `
           <td class="p-2 customer-name" 
             data-customer-id="${customerId}"
@@ -1389,6 +1392,13 @@ async function loadSalesHistory() {
           <td class="p-2">${item.name || 'Unnamed Product'}</td>
           <td class="p-2 text-center">${item.quantity || 0}</td>
           <td class="p-2">${saleDate}</td>
+          <td class="p-2 text-center">
+            <button class="delete-sale-btn text-red-500 hover:text-red-700" title="Delete this sale">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </td>
         `;
         salesHistoryBody.appendChild(row);
       });
@@ -1396,11 +1406,53 @@ async function loadSalesHistory() {
     
     setupCustomerClick(customersMap, salesByCustomer);
     
+    // Add event listeners to all delete buttons
+    document.querySelectorAll('.delete-sale-btn').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const row = e.target.closest('tr');
+        const saleId = row.dataset.saleId;
+        const itemIndex = parseInt(row.dataset.itemIndex);
+        
+        try {
+          // Get the sale document
+          const saleRef = db.collection('users').doc(user.uid).collection('sales').doc(saleId);
+          const saleDoc = await saleRef.get();
+          
+          if (!saleDoc.exists) {
+            alert('Sale not found!');
+            return;
+          }
+          
+          const saleData = saleDoc.data();
+          const items = saleData.items || [];
+          
+          if (items.length <= 1) {
+            // If this is the only item, delete the entire sale
+            if (confirm('Are you sure you want to delete this sale record?')) {
+              await saleRef.delete();
+              row.remove();
+            }
+          } else {
+            // If there are multiple items, remove just this item
+            if (confirm('Are you sure you want to delete this item from the sale?')) {
+              items.splice(itemIndex, 1);
+              await saleRef.update({ items });
+              row.remove();
+            }
+          }
+        } catch (error) {
+          console.error('Error deleting sale:', error);
+          alert('Error deleting sale. Please try again.');
+        }
+      });
+    });
+    
   } catch (error) {
     console.error('Error loading sales history:', error);
-    salesHistoryBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
+    salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
   }
 }
+
 
 function setupCustomerClick(customersMap, salesByCustomer) {
   let currentCustomerId = null;
