@@ -218,6 +218,22 @@ select, input[type="number"], input[type="date"] {
         z-index: 1;
     }
     
+    /* Add to your style section */
+    #appointmentDate, #appointmentTime {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    width: 100%;
+    }
+    
+    #setAppointmentBtn {
+    transition: background-color 0.2s ease;
+    }
+    
+    #appointmentStatus {
+    min-height: 1.5rem;
+    }
+    
     
     @media (max-width: 600px) {
         .content {
@@ -289,27 +305,47 @@ select, input[type="number"], input[type="date"] {
     </div>
     
     <!-- Modal -->
-<div id="leadModal">
+    <div id="leadModal">
     <div>
-        <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
-        <p><strong>Name:</strong> <span id="modalName"></span></p>
-        <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
-        <p><strong>Contact:</strong> <span id="modalContact"></span></p>
-        <p><strong>Email:</strong> <span id="modalEmail"></span></p>
-        <div class="mt-4 flex flex-wrap gap-2">
+    <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
+    <p><strong>Name:</strong> <span id="modalName"></span></p>
+    <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
+    <p><strong>Contact:</strong> <span id="modalContact"></span></p>
+    <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+    
+    <!-- Appointment Section -->
+    <div class="mt-4 border-t pt-4">
+    <h3 class="font-medium mb-2">Appointment Scheduling</h3>
+    <div class="grid grid-cols-2 gap-4">
+    <div>
+    <label for="appointmentDate" class="block text-sm font-medium">Appointment Date:</label>
+        <input type="date" id="appointmentDate" class="w-full border rounded p-2">
+        </div>
+        <div>
+        <label for="appointmentTime" class="block text-sm font-medium">Time:</label>
+            <input type="time" id="appointmentTime" class="w-full border rounded p-2">
+            </div>
+            </div>
+            <button id="setAppointmentBtn" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            Set Appointment
+            </button>
+            <div id="appointmentStatus" class="mt-2 text-sm text-green-600"></div>
+            </div>
+            
+            <div class="mt-4 flex flex-wrap gap-2">
             <button id="callButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center">
-                <i class="fas fa-phone mr-2"></i> Call
+            <i class="fas fa-phone mr-2"></i> Call
             </button>
             <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
-                <i class="fas fa-sms mr-2"></i> SMS
+            <i class="fas fa-sms mr-2"></i> Initial SMS (5-day offer)
             </button>
             <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center">
-                <i class="fas fa-sms mr-2"></i> Follow-up SMS
+            <i class="fas fa-sms mr-2"></i> Follow-up SMS
             </button>
             <button id="closeModal" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Close</button>
-        </div>
-    </div>
-</div>
+            </div>
+            </div>
+            </div>
     
 </div>
     </div>
@@ -522,16 +558,89 @@ function toProperCase(str) {
     }
 
 
+        // When showing modal, set default appointment to tomorrow at 10am
         function showModal(name, birthday, contact, email) {
             modalName.textContent = toProperCase(name);
             modalBirthday.textContent = birthday;
-            modalContact.textContent = formatPhoneNumber(contact); // Format the number for display
-                modalEmail.textContent = email;
-                modal.style.display = 'flex';
-                setTimeout(() => {
+            modalContact.textContent = formatPhoneNumber(contact);
+            modalEmail.textContent = email;
+            
+            // Set default appointment to tomorrow at 10am
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(10, 0, 0, 0);
+            
+            document.getElementById('appointmentDate').valueAsDate = tomorrow;
+            document.getElementById('appointmentTime').value = '10:00';
+            document.getElementById('appointmentStatus').textContent = '';
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
         modal.classList.add('show');
     }, 10);
 }
+
+
+
+
+// Format date for display
+function formatDate(date) {
+    return date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+    });
+}
+
+// Initial SMS with 5-day expiration
+smsButton.addEventListener('click', () => {
+    const phoneNumber = modalContact.textContent.trim();
+    const leadName = modalName.textContent.trim();
+    
+    if (phoneNumber) {
+        const formattedDate = formatDate(currentUser.offerExpiry);
+        const message = `Hi Ma'am ${leadName}! 😊 This is ${currentUser.name} from USANA.
+
+Great news — you've been selected for a FREE Celavive skincare experience!
+
+Are you near ${currentUser.location}? We'd love to pamper you! 🎉
+
+Just reply YES to book your slot — you can claim this offer until ${formattedDate}.
+Let us know what time works best for you!`;
+        
+        window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+    } else {
+        alert('No phone number available for this contact');
+    }
+});
+
+// Set Appointment Button
+document.getElementById('setAppointmentBtn').addEventListener('click', () => {
+    const date = document.getElementById('appointmentDate').value;
+    const time = document.getElementById('appointmentTime').value;
+    
+    if (!date || !time) {
+        alert('Please select both date and time');
+        return;
+    }
+    
+    const appointmentDateTime = new Date(`${date}T${time}`);
+    const formattedDateTime = appointmentDateTime.toLocaleString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    document.getElementById('appointmentStatus').textContent = 
+        `Appointment set for ${formattedDateTime}`;
+    
+    // Here you would typically save this to your database
+    // For example: saveAppointmentToDatabase(modalName.textContent, phoneNumber, appointmentDateTime);
+});
+
 
 
 function formatPhoneNumber(phone) {
