@@ -63,6 +63,8 @@ html, body {
   }
 }
 
+
+
 /* Modal Styles */
 #leadModal {
 display: none;
@@ -225,17 +227,106 @@ input[type="file"]:hover::before {
   color: #1e40af;
 }
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  .settings-bar > div {
-    flex-direction: column;
-    gap: 8px;
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Prevent zooming on mobile */
+  html {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
   }
-  .settings-bar > div > div {
-    width: 100%;
-  }
-}
-
+  
+  /* Adjust layout for smaller screens */
+    .content {
+      padding: 0 8px;
+      margin-top: -10px;
+    }
+    
+    /* Make settings bar stack vertically */
+    .settings-bar > div {
+      flex-direction: column;
+    }
+    
+    .settings-bar > div > div {
+      width: 100% !important;
+      margin-bottom: 8px;
+    }
+    
+    /* Adjust table container for scrolling */
+      #tableContainer {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      display: block;
+      padding: 8px !important;
+      }
+      
+      /* Make table scroll horizontally */
+      #tableContainer table {
+      min-width: 700px; /* Force table to be wider than container */
+      width: 100%;
+      margin: 0;
+      }
+      
+      /* Adjust table cells */
+      #tableContainer th, 
+      #tableContainer td {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      }
+      
+      /* Modal adjustments */
+      #leadModal > div {
+      width: 95%;
+      max-width: 95%;
+      padding: 12px;
+      }
+      
+      /* Stack modal action buttons */
+      .modal-actions {
+        flex-direction: column;
+      }
+      
+      .modal-actions button {
+        width: 100%;
+        margin-bottom: 6px;
+      }
+      
+      /* Adjust form elements in modal */
+      .modal-section .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      /* Header adjustments */
+      .header .logo {
+        font-size: 1.2rem;
+      }
+      
+      /* Sidebar and topbar icons */
+      .sidebar, .topbar {
+        padding: 6px;
+      }
+      
+      .sidebar a, .topbar a {
+        padding: 8px;
+        font-size: 0.9rem;
+      }
+      
+      /* Greeting text */
+      .greeting-text {
+        font-size: 0.9rem;
+      }
+      }
+      
+      /* Prevent textarea zoom on iOS */
+      textarea, input, select {
+        font-size: 16px !important;
+      }
+        
+        /* Disable double-tap zoom */
+        * {
+          touch-action: manipulation;
+        }
 </style>
 <body>
 
