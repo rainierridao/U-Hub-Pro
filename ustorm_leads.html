@@ -414,23 +414,21 @@ select, input[type="number"], input[type="date"] {
 });
 
 
-        callButton.addEventListener('click', () => {
-            const phoneNumber = modalContact.textContent.trim();
-            if (phoneNumber) {
-                const cleanNumber = phoneNumber.replace(/\D/g, '');
-                window.open(`tel:${cleanNumber}`);
-            } else {
-                alert('No phone number available for this contact');
-            }
-        });
+    callButton.addEventListener('click', () => {
+    const phoneNumber = modalContact.textContent.trim();
+    if (phoneNumber) {
+        window.open(`tel:${phoneNumber}`);
+    } else {
+        alert('No phone number available for this contact');
+    }
+});
 
-        smsButton.addEventListener('click', () => {
-            const phoneNumber = modalContact.textContent.trim();
-            const leadName = modalName.textContent.trim();
-            
-            if (phoneNumber) {
-                const cleanNumber = phoneNumber.replace(/\D/g, '');
-                const message = `Hi Ma'am ${leadName}! 😊 This is ${fullname} from USANA.
+smsButton.addEventListener('click', () => {
+    const phoneNumber = modalContact.textContent.trim();
+    const leadName = modalName.textContent.trim();
+    
+    if (phoneNumber) {
+        const message = `Hi Ma'am ${leadName}! 😊 This is ${currentUser.name} from USANA.
 
 Great news — you've been selected for a FREE Celavive skincare experience!
 
@@ -438,30 +436,30 @@ Are you near ${currentUser.location}? We'd love to pamper you! 🎉
 
 Just reply to book your slot — you can claim this offer until ${currentUser.offerExpiry}.
 Let us know what time works best for you, and we'll handle the rest!`;
-                
-                window.open(`sms:${cleanNumber}?body=${encodeURIComponent(message)}`);
-            } else {
-                alert('No phone number available for this contact');
-            }
-        });
+        
+        window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+    } else {
+        alert('No phone number available for this contact');
+    }
+});
 
-        secondSmsButton.addEventListener('click', () => {
-            const phoneNumber = modalContact.textContent.trim();
-            const leadName = modalName.textContent.trim();
-            
-            if (phoneNumber) {
-                const cleanNumber = phoneNumber.replace(/\D/g, '');
-                const message = `Hi Ma'am ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
+secondSmsButton.addEventListener('click', () => {
+    const phoneNumber = modalContact.textContent.trim();
+    const leadName = modalName.textContent.trim();
+    
+    if (phoneNumber) {
+        const message = `Hi Ma'am ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
 
 We still have slots available this week at ${currentUser.location}! Would you like to book your session on [specific day] at [specific time]?
 
 This exclusive offer is only available until ${currentUser.offerExpiry}. Let me know if this works for you or if you'd prefer another time. Can't wait to pamper you! 💆‍♀️✨`;
-                
-                window.open(`sms:${cleanNumber}?body=${encodeURIComponent(message)}`);
-            } else {
-                alert('No phone number available for this contact');
-            }
-        });
+        
+        window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+    } else {
+        alert('No phone number available for this contact');
+    }
+});
+
 
         // And update the table rendering
 function renderTable(data) {
@@ -480,7 +478,7 @@ function renderTable(data) {
         html += '<tr class="bg-white border-b">';
         visibleHeaders.forEach(header => {
             if (header === "Name") {
-                html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" onclick="showModal('${escapeHtml(row["Name"])}', '${escapeHtml(row["Birthday"])}', '${escapeHtml(row["Contact"])}', '${escapeHtml(row["Email"])}')">${toProperCase(escapeHtml(row["Name"]))}</td>`;
+            html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" onclick="showModal('${escapeHtml(row["Name"])}', '${escapeHtml(row["Birthday"])}', '${escapeHtml(row["Contact"])}', '${escapeHtml(row["Email"])}')">${toProperCase(escapeHtml(row["Name"]))}</td>`;
             } else if (header === "Lead Status") {
                 html += `<td class="px-4 py-2 border">
                                         <select class="border p-1 rounded">
@@ -527,14 +525,36 @@ function toProperCase(str) {
         function showModal(name, birthday, contact, email) {
             modalName.textContent = toProperCase(name);
             modalBirthday.textContent = birthday;
-            modalContact.textContent = contact;
-            modalEmail.textContent = email;
-            modal.style.display = 'flex';
-            setTimeout(() => {
+            modalContact.textContent = formatPhoneNumber(contact); // Format the number for display
+                modalEmail.textContent = email;
+                modal.style.display = 'flex';
+                setTimeout(() => {
         modal.classList.add('show');
     }, 10);
 }
 
+
+function formatPhoneNumber(phone) {
+    if (!phone) return '';
+    
+    // Remove all non-digit characters
+    let cleanNumber = phone.replace(/\D/g, '');
+    
+    // If number starts with 0, replace with +63
+    if (cleanNumber.startsWith('0')) {
+                cleanNumber = '+63' + cleanNumber.substring(1);
+            }
+            // If number starts with 63 but missing +, add it
+            else if (cleanNumber.startsWith('63')) {
+                cleanNumber = '+' + cleanNumber;
+            }
+                // If number doesn't start with +, add +63
+    else if (!cleanNumber.startsWith('+')) {
+        cleanNumber = '+63' + cleanNumber;
+    }
+    
+    return cleanNumber;
+}
 
         // Helper function to escape HTML special characters
         function escapeHtml(unsafe) {
