@@ -59,6 +59,148 @@ max-height: 90vh;
 overflow-y: auto;
 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+
+
+.settings-bar {
+  background-color: #f8fafc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.settings-bar h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.settings-bar .grid {
+  gap: 8px;
+}
+
+.settings-bar label {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #64748b;
+}
+
+.settings-bar input {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+  height: 36px;
+}
+
+.settings-bar button {
+  height: 36px;
+  font-size: 0.9rem;
+  padding: 0 12px;
+}
+
+/* Compact Modal */
+#leadModal > div {
+max-width: 420px;
+padding: 16px;
+width: 95%;
+}
+
+#leadModal h2 {
+font-size: 1.1rem;
+margin-bottom: 12px;
+}
+
+#leadModal p {
+font-size: 0.9rem;
+margin-bottom: 8px;
+display: flex;
+}
+
+#leadModal p strong {
+width: 80px;
+flex-shrink: 0;
+}
+
+.modal-section {
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.modal-section h3 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.modal-section .grid {
+  gap: 8px;
+}
+
+.modal-section label {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.modal-section input {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+  height: 36px;
+}
+
+#setAppointmentBtn {
+font-size: 0.9rem;
+padding: 8px 12px;
+}
+
+#appointmentStatus {
+font-size: 0.85rem;
+margin-top: 8px;
+}
+
+.modal-actions {
+  margin-top: 12px;
+  gap: 6px;
+}
+
+.modal-actions button {
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+
+.modal-actions button i {
+  margin-right: 4px;
+}
+
+/* Table Container */
+#tableContainer {
+padding: 12px !important;
+}
+
+
+/* Make file input look consistent with other inputs */
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+input[type="file"]::before {
+  content: 'Upload CSV';
+  display: inline-block;
+  color: #4b5563;
+  font-size: 0.75rem;
+}
+input[type="file"]:hover::before {
+  color: #1e40af;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .settings-bar > div {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .settings-bar > div > div {
+    width: 100%;
+  }
+}
 </style>
 <body>
 
@@ -105,73 +247,82 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     </div>
     
     <div class="settings-bar">
-        <h3>Current Week Settings</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium">Claim Deadline Date:</label>
-                <input type="date" id="settingsClaimDate" class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Default Location:</label>
-                <input type="text" id="settingsLocation" class="w-full border rounded p-2">
-            </div>
-            <div class="flex items-end">
-                <button onclick="saveSettings()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Save Settings
-                </button>
-            </div>
-        </div>
+    <h3 class="text-sm font-medium mb-2">Current Week Settings</h3>
+    <div class="flex flex-col sm:flex-row gap-2 items-end">
+    <!-- CSV Upload -->
+    <div class="flex-1 min-w-[120px]">
+    <input type="file" id="csvFile" accept=".csv" class="w-full text-xs border rounded py-1 px-2">
     </div>
     
+    <!-- Claim Date -->
+    <div class="flex-1 min-w-[150px]">
+    <input type="date" id="settingsClaimDate" class="w-full text-xs border rounded py-1 px-2">
+    </div>
+    
+    <!-- Location -->
+    <div class="flex-1 min-w-[150px]">
+    <input type="text" id="settingsLocation" placeholder="Default Location" class="w-full text-xs border rounded py-1 px-2">
+    </div>
+    
+    <!-- Save Button -->
+    <div class="flex-0">
+    <button onclick="saveSettings()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded hover:bg-blue-700 whitespace-nowrap">
+    Save Settings
+    </button>
+    </div>
+    </div>
+    </div>
+    
+
     <div class="max-w-7xl mx-auto">
-    <input type="file" id="csvFile" accept=".csv" class="mb-4" />
-    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg" style="padding: 20px;"></div>
+    
+    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
     </div>
     
     <div id="leadModal">
     <div>
-    <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
-    <p><strong>Name:</strong> <span id="modalName"></span></p>
+    <h2 class="text-lg font-semibold">Lead Details</h2>
+    <p><strong>Name:</strong> <span id="modalName" class="truncate"></span></p>
     <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
     <p><strong>Contact:</strong> <span id="modalContact"></span></p>
-    <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+    <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
     
-    <div class="mt-4 border-t pt-4">
-    <h3 class="font-medium mb-2">Appointment Scheduling</h3>
+    <div class="modal-section border-t">
+    <h3 class="font-medium">Appointment</h3>
     <div class="grid grid-cols-2 gap-4">
     <div>
-    <label for="appointmentDate" class="block text-sm font-medium">Appointment Date:</label>
-        <input type="date" id="appointmentDate" class="w-full border rounded p-2">
-        </div>
-        <div>
-        <label for="appointmentTime" class="block text-sm font-medium">Time:</label>
-            <input type="time" id="appointmentTime" class="w-full border rounded p-2">
-            </div>
-            </div>
-            <div class="mt-2">
-                <label for="customLocation" class="block text-sm font-medium">Location (optional):</label>
-                <input type="text" id="customLocation" class="w-full border rounded p-2">
-            </div>
-            <button id="setAppointmentBtn" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-            Set Appointment
-            </button>
-            <div id="appointmentStatus" class="mt-2 text-sm text-green-600"></div>
-            </div>
-            
-            <div class="mt-4 flex flex-wrap gap-2">
-            <button id="callButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center">
-            <i class="fas fa-phone mr-2"></i> Call
-            </button>
-            <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
-            <i class="fas fa-sms mr-2"></i> SMS
-            </button>
-            <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center">
-            <i class="fas fa-sms mr-2"></i> Follow-up SMS
-            </button>
-            <button id="closeModal" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Close</button>
-            </div>
-            </div>
-            </div>
+    <label class="block text-xs">Date:</label>
+    <input type="date" id="appointmentDate" class="w-full border rounded">
+    </div>
+    <div>
+    <label class="block text-xs">Time:</label>
+    <input type="time" id="appointmentTime" class="w-full border rounded">
+    </div>
+    </div>
+    <div class="mt-2">
+    <label class="block text-xs">Location:</label>
+    <input type="text" id="customLocation" class="w-full border rounded">
+    </div>
+    <button id="setAppointmentBtn" class="mt-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+    Set Appointment
+    </button>
+    <div id="appointmentStatus"></div>
+    </div>
+    
+    <div class="modal-actions flex flex-wrap">
+    <button id="callButton" class="bg-green-500 hover:bg-green-600 text-white rounded flex items-center">
+    <i class="fas fa-phone"></i> Call
+    </button>
+    <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center">
+    <i class="fas fa-sms"></i> SMS
+    </button>
+    <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white rounded flex items-center">
+    <i class="fas fa-sms"></i> Follow-up
+    </button>
+    <button id="closeModal" class="bg-gray-500 hover:bg-gray-600 text-white rounded">Close</button>
+    </div>
+    </div>
+    </div>
     
 </div>
     </div>
