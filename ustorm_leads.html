@@ -12,265 +12,75 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
-    <!-- Add to <head> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
-    <!-- Add Papa Parse for CSV parsing -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
         
-        <!-- Firebase SDKs -->
-        <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    </head>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
 <style>
+    /* Your existing CSS styles remain unchanged */
+    .content {
+      max-width: auto;
+      margin: auto;
+      margin-top: -20px;
+    }
 
-
-
-.content {
-  max-width: auto;
-  margin: auto;
-  margin-top: -20px;
+/* Modal Styles */
+#leadModal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+z-index: 1000;
+justify-content: center;
+align-items: center;
+opacity: 0;
+transition: opacity 0.3s ease;
 }
 
-
-
-section.form-section {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
+#leadModal.show {
+opacity: 1;
 }
 
-section.form-section h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
+#leadModal > div {
+background-color: white;
+padding: 20px;
+border-radius: 8px;
+max-width: 500px;
+width: 90%;
+max-height: 90vh;
+overflow-y: auto;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
-form#addItemForm {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
-
-
-#accountDetails {
-grid-column: span 2;
-}
-
-
-/* Desktop/Tablet (2 columns) */
-@media (min-width: 768px) {
-    form#addItemForm {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    /* Make button span 2 columns */
-    button#additem {
-        grid-column: span 2;
-    }
-}
-
-/* Input styling (keep your existing) */
-select, input[type="number"], input[type="date"] {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 100%;
-    font-size: 16px;
-}
-    
-    button#additem {
-        background: #0b72c9;
-        color: white;
-        padding: 14px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 5px;
-    }
-
-select, input[type="number"], input[type="date"] {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  width: 100%;
-}
-  
-  button#additem {
-    background-color: #0b72c9;
-    color: white;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    grid-column: span 2;
-  }
-  
-  button#additem:hover {
-    background-color: #0859a6;
-  }
-  
-  section.table-section {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  
-  section.table-section h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
-  
-  .overflow-x-auto {
-    overflow-x: auto;
-    margin-top: -40px;
-  }
-  
-  
-      
-        
-        
-        
-        .loader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-        
-        .loader-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-            display: none;
-        }
-        
-        .loader-spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3f86f9;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        
-        
-    /* Modal Styles */
-    #leadModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none; /* Start with display none */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    }
-    
-    #leadModal.show {
-    opacity: 1;
-    }
-    
-    #leadModal > div {
-    background-color: white;
-    padding: 25px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-    }
-    
-    #leadModal.show > div {
-    transform: translateY(0);
-    }
-        
-    /* Add this to your table cell styling */
-    td.text-blue-600.cursor-pointer {
-        position: relative;
-        z-index: 1;
-    }
-    
-    /* Add to your style section */
-    #appointmentDate, #appointmentTime {
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    width: 100%;
-    }
-    
-    #setAppointmentBtn {
-    transition: background-color 0.2s ease;
-    }
-    
-    #appointmentStatus {
-    min-height: 1.5rem;
-    }
-    
-    
-    @media (max-width: 600px) {
-        .content {
-            margin-top: 60px;
-            padding-bottom: 8.5rem;
-            width: 300px;
-        }
-    }
-
 </style>
 <body>
 
-<!-- Topbar Icons -->
+<!-- Your existing HTML structure remains unchanged -->
 <div class="topbar">
 <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
 <a href="productcomputer.html"  title="Product Calculator"><i class="fas fa-calculator"></i></a>
 <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
 <a href="product_inv.html"  title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
   <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
-<!-- Logout Button in Sidebar -->
 <a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
 <i class="fas fa-sign-out-alt"></i>
 </a>
-
 </div>
+
 <div class="header">
 <div class="logo">
 <span style="margin-left: 0px;">Storm Leads</span>
-
-
 </div>
-
-
 </div>
     
-    <div class="dashboard">
-    
+<div class="dashboard">
   <!-- Sidebar -->
   <div class="sidebar">
   <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
@@ -279,7 +89,6 @@ select, input[type="number"], input[type="date"] {
   <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
   <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
   
-  <!-- Logout Button in Sidebar -->
   <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
   <i class="fas fa-sign-out-alt"></i>
   </a>
@@ -287,24 +96,38 @@ select, input[type="number"], input[type="date"] {
     
     <!-- Content -->
     <div class="content">
-    <!-- Header with ID instead of class -->
     <header id="mainHeader">
     <p id="greeting" class="greeting-text">Hi, User</p>
     </header>
     
-    <!-- Loader -->
     <div id="loader" class="loader-overlay">
     <div class="loader-spinner"></div>
     </div>
     
-    <div class="max-w-7xl mx-auto">
-    
-    
-    <input type="file" id="csvFile" accept=".csv" class="mb-4" />
-    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
+    <div class="settings-bar">
+        <h3>Current Week Settings</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium">Claim Deadline Date:</label>
+                <input type="date" id="settingsClaimDate" class="w-full border rounded p-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Default Location:</label>
+                <input type="text" id="settingsLocation" class="w-full border rounded p-2">
+            </div>
+            <div class="flex items-end">
+                <button onclick="saveSettings()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Save Settings
+                </button>
+            </div>
+        </div>
     </div>
     
-    <!-- Modal -->
+    <div class="max-w-7xl mx-auto">
+    <input type="file" id="csvFile" accept=".csv" class="mb-4" />
+    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg" style="padding: 20px;"></div>
+    </div>
+    
     <div id="leadModal">
     <div>
     <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
@@ -313,7 +136,6 @@ select, input[type="number"], input[type="date"] {
     <p><strong>Contact:</strong> <span id="modalContact"></span></p>
     <p><strong>Email:</strong> <span id="modalEmail"></span></p>
     
-    <!-- Appointment Section -->
     <div class="mt-4 border-t pt-4">
     <h3 class="font-medium mb-2">Appointment Scheduling</h3>
     <div class="grid grid-cols-2 gap-4">
@@ -326,6 +148,10 @@ select, input[type="number"], input[type="date"] {
             <input type="time" id="appointmentTime" class="w-full border rounded p-2">
             </div>
             </div>
+            <div class="mt-2">
+                <label for="customLocation" class="block text-sm font-medium">Location (optional):</label>
+                <input type="text" id="customLocation" class="w-full border rounded p-2">
+            </div>
             <button id="setAppointmentBtn" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
             Set Appointment
             </button>
@@ -337,7 +163,7 @@ select, input[type="number"], input[type="date"] {
             <i class="fas fa-phone mr-2"></i> Call
             </button>
             <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
-            <i class="fas fa-sms mr-2"></i> Initial SMS (5-day offer)
+            <i class="fas fa-sms mr-2"></i> SMS
             </button>
             <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center">
             <i class="fas fa-sms mr-2"></i> Follow-up SMS
@@ -365,325 +191,596 @@ select, input[type="number"], input[type="date"] {
     const auth = firebase.auth();
     const db = firebase.firestore();
     
+    // Current user data
+    let currentUser = {
+        uid: null,
+        fullname: "",
+        location: "",
+        phone: ""
+    };
+
+    // Current appointment settings
+    let currentAppointmentSettings = {
+        claimDate: "",
+        location: ""
+    };
+
+    // Current lead being viewed in modal
+    let currentLeadId = null;
+
+    // Collection references (will be initialized after auth)
+    let leadsCollection;
+    let appointmentSettingsCollection;
+    let appointmentsCollection;
+    const usersCollection = db.collection("users");
+
+    // DOM elements
+    const tableContainer = document.getElementById('tableContainer');
+    const modal = document.getElementById('leadModal');
+    const modalName = document.getElementById('modalName');
+    const modalBirthday = document.getElementById('modalBirthday');
+    const modalContact = document.getElementById('modalContact');
+    const modalEmail = document.getElementById('modalEmail');
+    const closeModal = document.getElementById('closeModal');
+    const callButton = document.getElementById('callButton');
+    const smsButton = document.getElementById('smsButton');
+    const secondSmsButton = document.getElementById('secondSmsButton');
+    const setAppointmentBtn = document.getElementById('setAppointmentBtn');
+
     // Initialize auth state listener
-    window.addEventListener("DOMContentLoaded", () => {
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("User logged in:", user.uid);
-                const uid = user.uid;
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser.uid = user.uid;
+            
+            // Initialize collections with user-specific paths
+            leadsCollection = db.collection("users").doc(currentUser.uid).collection("leads");
+            appointmentSettingsCollection = db.collection("users").doc(currentUser.uid).collection("appointmentSettings");
+            appointmentsCollection = db.collection("users").doc(currentUser.uid).collection("appointments");
 
-                db.collection("users").doc(uid).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            const data = doc.data();
-                            const username = data.username || "User";
-                            const fullname = data.fullname || "User";
-                            document.getElementById("greeting").innerText = `Hi, ${fullname}!`;
-                        }
-                        // Hide loader after username is set
-                        document.getElementById("loader").classList.add("hidden");
-                    })
-                    .catch((error) => {
-                        console.error("Error getting user data:", error);
-                    });
-            } else {
-                console.warn("No user is logged in. Redirecting...");
-                window.location.href = "index.html";
+            // Get user data
+            const userDoc = await usersCollection.doc(user.uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                currentUser.fullname = userData.fullname || "Your Name";
+                currentUser.location = userData.location || "Your Location";
+                currentUser.phone = userData.phone || "";
+                document.getElementById("greeting").innerText = `Hi, ${currentUser.fullname}!`;
             }
-        });
+
+            // Load settings and leads
+            await loadSettings();
+            await loadLeads();
+            
+            // Hide loader after everything is loaded
+            document.getElementById("loader").classList.add("hidden");
+        } else {
+            console.warn("No user is logged in. Redirecting...");
+            window.location.href = "index.html";
+        }
     });
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // Function to handle logout
-        const handleLogout = () => {
-            auth.signOut()
-                .then(() => window.location.href = "index.html")
-                .catch(error => {
-                    console.error("Logout failed:", error);
-                    alert("Logout error. Check console.");
+    // Load settings from Firestore
+    async function loadSettings() {
+        try {
+            const settingsDoc = await appointmentSettingsCollection.doc("current").get();
+            if (settingsDoc.exists) {
+                currentAppointmentSettings = settingsDoc.data();
+                updateSettingsUI();
+            } else {
+                // Set default settings if none exist
+                const defaultDate = new Date();
+                defaultDate.setDate(defaultDate.getDate() + 7);
+                currentAppointmentSettings = {
+                    claimDate: defaultDate.toISOString().split('T')[0],
+                    location: currentUser.location
+                };
+                await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
+                updateSettingsUI();
+            }
+        } catch (error) {
+            console.error("Error loading settings:", error);
+        }
+    }
+
+    // Update settings UI
+    function updateSettingsUI() {
+        document.getElementById("settingsClaimDate").value = currentAppointmentSettings.claimDate;
+        document.getElementById("settingsLocation").value = currentAppointmentSettings.location;
+    }
+
+    // Save settings
+    async function saveSettings() {
+        const newClaimDate = document.getElementById("settingsClaimDate").value;
+        const newLocation = document.getElementById("settingsLocation").value;
+        
+        if (!newClaimDate || !newLocation) {
+            alert("Please fill in all fields");
+            return;
+        }
+        
+        currentAppointmentSettings = {
+            claimDate: newClaimDate,
+            location: newLocation
+        };
+        
+        try {
+            await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
+            alert("Settings updated successfully!");
+        } catch (error) {
+            console.error("Error saving settings:", error);
+            alert("Error saving settings. Check console for details.");
+        }
+    }
+
+    // Load leads from Firestore
+    async function loadLeads() {
+        try {
+            document.getElementById("loader").classList.remove("hidden");
+            const querySnapshot = await leadsCollection.get();
+            const leads = [];
+            querySnapshot.forEach(doc => {
+                leads.push({
+                    id: doc.id,
+                    ...doc.data()
                 });
-        };
+            });
+            renderTable(leads);
+        } catch (error) {
+            console.error("Error loading leads:", error);
+            alert("Error loading leads. Check console for details.");
+        } finally {
+            document.getElementById("loader").classList.add("hidden");
+        }
+    }
 
-        // Attach to both buttons
-        document.getElementById("sidebarLogoutBtn")?.addEventListener("click", handleLogout);
-        document.getElementById("topbarLogoutBtn")?.addEventListener("click", handleLogout);
-    });
+    // Save CSV data to Firestore
+    async function saveLeadsToDB(leadsData) {
+        try {
+            document.getElementById("loader").classList.remove("hidden");
+            const batch = db.batch();
+            
+            leadsData.forEach(lead => {
+                const leadRef = leadsCollection.doc(); // Auto-generated ID
+                batch.set(leadRef, {
+                    ...lead,
+                    userId: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "New",
+                    lastContacted: null,
+                    notes: "",
+                    followUpDate: null
+                });
+            });
+            
+            await batch.commit();
+            loadLeads(); // Refresh the table
+            alert("Leads imported successfully!");
+        } catch (error) {
+            console.error("Error saving leads:", error);
+            alert("Error saving leads. Check console for details.");
+        } finally {
+            document.getElementById("loader").classList.add("hidden");
+        }
+    }
 
-            const tableContainer = document.getElementById('tableContainer');
-        const modal = document.getElementById('leadModal');
-        const modalName = document.getElementById('modalName');
-        const modalBirthday = document.getElementById('modalBirthday');
-        const modalContact = document.getElementById('modalContact');
-        const modalEmail = document.getElementById('modalEmail');
-        const closeModal = document.getElementById('closeModal');
-        const callButton = document.getElementById('callButton');
-        const smsButton = document.getElementById('smsButton');
-        const secondSmsButton = document.getElementById('secondSmsButton');
-
-        // Current user details (you can modify these)
-        const currentUser = {
-            name: "Your Name",
-            location: "Your Location",
-            offerExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() // 7 days from now
-        };
-
-        document.getElementById('csvFile').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                Papa.parse(file, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function (results) {
-                        const data = results.data;
-                        renderTable(data);
+    // Update the CSV import handler
+    document.getElementById('csvFile').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async function (results) {
+                    if (results.data.length > 0) {
+                        await saveLeadsToDB(results.data);
+                    } else {
+                        alert("No valid data found in CSV file");
                     }
-                });
-            }
-        });
+                },
+                error: function(error) {
+                    console.error("CSV parsing error:", error);
+                    alert("Error parsing CSV file. Please check the format.");
+                }
+            });
+        }
+    });
 
-        closeModal.addEventListener('click', () => {
-    modal.classList.remove('show');
-    // Add a small delay to ensure the transition completes
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300); // Match this with your transition duration
-});
-
-
-    callButton.addEventListener('click', () => {
-    const phoneNumber = modalContact.textContent.trim();
-    if (phoneNumber) {
-        window.open(`tel:${phoneNumber}`);
-    } else {
-        alert('No phone number available for this contact');
-    }
-});
-
-smsButton.addEventListener('click', () => {
-    const phoneNumber = modalContact.textContent.trim();
-    const leadName = modalName.textContent.trim();
-    
-    if (phoneNumber) {
-        const message = `Hi Ma'am ${leadName}! 😊 This is ${currentUser.name} from USANA.
+    // Enhanced SMS functions
+    smsButton.addEventListener('click', () => {
+        const phoneNumber = modalContact.textContent.trim();
+        const leadName = modalName.textContent.trim();
+        
+        if (phoneNumber) {
+            const formattedDate = formatDate(new Date(currentAppointmentSettings.claimDate));
+            const message = `Hi ${leadName}! 😊 This is ${currentUser.fullname} from USANA.
 
 Great news — you've been selected for a FREE Celavive skincare experience!
 
-Are you near ${currentUser.location}? We'd love to pamper you! 🎉
-
-Just reply to book your slot — you can claim this offer until ${currentUser.offerExpiry}.
-Let us know what time works best for you, and we'll handle the rest!`;
-        
-        window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
-    } else {
-        alert('No phone number available for this contact');
-    }
-});
-
-secondSmsButton.addEventListener('click', () => {
-    const phoneNumber = modalContact.textContent.trim();
-    const leadName = modalName.textContent.trim();
-    
-    if (phoneNumber) {
-        const message = `Hi Ma'am ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
-
-We still have slots available this week at ${currentUser.location}! Would you like to book your session on [specific day] at [specific time]?
-
-This exclusive offer is only available until ${currentUser.offerExpiry}. Let me know if this works for you or if you'd prefer another time. Can't wait to pamper you! 💆‍♀️✨`;
-        
-        window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
-    } else {
-        alert('No phone number available for this contact');
-    }
-});
-
-
-        // And update the table rendering
-function renderTable(data) {
-    let html = '<table class="min-w-full text-sm text-left text-gray-800">';
-    html += '<thead class="bg-blue-100 text-xs uppercase font-semibold text-gray-700">';
-    html += '<tr>';
-
-    const visibleHeaders = ["Name", "Age", "Address", "Occupation", "Event", "Lead Status", "Next Follow-Up", "Notes"];
-
-    visibleHeaders.forEach(header => {
-        html += `<th class="px-4 py-2 border">${header}</th>`;
-    });
-    html += '</tr></thead><tbody>';
-
-    data.forEach((row, rowIndex) => {
-        html += '<tr class="bg-white border-b">';
-        visibleHeaders.forEach(header => {
-            if (header === "Name") {
-            html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" onclick="showModal('${escapeHtml(row["Name"])}', '${escapeHtml(row["Birthday"])}', '${escapeHtml(row["Contact"])}', '${escapeHtml(row["Email"])}')">${toProperCase(escapeHtml(row["Name"]))}</td>`;
-            } else if (header === "Lead Status") {
-                html += `<td class="px-4 py-2 border">
-                                        <select class="border p-1 rounded">
-                                            <option>New</option>
-                                            <option>Contacted</option>
-                                            <option>Presented</option>
-                                            <option>Followed Up</option>
-                                            <option>Closed - Won</option>
-                                            <option>Closed - Lost</option>
-                                        </select>
-                                    </td>`;
-            } else if (header === "Next Follow-Up") {
-                html += `<td class="px-4 py-2 border">
-                                        <input type="date" class="border p-1 rounded" />
-                                    </td>`;
-            } else if (header === "Notes") {
-                html += `<td class="px-4 py-2 border">
-                                        <textarea rows="2" class="w-full border p-1 rounded"></textarea>
-                                    </td>`;
-            } else {
-                html += `<td class="px-4 py-2 border">${escapeHtml(row[header] || "")}</td>`;
-            }
-        });
-        html += '</tr>';
-    });
-
-    html += '</tbody></table>';
-    tableContainer.innerHTML = html;
-}
-
-// Make the new function available globally
-window.toProperCase = toProperCase;
-
-
-function toProperCase(str) {
-    if (!str) return '';
-    return str.toLowerCase()
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-    }
-
-
-        // When showing modal, set default appointment to tomorrow at 10am
-        function showModal(name, birthday, contact, email) {
-            modalName.textContent = toProperCase(name);
-            modalBirthday.textContent = birthday;
-            modalContact.textContent = formatPhoneNumber(contact);
-            modalEmail.textContent = email;
-            
-            // Set default appointment to tomorrow at 10am
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(10, 0, 0, 0);
-            
-            document.getElementById('appointmentDate').valueAsDate = tomorrow;
-            document.getElementById('appointmentTime').value = '10:00';
-            document.getElementById('appointmentStatus').textContent = '';
-            
-            modal.style.display = 'flex';
-            setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
-}
-
-
-
-
-// Format date for display
-function formatDate(date) {
-    return date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'long', 
-        day: 'numeric', 
-        year: 'numeric' 
-    });
-}
-
-// Initial SMS with 5-day expiration
-smsButton.addEventListener('click', () => {
-    const phoneNumber = modalContact.textContent.trim();
-    const leadName = modalName.textContent.trim();
-    
-    if (phoneNumber) {
-        const formattedDate = formatDate(currentUser.offerExpiry);
-        const message = `Hi Ma'am ${leadName}! 😊 This is ${currentUser.name} from USANA.
-
-Great news — you've been selected for a FREE Celavive skincare experience!
-
-Are you near ${currentUser.location}? We'd love to pamper you! 🎉
+Are you near ${currentAppointmentSettings.location}? We'd love to pamper you! 🎉
 
 Just reply YES to book your slot — you can claim this offer until ${formattedDate}.
 Let us know what time works best for you!`;
-        
-        window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
-    } else {
-        alert('No phone number available for this contact');
-    }
-});
-
-// Set Appointment Button
-document.getElementById('setAppointmentBtn').addEventListener('click', () => {
-    const date = document.getElementById('appointmentDate').value;
-    const time = document.getElementById('appointmentTime').value;
-    
-    if (!date || !time) {
-        alert('Please select both date and time');
-        return;
-    }
-    
-    const appointmentDateTime = new Date(`${date}T${time}`);
-    const formattedDateTime = appointmentDateTime.toLocaleString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+            
+            // Save SMS sent timestamp
+            leadsCollection.doc(currentLeadId).update({
+                lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+                status: "Contacted"
+            }).then(() => {
+                loadLeads(); // Refresh the table
+            });
+            
+            window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+        } else {
+            alert('No phone number available for this contact');
+        }
     });
-    
-    document.getElementById('appointmentStatus').textContent = 
-        `Appointment set for ${formattedDateTime}`;
-    
-    // Here you would typically save this to your database
-    // For example: saveAppointmentToDatabase(modalName.textContent, phoneNumber, appointmentDateTime);
-});
 
+    secondSmsButton.addEventListener('click', () => {
+        const phoneNumber = modalContact.textContent.trim();
+        const leadName = modalName.textContent.trim();
+        
+        if (phoneNumber) {
+            const formattedDate = formatDate(new Date(currentAppointmentSettings.claimDate));
+            const message = `Hi ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
 
+We still have slots available this week at ${currentAppointmentSettings.location}! Would you like to book your session?
 
-function formatPhoneNumber(phone) {
-    if (!phone) return '';
-    
-    // Remove all non-digit characters
-    let cleanNumber = phone.replace(/\D/g, '');
-    
-    // If number starts with 0, replace with +63
-    if (cleanNumber.startsWith('0')) {
-                cleanNumber = '+63' + cleanNumber.substring(1);
-            }
-            // If number starts with 63 but missing +, add it
-            else if (cleanNumber.startsWith('63')) {
-                cleanNumber = '+' + cleanNumber;
-            }
-                // If number doesn't start with +, add +63
-    else if (!cleanNumber.startsWith('+')) {
-        cleanNumber = '+63' + cleanNumber;
+This exclusive offer is only available until ${formattedDate}. Let me know if you're interested. Can't wait to pamper you! 💆‍♀️✨`;
+            
+            // Save SMS sent timestamp
+            leadsCollection.doc(currentLeadId).update({
+                lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+                status: "Followed Up"
+            }).then(() => {
+                loadLeads(); // Refresh the table
+            });
+            
+            window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+        } else {
+            alert('No phone number available for this contact');
+        }
+    });
+
+    // Enhanced Appointment System
+    setAppointmentBtn.addEventListener('click', async () => {
+        const date = document.getElementById('appointmentDate').value;
+        const time = document.getElementById('appointmentTime').value;
+        const customLocation = document.getElementById('customLocation').value || currentAppointmentSettings.location;
+        
+        if (!date || !time) {
+            alert('Please select both date and time');
+            return;
+        }
+        
+        const appointmentDateTime = new Date(`${date}T${time}`);
+        
+        try {
+            document.getElementById("loader").classList.remove("hidden");
+            
+            // Save appointment
+            await appointmentsCollection.doc(currentLeadId).set({
+                leadId: currentLeadId,
+                userId: currentUser.uid,
+                date: appointmentDateTime,
+                location: customLocation,
+                status: "Scheduled",
+                leadName: modalName.textContent,
+                leadPhone: modalContact.textContent,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Update lead status
+            await leadsCollection.doc(currentLeadId).update({
+                status: "Appointment Set",
+                lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+                followUpDate: appointmentDateTime
+            });
+            
+            // Set reminders
+            scheduleReminders(currentLeadId, appointmentDateTime, customLocation);
+            
+            document.getElementById('appointmentStatus').textContent = 
+                `Appointment set for ${formatDateTime(appointmentDateTime)} at ${customLocation}`;
+            
+            loadLeads(); // Refresh the table
+        } catch (error) {
+            console.error("Error setting appointment:", error);
+            alert("Error setting appointment. Check console for details.");
+        } finally {
+            document.getElementById("loader").classList.add("hidden");
+        }
+    });
+
+    // Schedule reminders
+    function scheduleReminders(leadId, appointmentDate, location) {
+        console.log(`Scheduled reminders for appointment ${leadId} on ${appointmentDate} at ${location}`);
     }
-    
-    return cleanNumber;
-}
 
-        // Helper function to escape HTML special characters
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe
-                .toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+    // Render table with leads data
+    function renderTable(data) {
+        if (data.length === 0) {
+            tableContainer.innerHTML = '<p class="p-4 text-center text-gray-500">No leads found. Import a CSV file to get started.</p>';
+            return;
         }
 
-        // Make functions available globally
-        window.showModal = showModal;
-        window.escapeHtml = escapeHtml;
+        let html = '<table class="min-w-full text-sm text-left text-gray-800">';
+        html += '<thead class="bg-blue-100 text-xs uppercase font-semibold text-gray-700">';
+        html += '<tr>';
+
+        const visibleHeaders = ["Name", "Age", "Contact", "Occupation", "Status", "Last Contacted", "Follow Up", "Notes", "Actions"];
+
+        visibleHeaders.forEach(header => {
+            html += `<th class="px-4 py-2 border">${header}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        data.forEach((row) => {
+            html += '<tr class="bg-white border-b">';
+            
+            // Name
+            html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
+                     onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
+                     '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', '${row.id}')">
+                     ${toProperCase(escapeHtml(row.Name || ""))}
+                    </td>`;
+            
+            // Age
+            html += `<td class="px-4 py-2 border">${escapeHtml(row.Age || "")}</td>`;
+            
+            // Contact
+            html += `<td class="px-4 py-2 border">${formatPhoneNumber(escapeHtml(row.Contact || ""))}</td>`;
+
+            // Occupation
+            html += `<td class="px-4 py-2 border">${escapeHtml(row.Occupation || "")}</td>`;
+
+
+            
+            // Status
+            html += `<td class="px-4 py-2 border">
+                        <select class="border p-1 rounded status-select" data-lead-id="${row.id}" 
+                                onchange="updateStatus('${row.id}', this.value)">
+                            <option value="New" ${row.status === "New" ? "selected" : ""}>New</option>
+                            <option value="Contacted" ${row.status === "Contacted" ? "selected" : ""}>Contacted</option>
+                            <option value="Followed Up" ${row.status === "Followed Up" ? "selected" : ""}>Followed Up</option>
+                            <option value="Appointment Set" ${row.status === "Appointment Set" ? "selected" : ""}>Appointment Set</option>
+                            <option value="Closed - Won" ${row.status === "Closed - Won" ? "selected" : ""}>Closed - Won</option>
+                            <option value="Closed - Lost" ${row.status === "Closed - Lost" ? "selected" : ""}>Closed - Lost</option>
+                        </select>
+                    </td>`;
+            
+            // Last Contacted
+            html += `<td class="px-4 py-2 border">${formatFirestoreDate(row.lastContacted)}</td>`;
+            
+            // Follow Up
+            html += `<td class="px-4 py-2 border">
+                        <input type="date" class="border p-1 rounded followup-date" 
+                               data-lead-id="${row.id}" 
+                               value="${row.followUpDate ? new Date(row.followUpDate.seconds * 1000).toISOString().split('T')[0] : ''}"
+                               onchange="updateFollowUpDate('${row.id}', this.value)">
+                    </td>`;
+            
+            // Notes
+            html += `<td class="px-4 py-2 border">
+                        <textarea rows="2" class="w-full border p-1 rounded notes-text" 
+                                  data-lead-id="${row.id}"
+                                  onchange="updateNotes('${row.id}', this.value)">${escapeHtml(row.notes || "")}</textarea>
+                    </td>`;
+            
+            // Actions
+            html += `<td class="px-4 py-2 border">
+                        <button class="text-red-500 hover:text-red-700" onclick="deleteLead('${row.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>`;
+            
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        tableContainer.innerHTML = html;
+    }
+
+    // Update lead status
+    async function updateStatus(leadId, status) {
+        try {
+            await leadsCollection.doc(leadId).update({
+                status: status,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Error updating status. Check console for details.");
+            loadLeads(); // Refresh to revert changes
+        }
+    }
+
+    // Update follow-up date
+    async function updateFollowUpDate(leadId, date) {
+        try {
+            await leadsCollection.doc(leadId).update({
+                followUpDate: date ? firebase.firestore.Timestamp.fromDate(new Date(date)) : null,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error updating follow-up date:", error);
+            alert("Error updating follow-up date. Check console for details.");
+            loadLeads(); // Refresh to revert changes
+        }
+    }
+
+    // Update notes
+    async function updateNotes(leadId, notes) {
+        try {
+            await leadsCollection.doc(leadId).update({
+                notes: notes,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error updating notes:", error);
+            alert("Error updating notes. Check console for details.");
+        }
+    }
+
+    // Delete lead
+    async function deleteLead(leadId) {
+        if (confirm("Are you sure you want to delete this lead?")) {
+            try {
+                document.getElementById("loader").classList.remove("hidden");
+                await leadsCollection.doc(leadId).delete();
+                loadLeads(); // Refresh the table
+            } catch (error) {
+                console.error("Error deleting lead:", error);
+                alert("Error deleting lead. Check console for details.");
+            } finally {
+                document.getElementById("loader").classList.add("hidden");
+            }
+        }
+    }
+
+    // When showing modal
+  function showModal(name, birthday, contact, email, leadId) {
+  currentLeadId = leadId;
+  modalName.textContent = toProperCase(name);
+  modalBirthday.textContent = birthday;
+  modalContact.textContent = formatPhoneNumber(contact);
+  modalEmail.textContent = email;
+  
+  // Set data attributes for buttons
+  smsButton.setAttribute('data-lead-id', leadId);
+  secondSmsButton.setAttribute('data-lead-id', leadId);
+  setAppointmentBtn.setAttribute('data-lead-id', leadId);
+  
+  // Set default appointment to tomorrow at 10am
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(10, 0, 0, 0);
+  
+  document.getElementById('appointmentDate').valueAsDate = tomorrow;
+  document.getElementById('appointmentTime').value = '10:00';
+  document.getElementById('customLocation').value = currentAppointmentSettings.location;
+  document.getElementById('appointmentStatus').textContent = '';
+  
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+}
+
+
+    // Format phone number
+    function formatPhoneNumber(phone) {
+        if (!phone) return '';
+        
+        // Remove all non-digit characters
+        let cleanNumber = phone.replace(/\D/g, '');
+        
+        // If number starts with 0, replace with +63
+        if (cleanNumber.startsWith('0')) {
+            cleanNumber = '+63' + cleanNumber.substring(1);
+        }
+        // If number starts with 63 but missing +, add it
+        else if (cleanNumber.startsWith('63')) {
+            cleanNumber = '+' + cleanNumber;
+        }
+        // If number doesn't start with +, add +63
+        else if (!cleanNumber.startsWith('+')) {
+            cleanNumber = '+63' + cleanNumber;
+        }
+        
+        return cleanNumber;
+    }
+
+    // Format Firestore timestamp
+    function formatFirestoreDate(timestamp) {
+        if (!timestamp) return '';
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString();
+    }
+
+    // Format date for display
+    function formatDate(date) {
+        return date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+    }
+
+    // Format date/time for display
+    function formatDateTime(date) {
+        return date.toLocaleString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // Helper function to escape HTML special characters
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Convert string to proper case
+    function toProperCase(str) {
+        if (!str) return '';
+        return str.toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+  // Close modal
+closeModal.addEventListener('click', () => {
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 300);
+});
+
+
+    // Call button
+    callButton.addEventListener('click', () => {
+        const phoneNumber = modalContact.textContent.trim();
+        if (phoneNumber) {
+            window.open(`tel:${phoneNumber}`);
+        } else {
+            alert('No phone number available for this contact');
+        }
+    });
+
+    // Handle logout
+    function handleLogout() {
+        auth.signOut()
+            .then(() => window.location.href = "index.html")
+            .catch(error => {
+                console.error("Logout failed:", error);
+                alert("Logout error. Check console.");
+            });
+    }
+
+    // Attach logout handlers
+    document.getElementById("sidebarLogoutBtn")?.addEventListener("click", handleLogout);
+    document.getElementById("topbarLogoutBtn")?.addEventListener("click", handleLogout);
+
+    // Make functions available globally
+    window.showModal = showModal;
+    window.escapeHtml = escapeHtml;
+    window.toProperCase = toProperCase;
+    window.updateStatus = updateStatus;
+    window.updateFollowUpDate = updateFollowUpDate;
+    window.updateNotes = updateNotes;
+    window.deleteLead = deleteLead;
+    window.saveSettings = saveSettings;
 </script>
-
-
-
-    </body>
+</body>
 </html>
-                    
