@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U Hub Pro - UStorm Leads Flow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Add to <head> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+    <!-- Add Papa Parse for CSV parsing -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        
+        <!-- Firebase SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    </head>
+<style>
+
+
+
+.content {
+  max-width: auto;
+  margin: auto;
+  margin-top: -20px;
+}
+
+
+
+section.form-section {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+section.form-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+form#addItemForm {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+
+#accountDetails {
+grid-column: span 2;
+}
+
+
+/* Desktop/Tablet (2 columns) */
+@media (min-width: 768px) {
+    form#addItemForm {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Make button span 2 columns */
+    button#additem {
+        grid-column: span 2;
+    }
+}
+
+/* Input styling (keep your existing) */
+select, input[type="number"], input[type="date"] {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+}
+    
+    button#additem {
+        background: #0b72c9;
+        color: white;
+        padding: 14px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
+
+select, input[type="number"], input[type="date"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+}
+  
+  button#additem {
+    background-color: #0b72c9;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    grid-column: span 2;
+  }
+  
+  button#additem:hover {
+    background-color: #0859a6;
+  }
+  
+  section.table-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  section.table-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .overflow-x-auto {
+    overflow-x: auto;
+    margin-top: -40px;
+  }
+  
+  
+      
+        
+        
+        
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+        
+        .loader-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3f86f9;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        
+        
+    /* Modal Styles */
+    #leadModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* Start with display none */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    }
+    
+    #leadModal.show {
+    opacity: 1;
+    }
+    
+    #leadModal > div {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+    }
+    
+    #leadModal.show > div {
+    transform: translateY(0);
+    }
+        
+    /* Add this to your table cell styling */
+    td.text-blue-600.cursor-pointer {
+        position: relative;
+        z-index: 1;
+    }
+    
+
+</style>
+<body>
+
+<!-- Topbar Icons -->
+<div class="topbar">
+<a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+<a href="productcomputer.html"  title="Product Calculator"><i class="fas fa-calculator"></i></a>
+<a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+<a href="product_inv.html"  title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+  <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+<!-- Logout Button in Sidebar -->
+<a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+<i class="fas fa-sign-out-alt"></i>
+</a>
+
+</div>
+<div class="header">
+<div class="logo">
+<span style="margin-left: 0px;">Storm Leads</span>
+
+
+</div>
+
+
+</div>
+    
+    <div class="dashboard">
+    
+  <!-- Sidebar -->
+  <div class="sidebar">
+  <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+  <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+  <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+  <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+  <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+  
+  <!-- Logout Button in Sidebar -->
+  <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+  <i class="fas fa-sign-out-alt"></i>
+  </a>
+  </div>
+    
+    <!-- Content -->
+    <div class="content">
+    <!-- Header with ID instead of class -->
+    <header id="mainHeader">
+    <p id="greeting" class="greeting-text">Hi, User</p>
+    </header>
+    
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay">
+    <div class="loader-spinner"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto">
+    
+    
+    <input type="file" id="csvFile" accept=".csv" class="mb-4" />
+    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
+    </div>
+    
+    <!-- Modal -->
+<div id="leadModal">
+    <div>
+        <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
+        <p><strong>Name:</strong> <span id="modalName"></span></p>
+        <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
+        <p><strong>Contact:</strong> <span id="modalContact"></span></p>
+        <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+        <div class="mt-4 flex flex-wrap gap-2">
+            <button id="callButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center">
+                <i class="fas fa-phone mr-2"></i> Call
+            </button>
+            <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
+                <i class="fas fa-sms mr-2"></i> SMS
+            </button>
+            <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center">
+                <i class="fas fa-sms mr-2"></i> Follow-up SMS
+            </button>
+            <button id="closeModal" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Close</button>
+        </div>
+    </div>
+</div>
+    
+</div>
+    </div>
+
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyC8Yn92BRWaUw6KElX5UIdIa4RjPdxYESg",
+        authDomain: "usana-bc-tracker-signup.firebaseapp.com",
+        projectId: "usana-bc-tracker-signup",
+        storageBucket: "usana-bc-tracker-signup.appspot.com",
+        messagingSenderId: "605379613292",
+        appId: "1:605379613292:web:b50b8d185c2d20db82fe49"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Initialize auth state listener
+    window.addEventListener("DOMContentLoaded", () => {
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("User logged in:", user.uid);
+                const uid = user.uid;
+
+                db.collection("users").doc(uid).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            const username = data.username || "User";
+                            const fullname = data.fullname || "User";
+                            document.getElementById("greeting").innerText = `Hi, ${fullname}!`;
+                        }
+                        // Hide loader after username is set
+                        document.getElementById("loader").classList.add("hidden");
+                    })
+                    .catch((error) => {
+                        console.error("Error getting user data:", error);
+                    });
+            } else {
+                console.warn("No user is logged in. Redirecting...");
+                window.location.href = "index.html";
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Function to handle logout
+        const handleLogout = () => {
+            auth.signOut()
+                .then(() => window.location.href = "index.html")
+                .catch(error => {
+                    console.error("Logout failed:", error);
+                    alert("Logout error. Check console.");
+                });
+        };
+
+        // Attach to both buttons
+        document.getElementById("sidebarLogoutBtn")?.addEventListener("click", handleLogout);
+        document.getElementById("topbarLogoutBtn")?.addEventListener("click", handleLogout);
+    });
+
+            const tableContainer = document.getElementById('tableContainer');
+        const modal = document.getElementById('leadModal');
+        const modalName = document.getElementById('modalName');
+        const modalBirthday = document.getElementById('modalBirthday');
+        const modalContact = document.getElementById('modalContact');
+        const modalEmail = document.getElementById('modalEmail');
+        const closeModal = document.getElementById('closeModal');
+        const callButton = document.getElementById('callButton');
+        const smsButton = document.getElementById('smsButton');
+        const secondSmsButton = document.getElementById('secondSmsButton');
+
+        // Current user details (you can modify these)
+        const currentUser = {
+            name: "Your Name",
+            location: "Your Location",
+            offerExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() // 7 days from now
+        };
+
+        document.getElementById('csvFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (results) {
+                        const data = results.data;
+                        renderTable(data);
+                    }
+                });
+            }
+        });
+
+        closeModal.addEventListener('click', () => {
+    modal.classList.remove('show');
+    // Add a small delay to ensure the transition completes
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300); // Match this with your transition duration
+});
+
+
+        callButton.addEventListener('click', () => {
+            const phoneNumber = modalContact.textContent.trim();
+            if (phoneNumber) {
+                const cleanNumber = phoneNumber.replace(/\D/g, '');
+                window.open(`tel:${cleanNumber}`);
+            } else {
+                alert('No phone number available for this contact');
+            }
+        });
+
+        smsButton.addEventListener('click', () => {
+            const phoneNumber = modalContact.textContent.trim();
+            const leadName = modalName.textContent.trim();
+            
+            if (phoneNumber) {
+                const cleanNumber = phoneNumber.replace(/\D/g, '');
+                const message = `Hi Ma'am ${leadName}! 😊 This is ${currentUser.name} from USANA.
+
+Great news — you've been selected for a FREE Celavive skincare experience!
+
+Are you near ${currentUser.location}? We'd love to pamper you! 🎉
+
+Just reply to book your slot — you can claim this offer until ${currentUser.offerExpiry}.
+Let us know what time works best for you, and we'll handle the rest!`;
+                
+                window.open(`sms:${cleanNumber}?body=${encodeURIComponent(message)}`);
+            } else {
+                alert('No phone number available for this contact');
+            }
+        });
+
+        secondSmsButton.addEventListener('click', () => {
+            const phoneNumber = modalContact.textContent.trim();
+            const leadName = modalName.textContent.trim();
+            
+            if (phoneNumber) {
+                const cleanNumber = phoneNumber.replace(/\D/g, '');
+                const message = `Hi Ma'am ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
+
+We still have slots available this week at ${currentUser.location}! Would you like to book your session on [specific day] at [specific time]?
+
+This exclusive offer is only available until ${currentUser.offerExpiry}. Let me know if this works for you or if you'd prefer another time. Can't wait to pamper you! 💆‍♀️✨`;
+                
+                window.open(`sms:${cleanNumber}?body=${encodeURIComponent(message)}`);
+            } else {
+                alert('No phone number available for this contact');
+            }
+        });
+
+        // And update the table rendering
+function renderTable(data) {
+    let html = '<table class="min-w-full text-sm text-left text-gray-800">';
+    html += '<thead class="bg-blue-100 text-xs uppercase font-semibold text-gray-700">';
+    html += '<tr>';
+
+    const visibleHeaders = ["Name", "Age", "Address", "Occupation", "Event", "Lead Status", "Next Follow-Up", "Notes"];
+
+    visibleHeaders.forEach(header => {
+        html += `<th class="px-4 py-2 border">${header}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    data.forEach((row, rowIndex) => {
+        html += '<tr class="bg-white border-b">';
+        visibleHeaders.forEach(header => {
+            if (header === "Name") {
+                html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" onclick="showModal('${escapeHtml(row["Name"])}', '${escapeHtml(row["Birthday"])}', '${escapeHtml(row["Contact"])}', '${escapeHtml(row["Email"])}')">${toProperCase(escapeHtml(row["Name"]))}</td>`;
+            } else if (header === "Lead Status") {
+                html += `<td class="px-4 py-2 border">
+                                        <select class="border p-1 rounded">
+                                            <option>New</option>
+                                            <option>Contacted</option>
+                                            <option>Presented</option>
+                                            <option>Followed Up</option>
+                                            <option>Closed - Won</option>
+                                            <option>Closed - Lost</option>
+                                        </select>
+                                    </td>`;
+            } else if (header === "Next Follow-Up") {
+                html += `<td class="px-4 py-2 border">
+                                        <input type="date" class="border p-1 rounded" />
+                                    </td>`;
+            } else if (header === "Notes") {
+                html += `<td class="px-4 py-2 border">
+                                        <textarea rows="2" class="w-full border p-1 rounded"></textarea>
+                                    </td>`;
+            } else {
+                html += `<td class="px-4 py-2 border">${escapeHtml(row[header] || "")}</td>`;
+            }
+        });
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    tableContainer.innerHTML = html;
+}
+
+// Make the new function available globally
+window.toProperCase = toProperCase;
+
+
+function toProperCase(str) {
+    if (!str) return '';
+    return str.toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+
+        function showModal(name, birthday, contact, email) {
+            modalName.textContent = toProperCase(name);
+            modalBirthday.textContent = birthday;
+            modalContact.textContent = contact;
+            modalEmail.textContent = email;
+            modal.style.display = 'flex';
+            setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+
+        // Helper function to escape HTML special characters
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Make functions available globally
+        window.showModal = showModal;
+        window.escapeHtml = escapeHtml;
+</script>
+
+
+
+    </body>
+</html>
+                    
