@@ -22,12 +22,46 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <style>
-    /* Your existing CSS styles remain unchanged */
-    .content {
-      max-width: auto;
-      margin: auto;
-      margin-top: -20px;
-    }
+/* Remove all horizontal scrolling */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+
+
+/* Prevent any flex overflow from main-content */
+.main-content {
+  max-width: 100vw;
+  box-sizing: border-box;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.sidebar {
+  max-width: 80px;
+  overflow-x: hidden;
+}
+
+/* Prevent layout shifts due to large content */
+.content, .dashboard {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+
+
+
+
+
+@media (max-width: 600px) {
+  .content {
+    margin-top: 60px;
+  }
+}
 
 /* Modal Styles */
 #leadModal {
@@ -201,6 +235,7 @@ input[type="file"]:hover::before {
     width: 100%;
   }
 }
+
 </style>
 <body>
 
