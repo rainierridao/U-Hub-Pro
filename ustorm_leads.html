@@ -4,22 +4,22 @@
 <meta name="apple-mobile-web-app-title" content="U Hub Pro">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>U Hub Pro - UStorm Leads Flow</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-        
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>U Hub Pro - UStorm Leads Flow</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="styles.css">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <style>
 /* Remove all horizontal scrolling */
@@ -29,8 +29,6 @@ html, body {
   overflow-x: hidden;
 }
 
-
-
 /* Prevent any flex overflow from main-content */
 .main-content {
   max-width: 100vw;
@@ -38,8 +36,6 @@ html, body {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-
-
 
 .sidebar {
   max-width: 80px;
@@ -49,20 +45,13 @@ html, body {
 .content {
   max-width: auto;
   margin: auto;
-
 }
-
-
-
-
 
 @media (max-width: 600px) {
   .content {
     margin-top: 60px;
   }
 }
-
-
 
 /* Modal Styles */
 #leadModal {
@@ -93,9 +82,8 @@ width: 90%;
 max-height: 90vh;
 overflow-y: auto;
 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+position: relative;
 }
-
-
 
 .settings-bar {
   background-color: #f8fafc;
@@ -144,6 +132,7 @@ width: 95%;
 #leadModal h2 {
 font-size: 1.1rem;
 margin-bottom: 12px;
+padding-right: 30px;
 }
 
 #leadModal p {
@@ -155,6 +144,27 @@ display: flex;
 #leadModal p strong {
 width: 80px;
 flex-shrink: 0;
+}
+
+#closeModal {
+position: absolute;
+top: 8px;
+right: 8px;
+background: transparent;
+border: none;
+font-size: 1.2rem;
+cursor: pointer;
+width: 32px;
+height: 32px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 50%;
+transition: background-color 0.2s;
+}
+
+#closeModal:hover {
+background-color: rgba(0, 0, 0, 0.05);
 }
 
 .modal-section {
@@ -182,35 +192,31 @@ flex-shrink: 0;
   height: 36px;
 }
 
-#setAppointmentBtn {
-font-size: 0.9rem;
-padding: 8px 12px;
-}
-
-#appointmentStatus {
-font-size: 0.85rem;
-margin-top: 8px;
-}
-
+//* Modal Actions - Force single row layout */
 .modal-actions {
-  margin-top: 12px;
-  gap: 6px;
+  display: flex;
+  flex-wrap: nowrap; /* Prevent wrapping to new line */
+  gap: 0.5rem; /* 8px spacing between buttons */
+  width: 100%;
+  margin-top: 16px;
 }
 
-.modal-actions button {
-  font-size: 0.85rem;
-  padding: 6px 10px;
-}
+.modal-actions .action-btn {
+  flex: 1 1 0; /* Grow and shrink equally, starting from 0 width */
+  min-width: 0; /* Allow buttons to shrink below content width */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis if text overflows */
+    padding: 0.5rem 0.75rem; /* Consistent padding */
+    text-align: center; /* Center button text */
+    color: white;
 
-.modal-actions button i {
-  margin-right: 4px;
-}
+    }
 
 /* Table Container */
 #tableContainer {
 padding: 12px !important;
 }
-
 
 /* Make file input look consistent with other inputs */
 input[type="file"]::-webkit-file-upload-button {
@@ -225,6 +231,11 @@ input[type="file"]::before {
 input[type="file"]:hover::before {
   color: #1e40af;
 }
+    
+    
+    #appointmentForm {
+    margin-bottom: 1rem;
+    }
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
@@ -263,7 +274,7 @@ input[type="file"]:hover::before {
       
       /* Make table scroll horizontally */
       #tableContainer table {
-      min-width: 700px; /* Force table to be wider than container */
+      min-width: 700px;
       width: 100%;
       margin: 0;
       }
@@ -285,6 +296,8 @@ input[type="file"]:hover::before {
       /* Stack modal action buttons */
       .modal-actions {
         flex-direction: column;
+        overflow-x: auto; /* Enable horizontal scrolling if needed */
+          padding-bottom: 4px; /* Space for scrollbar */
       }
       
       .modal-actions button {
@@ -297,10 +310,17 @@ input[type="file"]:hover::before {
         grid-template-columns: 1fr;
       }
       
-              
       /* Greeting text */
       .greeting-text {
         font-size: 0.9rem;
+      }
+      
+      /* Adjust action buttons on mobile */
+      .action-btn {
+        min-width: auto;
+        width: 100%;
+        justify-content: flex-start;
+        padding: 10px 12px;
       }
       }
       
@@ -313,349 +333,534 @@ input[type="file"]:hover::before {
         * {
           touch-action: manipulation;
         }
-</style>
-<body>
+        
+        
+        
+        .modal-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        .modal-content {
+          background-color: white;
+          padding: 20px;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 500px;
+          position: relative;
+        }
+        
+        .modal-close {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+        }
+        
+        
+        
+        
+        /* Notification styles */
+        .notification-item {
+          padding: 12px 16px;
+          border-bottom: 1px solid #e5e7eb;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          text-align: left; /* Ensure text is left-aligned */
+        }
+        
+        .notification-item:hover {
+          background-color: #f9fafb;
+        }
+        
+        .notification-item.unread {
+          background-color: #f0f9ff;
+        }
+        
+        .notification-item h3 {
+          font-weight: 600;
+          color: #1e40af;
+          margin-bottom: 4px;
+        }
+        
+        .notification-item p {
+          margin: 0;
+          color: #4b5563;
+        }
+        
+        .notification-time {
+          font-size: 0.75rem;
+          color: #6b7280;
+          margin-top: 4px;
+        }
+        
+        .notification-detail {
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px dashed #e5e7eb;
+        }
 
-<!-- Your existing HTML structure remains unchanged -->
-<div class="topbar">
-<a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
-<a href="productcomputer.html"  title="Product Calculator"><i class="fas fa-calculator"></i></a>
-<a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
-<a href="product_inv.html"  title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
-  <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
-<a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
-<i class="fas fa-sign-out-alt"></i>
-</a>
-</div>
+        </style>
+        <body>
+        
+        <!-- Your existing HTML structure remains unchanged -->
+        <div class="topbar">
+        <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+        <a href="productcomputer.html"  title="Product Calculator"><i class="fas fa-calculator"></i></a>
+        <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+        <a href="product_inv.html"  title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+        <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+        <a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        </a>
+        </div>
+        
+        <div class="header">
+        <div class="logo">
+        <span style="margin-left: 0px;">Storm Leads</span>
+        </div>
+        </div>
+        
+        <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+        <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+        <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+        <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+        <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+        <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+        
+        <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        </a>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+        <header id="mainHeader">
+        <p id="greeting" class="greeting-text">Hi, User</p>
+        
+        
+        <!-- Add this right after the greeting in your header -->
+        <div class="relative inline-block ml-4">
+        <button id="notificationBell" class="relative">
+        <i class="fas fa-bell text-gray-600 hover:text-blue-600"></i>
+        <span id="notificationCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </button>
+        </div>
 
-<div class="header">
-<div class="logo">
-<span style="margin-left: 0px;">Storm Leads</span>
-</div>
-</div>
-    
-<div class="dashboard">
-  <!-- Sidebar -->
-  <div class="sidebar">
-  <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
-  <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
-  <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
-  <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
-  <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
-  
-  <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
-  <i class="fas fa-sign-out-alt"></i>
-  </a>
-  </div>
-    
-    <!-- Content -->
-    <div class="content">
-    <header id="mainHeader">
-    <p id="greeting" class="greeting-text">Hi, User</p>
-    </header>
-    
-    <div id="loader" class="loader-overlay">
-    <div class="loader-spinner"></div>
-    </div>
-    
-    <div class="settings-bar">
-    <h3 class="text-sm font-medium mb-2">Current Week Settings</h3>
-    <div class="flex flex-col sm:flex-row gap-2 items-end">
-    <!-- CSV Upload -->
-    <div class="flex-1 min-w-[120px]">
-    <input type="file" id="csvFile" accept=".csv" class="w-full text-xs border rounded py-1 px-2">
-    </div>
-    
-    <!-- Claim Date -->
-    <div class="flex-1 min-w-[150px]">
-    <input type="date" id="settingsClaimDate" class="w-full text-xs border rounded py-1 px-2" style="width: 353px;">
-    </div>
-    
-    <!-- Location -->
-    <div class="flex-1 min-w-[150px]">
-    <input type="text" id="settingsLocation" placeholder="Default Location" class="w-full text-xs border rounded py-1 px-2">
-    </div>
-    
-    <!-- Save Button -->
-    <div class="flex-0">
-    <button onclick="saveSettings()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded hover:bg-blue-700 whitespace-nowrap">
-    Save Settings
-    </button>
-    </div>
-    </div>
-    </div>
-    
-
-    <div class="max-w-7xl mx-auto">
-    
-    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
-    </div>
-    
-    <div id="leadModal">
-    <div>
-    <h2 class="text-lg font-semibold">Lead Details</h2>
-    <p><strong>Name:</strong> <span id="modalName" class="truncate"></span></p>
-    <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
-    <p><strong>Contact:</strong> <span id="modalContact"></span></p>
-    <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
-    
-    <div class="modal-section border-t">
-    <h3 class="font-medium">Appointment</h3>
-    <div class="grid grid-cols-2 gap-4">
-    <div>
-    <label class="block text-xs">Date:</label>
-    <input type="date" id="appointmentDate" class="w-full border rounded">
-    </div>
-    <div>
-    <label class="block text-xs">Time:</label>
-    <input type="time" id="appointmentTime" class="w-full border rounded">
-    </div>
-    </div>
-    <div class="mt-2">
-    <label class="block text-xs">Location:</label>
-    <input type="text" id="customLocation" class="w-full border rounded">
-    </div>
-    <button id="setAppointmentBtn" class="mt-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-    Set Appointment
-    </button>
-    <div id="appointmentStatus"></div>
-    </div>
-    
-    <div class="modal-actions flex flex-wrap">
-    <button id="callButton" class="bg-green-500 hover:bg-green-600 text-white rounded flex items-center">
-    <i class="fas fa-phone"></i> Call
-    </button>
-    <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center">
-    <i class="fas fa-sms"></i> SMS
-    </button>
-    <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white rounded flex items-center">
-    <i class="fas fa-sms"></i> Follow-up
-    </button>
-    <button id="closeModal" class="bg-gray-500 hover:bg-gray-600 text-white rounded">Close</button>
-    </div>
-    </div>
-    </div>
-    
-</div>
-    </div>
-
-    <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyC8Yn92BRWaUw6KElX5UIdIa4RjPdxYESg",
-        authDomain: "usana-bc-tracker-signup.firebaseapp.com",
-        projectId: "usana-bc-tracker-signup",
-        storageBucket: "usana-bc-tracker-signup.appspot.com",
-        messagingSenderId: "605379613292",
-        appId: "1:605379613292:web:b50b8d185c2d20db82fe49"
-    };
-    
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    
-    // Current user data
-    let currentUser = {
-        uid: null,
-        fullname: "",
-        location: "",
-        phone: ""
-    };
-
-    // Current appointment settings
-    let currentAppointmentSettings = {
-        claimDate: "",
-        location: ""
-    };
-
-    // Current lead being viewed in modal
-    let currentLeadId = null;
-
-    // Collection references (will be initialized after auth)
-    let leadsCollection;
-    let appointmentSettingsCollection;
-    let appointmentsCollection;
-    const usersCollection = db.collection("users");
-
-    // DOM elements
-    const tableContainer = document.getElementById('tableContainer');
-    const modal = document.getElementById('leadModal');
-    const modalName = document.getElementById('modalName');
-    const modalBirthday = document.getElementById('modalBirthday');
-    const modalContact = document.getElementById('modalContact');
-    const modalEmail = document.getElementById('modalEmail');
-    const closeModal = document.getElementById('closeModal');
-    const callButton = document.getElementById('callButton');
-    const smsButton = document.getElementById('smsButton');
-    const secondSmsButton = document.getElementById('secondSmsButton');
-    const setAppointmentBtn = document.getElementById('setAppointmentBtn');
-
-    // Initialize auth state listener
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
+        </header>
+        
+        
+        
+        <!-- Notification Modal -->
+        <div id="notificationModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+        <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Follow-up Reminders</h2>
+        <div class="flex items-center">
+        <button id="notificationOptions" class="mr-2 text-gray-500 hover:text-gray-700" style="position: relative;
+  left: -3px;
+  top: -4px;">
+        <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <button id="closeNotificationModal" class="modal-close">&times;</button>
+        </div>
+        </div>
+        
+        <!-- Options dropdown (hidden by default) -->
+        <div id="notificationOptionsMenu" class="absolute right-12 top-12 bg-white shadow-lg rounded-md py-1 z-10 hidden" style="min-width: 180px;">
+        <button id="markAllRead" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mark All as Read</button>
+        <button id="markAllUnread" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mark All as Unread</button>
+        </div>
+        
+        <div id="notificationList" class="max-h-96 overflow-y-auto">
+        <!-- Notifications will be loaded here -->
+        </div>
+        </div>
+        </div>
+        
+        <!-- Notification Detail Modal -->
+        <div id="notificationDetailModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+        <button id="closeNotificationDetailModal" class="modal-close">&times;</button>
+        <h2 id="detailModalTitle" class="text-lg font-semibold mb-2">Appointment Details</h2>
+        <div id="detailModalContent" class="mb-4">
+        <!-- Detailed content will be loaded here -->
+        </div>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+        <div class="flex">
+        <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-circle text-yellow-400"></i>
+        </div>
+        <div class="ml-3">
+        <p class="text-sm text-yellow-700">
+        Don't forget to follow-up before the appointment time to confirm and ensure the appointment isn't cancelled or ignored.
+        </p>
+        </div>
+        </div>
+        </div>
+        <div class="flex justify-center space-x-4 mt-4">
+        <button id="smsFromNotification" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <i class="fas fa-sms mr-2"></i>Send SMS
+        </button>
+        <button id="callFromNotification" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        <i class="fas fa-phone mr-2"></i>Call Now
+        </button>
+        </div>
+        </div>
+        </div>
+        
+        
+        
+        <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        </div>
+        
+        <div class="settings-bar">
+        <h3 class="text-sm font-medium mb-2">Current Week Settings</h3>
+        <div class="flex flex-col sm:flex-row gap-2 items-end">
+        <!-- CSV Upload -->
+        <div class="flex-1 min-w-[120px]">
+        <input type="file" id="csvFile" accept=".csv" class="w-full text-xs border rounded py-1 px-2">
+        </div>
+        
+        <!-- Claim Date -->
+        <div class="flex-1 min-w-[150px]">
+        <input type="date" id="settingsClaimDate" class="w-full text-xs border rounded py-1 px-2" style="width: 353px;">
+        </div>
+        
+        <!-- Location -->
+        <div class="flex-1 min-w-[150px]">
+        <input type="text" id="settingsLocation" placeholder="Default Location" class="w-full text-xs border rounded py-1 px-2">
+        </div>
+        
+        <!-- Save Button -->
+        <div class="flex-0">
+        <button onclick="saveSettings()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded hover:bg-blue-700 whitespace-nowrap">
+        Save Settings
+        </button>
+        </div>
+        </div>
+        </div>
+        
+        
+        <div class="max-w-7xl mx-auto">
+        
+        <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
+        </div>
+        
+        <div id="leadModal">
+        <div>
+        <div class="flex justify-between items-start">
+        <h2 class="text-lg font-semibold">Lead Details</h2>
+        <button id="closeModal" class="text-gray-500 hover:text-gray-700 rounded-full p-1">
+        <i class="fas fa-times"></i>
+        </button>
+        </div>
+        
+        <p><strong>Name:</strong> <span id="modalName" class="truncate"></span></p>
+        <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
+        <p><strong>Contact:</strong> <span id="modalContact"></span></p>
+        <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
+        
+        <div id="appointmentForm" style="display: none;">
+        <h3 class="font-medium">Appointment</h3>
+        <div class="grid grid-cols-2 gap-4">
+        <div>
+        <label class="block text-xs">Date:</label>
+        <input type="date" id="appointmentDate" class="w-full border rounded">
+        </div>
+        <div>
+        <label class="block text-xs">Time:</label>
+        <input type="time" id="appointmentTime" class="w-full border rounded">
+        </div>
+        </div>
+        <div class="mt-2">
+        <label class="block text-xs">Location:</label>
+        <input type="text" id="customLocation" class="w-full border rounded">
+        </div>
+        <button id="confirmAppointmentBtn" class="mt-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 w-full">
+        Confirm Appointment
+        </button>
+        </div>
+        
+        <div class="modal-actions" style="display: flex; flex-direction: row; gap: 8px; justify-content: space-between; width: 100%;">
+        <button id="callButton" class="action-btn bg-green-500 hover:bg-green-600" style="flex: 1;">
+        <i class="fas fa-phone"></i> Call
+        </button>
+        <button id="smsButton" class="action-btn bg-blue-500 hover:bg-blue-600" style="flex: 1;">
+        <i class="fas fa-sms"></i> SMS
+        </button>
+        <button id="secondSmsButton" class="action-btn bg-purple-500 hover:bg-purple-600" style="flex: 1;">
+        <i class="fas fa-sms"></i> Follow-up
+        </button>
+        <button id="setAppointmentBtn" class="action-btn bg-indigo-500 hover:bg-indigo-600" style="flex: 1;">
+        <i class="fas fa-calendar-plus"></i> Set Appointment
+        </button>
+        </div>
+        
+        <div id="appointmentStatus" class="text-xs mt-2"></div>
+        </div>
+        </div>
+        
+        </div>
+        </div>
+        
+        
+        <div id="appointmentModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:left;">
+        <button id="closeAppointmentModal" class="modal-close">&times;</button>
+        <h2>Appointment Details</h2>
+        
+        <div class="modal-body">
+        <p><strong>Date:</strong> <span id="appointmentModalDate"></span></p>
+        <p><strong>Time:</strong> <span id="appointmentModalTime"></span></p>
+        <p><strong>Location:</strong> <span id="appointmentModalLocation"></span></p>
+        <p style="margin-bottom: 15px;"><strong>Status:</strong> <span id="appointmentModalStatus"></span></p>
+        
+        <div class="modal-actions" style="text-align:center;">
+        <button id="rescheduleBtn" class="action-btn bg-blue-500">
+        <i class="fas fa-calendar-edit"></i> Reschedule
+        </button>
+        <button id="cancelAppointmentBtn" class="action-btn bg-red-500">
+        <i class="fas fa-calendar-times"></i> Cancel
+        </button>
+        </div>
+        </div>
+        </div>
+        </div>
+        
+        
+        <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyC8Yn92BRWaUw6KElX5UIdIa4RjPdxYESg",
+          authDomain: "usana-bc-tracker-signup.firebaseapp.com",
+          projectId: "usana-bc-tracker-signup",
+          storageBucket: "usana-bc-tracker-signup.appspot.com",
+          messagingSenderId: "605379613292",
+          appId: "1:605379613292:web:b50b8d185c2d20db82fe49"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Current user data
+        let currentUser = {
+          uid: null,
+          fullname: "",
+          location: "",
+          phone: ""
+        };
+        
+        // Current appointment settings
+        let currentAppointmentSettings = {
+          claimDate: "",
+          location: ""
+        };
+        
+        // Current lead being viewed in modal
+        let currentLeadId = null;
+        
+        // Collection references (will be initialized after auth)
+        let leadsCollection;
+        let appointmentSettingsCollection;
+        let appointmentsCollection;
+        const usersCollection = db.collection("users");
+        
+        // DOM elements
+        const tableContainer = document.getElementById('tableContainer');
+        const modal = document.getElementById('leadModal');
+        const modalName = document.getElementById('modalName');
+        const modalBirthday = document.getElementById('modalBirthday');
+        const modalContact = document.getElementById('modalContact');
+        const modalEmail = document.getElementById('modalEmail');
+        const closeModal = document.getElementById('closeModal');
+        const callButton = document.getElementById('callButton');
+        const smsButton = document.getElementById('smsButton');
+        const secondSmsButton = document.getElementById('secondSmsButton');
+        const setAppointmentBtn = document.getElementById('setAppointmentBtn');
+        
+        // Initialize auth state listener
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
             currentUser.uid = user.uid;
             
             // Initialize collections with user-specific paths
             leadsCollection = db.collection("users").doc(currentUser.uid).collection("leads");
             appointmentSettingsCollection = db.collection("users").doc(currentUser.uid).collection("appointmentSettings");
             appointmentsCollection = db.collection("users").doc(currentUser.uid).collection("appointments");
-
+            
             // Get user data
             const userDoc = await usersCollection.doc(user.uid).get();
             if (userDoc.exists) {
-                const userData = userDoc.data();
-                currentUser.fullname = userData.fullname || "Your Name";
-                currentUser.location = userData.location || "Your Location";
-                currentUser.phone = userData.phone || "";
-                document.getElementById("greeting").innerText = `Hi, ${currentUser.fullname}!`;
+              const userData = userDoc.data();
+              currentUser.fullname = userData.fullname || "Your Name";
+              currentUser.location = userData.location || "Your Location";
+              currentUser.phone = userData.phone || "";
+              document.getElementById("greeting").innerText = `Hi, ${currentUser.fullname}!`;
             }
-
-            // Load settings and leads
-            await loadSettings();
-            await loadLeads();
-            
-            // Hide loader after everything is loaded
-            document.getElementById("loader").classList.add("hidden");
-        } else {
-            console.warn("No user is logged in. Redirecting...");
-            window.location.href = "index.html";
-        }
-    });
-
-    // Load settings from Firestore
-    async function loadSettings() {
-        try {
-            const settingsDoc = await appointmentSettingsCollection.doc("current").get();
-            if (settingsDoc.exists) {
-                currentAppointmentSettings = settingsDoc.data();
-                updateSettingsUI();
+              
+              // Load settings and leads
+              await loadSettings();
+              await loadLeads();
+              await loadNotifications(); // Add this line
+              
+              // Hide loader after everything is loaded
+              document.getElementById("loader").classList.add("hidden");
             } else {
-                // Set default settings if none exist
-                const defaultDate = new Date();
-                defaultDate.setDate(defaultDate.getDate() + 7);
-                currentAppointmentSettings = {
-                    claimDate: defaultDate.toISOString().split('T')[0],
-                    location: currentUser.location
-                };
-                await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
-                updateSettingsUI();
+              console.warn("No user is logged in. Redirecting...");
+              window.location.href = "index.html";
             }
-        } catch (error) {
-            console.error("Error loading settings:", error);
-        }
-    }
-
-    // Update settings UI
-    function updateSettingsUI() {
-        document.getElementById("settingsClaimDate").value = currentAppointmentSettings.claimDate;
-        document.getElementById("settingsLocation").value = currentAppointmentSettings.location;
-    }
-
-    // Save settings
-    async function saveSettings() {
-        const newClaimDate = document.getElementById("settingsClaimDate").value;
-        const newLocation = document.getElementById("settingsLocation").value;
-        
-        if (!newClaimDate || !newLocation) {
-            alert("Please fill in all fields");
-            return;
-        }
-        
-        currentAppointmentSettings = {
-            claimDate: newClaimDate,
-            location: newLocation
-        };
-        
-        try {
-            await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
-            alert("Settings updated successfully!");
-        } catch (error) {
-            console.error("Error saving settings:", error);
-            alert("Error saving settings. Check console for details.");
-        }
-    }
-
-    // Load leads from Firestore
-    async function loadLeads() {
-        try {
-            document.getElementById("loader").classList.remove("hidden");
-            const querySnapshot = await leadsCollection.get();
-            const leads = [];
-            querySnapshot.forEach(doc => {
-                leads.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-            renderTable(leads);
-        } catch (error) {
-            console.error("Error loading leads:", error);
-            alert("Error loading leads. Check console for details.");
-        } finally {
-            document.getElementById("loader").classList.add("hidden");
-        }
-    }
-
-    // Save CSV data to Firestore
-    async function saveLeadsToDB(leadsData) {
-        try {
-            document.getElementById("loader").classList.remove("hidden");
-            const batch = db.batch();
-            
-            leadsData.forEach(lead => {
-                const leadRef = leadsCollection.doc(); // Auto-generated ID
-                batch.set(leadRef, {
-                    ...lead,
-                    userId: currentUser.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: "New",
-                    lastContacted: null,
-                    notes: "",
-                    followUpDate: null
-                });
-            });
-            
-            await batch.commit();
-            loadLeads(); // Refresh the table
-            alert("Leads imported successfully!");
-        } catch (error) {
-            console.error("Error saving leads:", error);
-            alert("Error saving leads. Check console for details.");
-        } finally {
-            document.getElementById("loader").classList.add("hidden");
-        }
-    }
-
-    // Update the CSV import handler
-    document.getElementById('csvFile').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: async function (results) {
-                    if (results.data.length > 0) {
-                        await saveLeadsToDB(results.data);
-                    } else {
-                        alert("No valid data found in CSV file");
-                    }
-                },
-                error: function(error) {
-                    console.error("CSV parsing error:", error);
-                    alert("Error parsing CSV file. Please check the format.");
-                }
-            });
-        }
-    });
-
-    // Enhanced SMS functions
-    smsButton.addEventListener('click', () => {
-        const phoneNumber = modalContact.textContent.trim();
-        const leadName = modalName.textContent.trim();
-        
-        if (phoneNumber) {
-            const formattedDate = formatDate(new Date(currentAppointmentSettings.claimDate));
-            const message = `Hi ${leadName}! 😊 This is ${currentUser.fullname} from USANA.
+              });
+              
+              // Load settings from Firestore
+              async function loadSettings() {
+                try {
+                  const settingsDoc = await appointmentSettingsCollection.doc("current").get();
+                  if (settingsDoc.exists) {
+                    currentAppointmentSettings = settingsDoc.data();
+                    updateSettingsUI();
+                  } else {
+                    // Set default settings if none exist
+                      const defaultDate = new Date();
+                      defaultDate.setDate(defaultDate.getDate() + 7);
+                      currentAppointmentSettings = {
+                        claimDate: defaultDate.toISOString().split('T')[0],
+                        location: currentUser.location
+                      };
+                      await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
+                      updateSettingsUI();
+                      }
+                      } catch (error) {
+                        console.error("Error loading settings:", error);
+                      }
+                      }
+                      
+                      // Update settings UI
+                      function updateSettingsUI() {
+                        document.getElementById("settingsClaimDate").value = currentAppointmentSettings.claimDate;
+                        document.getElementById("settingsLocation").value = currentAppointmentSettings.location;
+                      }
+                      
+                      // Save settings
+                      async function saveSettings() {
+                        const newClaimDate = document.getElementById("settingsClaimDate").value;
+                        const newLocation = document.getElementById("settingsLocation").value;
+                        
+                        if (!newClaimDate || !newLocation) {
+                          alert("Please fill in all fields");
+                          return;
+                        }
+                          
+                          currentAppointmentSettings = {
+                            claimDate: newClaimDate,
+                            location: newLocation
+                          };
+                          
+                          try {
+                            await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
+                            alert("Settings updated successfully!");
+                          } catch (error) {
+                            console.error("Error saving settings:", error);
+                            alert("Error saving settings. Check console for details.");
+                          }
+                          }
+                          
+                          // Load leads from Firestore
+                          async function loadLeads() {
+                            try {
+                              document.getElementById("loader").classList.remove("hidden");
+                              const querySnapshot = await leadsCollection.get();
+                              const leads = [];
+                              querySnapshot.forEach(doc => {
+                                leads.push({
+                                  id: doc.id,
+                                  ...doc.data()
+                                });
+                              });
+                              renderTable(leads);
+                            } catch (error) {
+                              console.error("Error loading leads:", error);
+                              alert("Error loading leads. Check console for details.");
+                            } finally {
+                              document.getElementById("loader").classList.add("hidden");
+                            }
+                          }
+                          
+                          // Save CSV data to Firestore
+                          async function saveLeadsToDB(leadsData) {
+                            try {
+                              document.getElementById("loader").classList.remove("hidden");
+                              const batch = db.batch();
+                              
+                              leadsData.forEach(lead => {
+                                const leadRef = leadsCollection.doc(); // Auto-generated ID
+                                batch.set(leadRef, {
+                                  ...lead,
+                                  userId: currentUser.uid,
+                                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                  status: "New",
+                                  lastContacted: null,
+                                  notes: "",
+                                  followUpDate: null
+                                });
+                              });
+                              
+                              await batch.commit();
+                              loadLeads(); // Refresh the table
+                              alert("Leads imported successfully!");
+                            } catch (error) {
+                              console.error("Error saving leads:", error);
+                              alert("Error saving leads. Check console for details.");
+                            } finally {
+                              document.getElementById("loader").classList.add("hidden");
+                            }
+                          }
+                          
+                          // Update the CSV import handler
+                          document.getElementById('csvFile').addEventListener('change', function (e) {
+                            const file = e.target.files[0];
+                            if (file) {
+                              Papa.parse(file, {
+                                header: true,
+                                skipEmptyLines: true,
+                                complete: async function (results) {
+                                  if (results.data.length > 0) {
+                                    await saveLeadsToDB(results.data);
+                                  } else {
+                                    alert("No valid data found in CSV file");
+                                  }
+                                    },
+                                    error: function(error) {
+                                      console.error("CSV parsing error:", error);
+                                      alert("Error parsing CSV file. Please check the format.");
+                                    }
+                                    });
+                                    }
+                                    });
+                                    
+                                    // Enhanced SMS functions
+                                    smsButton.addEventListener('click', () => {
+                                      const phoneNumber = modalContact.textContent.trim();
+                                      const leadName = modalName.textContent.trim();
+                                      
+                                      if (phoneNumber) {
+                                        const formattedDate = formatDate(new Date(currentAppointmentSettings.claimDate));
+                                        const message = `Hi ${leadName}! 😊 This is ${currentUser.fullname} from USANA.
 
 Great news — you've been selected for a FREE Celavive skincare experience!
 
@@ -704,55 +909,64 @@ This exclusive offer is only available until ${formattedDate}. Let me know if yo
         }
     });
 
-    // Enhanced Appointment System
-    setAppointmentBtn.addEventListener('click', async () => {
-        const date = document.getElementById('appointmentDate').value;
-        const time = document.getElementById('appointmentTime').value;
-        const customLocation = document.getElementById('customLocation').value || currentAppointmentSettings.location;
-        
-        if (!date || !time) {
-            alert('Please select both date and time');
-            return;
-        }
-        
-        const appointmentDateTime = new Date(`${date}T${time}`);
-        
-        try {
-            document.getElementById("loader").classList.remove("hidden");
-            
-            // Save appointment
-            await appointmentsCollection.doc(currentLeadId).set({
-                leadId: currentLeadId,
-                userId: currentUser.uid,
-                date: appointmentDateTime,
-                location: customLocation,
-                status: "Scheduled",
-                leadName: modalName.textContent,
-                leadPhone: modalContact.textContent,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            // Update lead status
-            await leadsCollection.doc(currentLeadId).update({
-                status: "Appointment Set",
-                lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
-                followUpDate: appointmentDateTime
-            });
-            
-            // Set reminders
-            scheduleReminders(currentLeadId, appointmentDateTime, customLocation);
-            
-            document.getElementById('appointmentStatus').textContent = 
-                `Appointment set for ${formatDateTime(appointmentDateTime)} at ${customLocation}`;
-            
-            loadLeads(); // Refresh the table
-        } catch (error) {
-            console.error("Error setting appointment:", error);
-            alert("Error setting appointment. Check console for details.");
-        } finally {
-            document.getElementById("loader").classList.add("hidden");
-        }
+  // Update the appointment confirmation button
+document.getElementById('confirmAppointmentBtn').addEventListener('click', async function() {
+  const date = document.getElementById('appointmentDate').value;
+  const time = document.getElementById('appointmentTime').value;
+  const customLocation = document.getElementById('customLocation').value || currentAppointmentSettings.location;
+  
+  if (!date || !time) {
+    alert('Please select both date and time');
+    return;
+  }
+  
+  const appointmentDateTime = new Date(`${date}T${time}`);
+  
+  try {
+    document.getElementById("loader").classList.remove("hidden");
+    
+    // Save appointment
+    await appointmentsCollection.doc(currentLeadId).set({
+      leadId: currentLeadId,
+      userId: currentUser.uid,
+      date: appointmentDateTime,
+      location: customLocation,
+      status: "Scheduled",
+      leadName: modalName.textContent,
+      leadPhone: modalContact.textContent,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
+    // Update lead status
+    await leadsCollection.doc(currentLeadId).update({
+      status: "Appointment Set",
+      lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+      followUpDate: appointmentDateTime
+    });
+    
+    // Set reminders
+    scheduleReminders(currentLeadId, appointmentDateTime, customLocation);
+    
+    document.getElementById('appointmentStatus').textContent = 
+      `✓ Appointment set for ${formatDateTime(appointmentDateTime)} at ${customLocation}`;
+    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-green-600';
+    
+    // Hide the form after successful appointment setting
+    document.getElementById('appointmentForm').style.display = 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-check"></i> Appointment Set';
+    document.getElementById('setAppointmentBtn').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+    document.getElementById('setAppointmentBtn').classList.add('bg-green-500', 'hover:bg-green-600');
+    
+    loadLeads(); // Refresh the table
+  } catch (error) {
+    console.error("Error setting appointment:", error);
+    document.getElementById('appointmentStatus').textContent = 'Error setting appointment';
+    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-red-600';
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
+  }
+});
+
 
     // Schedule reminders
     function scheduleReminders(leadId, appointmentDate, location) {
@@ -782,9 +996,9 @@ This exclusive offer is only available until ${formattedDate}. Let me know if yo
             
             // Name
             html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
-                     onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
-                     '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', '${row.id}')">
-                     ${toProperCase(escapeHtml(row.Name || ""))}
+                      onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
+                      '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', '${row.id}')">
+                      ${toProperCase(escapeHtml(row.Name || ""))}
                     </td>`;
             
             // Age
@@ -795,21 +1009,17 @@ This exclusive offer is only available until ${formattedDate}. Let me know if yo
 
             // Occupation
             html += `<td class="px-4 py-2 border">${escapeHtml(row.Occupation || "")}</td>`;
-
-
             
             // Status
-            html += `<td class="px-4 py-2 border">
-                        <select class="border p-1 rounded status-select" data-lead-id="${row.id}" 
-                                onchange="updateStatus('${row.id}', this.value)">
-                            <option value="New" ${row.status === "New" ? "selected" : ""}>New</option>
-                            <option value="Contacted" ${row.status === "Contacted" ? "selected" : ""}>Contacted</option>
-                            <option value="Followed Up" ${row.status === "Followed Up" ? "selected" : ""}>Followed Up</option>
-                            <option value="Appointment Set" ${row.status === "Appointment Set" ? "selected" : ""}>Appointment Set</option>
-                            <option value="Closed - Won" ${row.status === "Closed - Won" ? "selected" : ""}>Closed - Won</option>
-                            <option value="Closed - Lost" ${row.status === "Closed - Lost" ? "selected" : ""}>Closed - Lost</option>
-                        </select>
-                    </td>`;
+              html += `<td class="px-4 py-2 border">
+        ${row.status === "Appointment Set" ? 
+            `<span class="text-blue-600 cursor-pointer underline" 
+                  onclick="showAppointmentModal('${row.id}')">
+                View Appointment
+            </span>` : 
+            escapeHtml(row.status || "Not Set")}
+    </td>`;
+
             
             // Last Contacted
             html += `<td class="px-4 py-2 border">${formatFirestoreDate(row.lastContacted)}</td>`;
@@ -817,9 +1027,9 @@ This exclusive offer is only available until ${formattedDate}. Let me know if yo
             // Follow Up
             html += `<td class="px-4 py-2 border">
                         <input type="date" class="border p-1 rounded followup-date" 
-                               data-lead-id="${row.id}" 
-                               value="${row.followUpDate ? new Date(row.followUpDate.seconds * 1000).toISOString().split('T')[0] : ''}"
-                               onchange="updateFollowUpDate('${row.id}', this.value)">
+                                data-lead-id="${row.id}" 
+                                value="${row.followUpDate ? new Date(row.followUpDate.seconds * 1000).toISOString().split('T')[0] : ''}"
+                                onchange="updateFollowUpDate('${row.id}', this.value)">
                     </td>`;
             
             // Notes
@@ -900,33 +1110,122 @@ This exclusive offer is only available until ${formattedDate}. Let me know if yo
         }
     }
 
-    // When showing modal
-  function showModal(name, birthday, contact, email, leadId) {
+  // Modify your showModal function:
+async function showModal(name, birthday, contact, email, leadId) {
   currentLeadId = leadId;
   modalName.textContent = toProperCase(name);
   modalBirthday.textContent = birthday;
   modalContact.textContent = formatPhoneNumber(contact);
   modalEmail.textContent = email;
   
-  // Set data attributes for buttons
-  smsButton.setAttribute('data-lead-id', leadId);
-  secondSmsButton.setAttribute('data-lead-id', leadId);
-  setAppointmentBtn.setAttribute('data-lead-id', leadId);
+  // Check for existing appointment
+  const appointmentDoc = await appointmentsCollection.doc(leadId).get();
   
-  // Set default appointment to tomorrow at 10am
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(10, 0, 0, 0);
-  
-  document.getElementById('appointmentDate').valueAsDate = tomorrow;
-  document.getElementById('appointmentTime').value = '10:00';
-  document.getElementById('customLocation').value = currentAppointmentSettings.location;
-  document.getElementById('appointmentStatus').textContent = '';
+  if (appointmentDoc.exists) {
+    const appointment = appointmentDoc.data();
+    const appointmentDate = appointment.date.toDate();
+    
+    document.getElementById('appointmentStatus').textContent = 
+      `✓ Appointment set for ${formatDateTime(appointmentDate)} at ${appointment.location}`;
+    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-green-600';
+    
+    document.getElementById('appointmentForm').style.display = 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-edit"></i> Reschedule';
+  } else {
+    // No appointment - show form
+    document.getElementById('appointmentForm').style.display = 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-plus"></i> Set Appointment';
+    document.getElementById('appointmentStatus').textContent = '';
+  }
   
   modal.style.display = 'flex';
   setTimeout(() => {
     modal.classList.add('show');
   }, 10);
+}
+
+
+// Add to your existing JavaScript
+async function showAppointmentModal(leadId) {
+  try {
+    const appointmentDoc = await appointmentsCollection.doc(leadId).get();
+    
+    if (appointmentDoc.exists) {
+      const appointment = appointmentDoc.data();
+      const appointmentDate = appointment.date.toDate();
+      
+      document.getElementById('appointmentModalDate').textContent = 
+        appointmentDate.toLocaleDateString();
+      document.getElementById('appointmentModalTime').textContent = 
+        appointmentDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      document.getElementById('appointmentModalLocation').textContent = 
+        appointment.location;
+      document.getElementById('appointmentModalStatus').textContent = 
+        appointment.status;
+      
+      // Store current appointment ID for actions
+      document.getElementById('appointmentModal').dataset.appointmentId = leadId;
+      
+      // Show modal
+      document.getElementById('appointmentModal').style.display = 'flex';
+    } else {
+      alert('No appointment found for this lead');
+    }
+  } catch (error) {
+    console.error("Error loading appointment:", error);
+    alert("Error loading appointment details");
+  }
+}
+
+// Close appointment modal
+document.getElementById('closeAppointmentModal').addEventListener('click', () => {
+  document.getElementById('appointmentModal').style.display = 'none';
+});
+
+// Cancel appointment
+document.getElementById('cancelAppointmentBtn').addEventListener('click', async function() {
+  if (confirm("Are you sure you want to cancel this appointment?")) {
+    const appointmentId = document.getElementById('appointmentModal').dataset.appointmentId;
+    
+    try {
+      // Update lead status
+      await leadsCollection.doc(appointmentId).update({
+        status: "Followed Up",
+        followUpDate: null
+      });
+      
+      // Delete appointment
+      await appointmentsCollection.doc(appointmentId).delete();
+      
+      // Refresh data
+      loadLeads();
+      document.getElementById('appointmentModal').style.display = 'none';
+      alert("Appointment cancelled successfully");
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      alert("Error cancelling appointment");
+    }
+  }
+});
+
+// Reschedule appointment
+document.getElementById('rescheduleBtn').addEventListener('click', function() {
+  const appointmentId = document.getElementById('appointmentModal').dataset.appointmentId;
+  document.getElementById('appointmentModal').style.display = 'none';
+  showModalFromAppointment(appointmentId);
+});
+
+async function showModalFromAppointment(leadId) {
+  const leadDoc = await leadsCollection.doc(leadId).get();
+  const lead = leadDoc.data();
+  
+  showModal(lead.Name, lead.Birthday, lead.Contact, lead.Email, leadId);
+  
+  // Open the appointment form
+  document.getElementById('appointmentForm').style.display = 'block';
+  document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-times"></i> Cancel';
+  document.getElementById('setAppointmentBtn').classList.remove('bg-blue-600');
+  document.getElementById('setAppointmentBtn').classList.add('bg-gray-500');
 }
 
 
@@ -1044,6 +1343,238 @@ closeModal.addEventListener('click', () => {
     window.updateNotes = updateNotes;
     window.deleteLead = deleteLead;
     window.saveSettings = saveSettings;
+
+
+
+// Toggle appointment form visibility
+document.getElementById('setAppointmentBtn').addEventListener('click', function() {
+  const form = document.getElementById('appointmentForm');
+  const btn = document.getElementById('setAppointmentBtn');
+  
+  if (form.style.display === 'none') {
+    form.style.display = 'block';
+    btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+    btn.classList.remove('bg-blue-600');
+    btn.classList.add('bg-gray-500');
+  } else {
+    form.style.display = 'none';
+    btn.innerHTML = '<i class="fas fa-calendar-plus"></i> Set Appointment';
+    btn.classList.remove('bg-gray-500');
+    btn.classList.add('bg-blue-600');
+  }
+});
+
+
+// Notification system
+let notifications = [];
+
+// Load notifications from Firestore
+async function loadNotifications() {
+  try {
+    const now = new Date();
+    const querySnapshot = await appointmentsCollection
+      .where('date', '>=', now)
+      .orderBy('date', 'asc')
+      .get();
+
+    notifications = [];
+    querySnapshot.forEach(doc => {
+      const appointment = doc.data();
+      notifications.push({
+        id: doc.id,
+        ...appointment,
+        read: false,
+        expanded: false
+      });
+    });
+
+    updateNotificationBadge();
+    renderNotificationList();
+  } catch (error) {
+    console.error("Error loading notifications:", error);
+  }
+}
+
+// Update notification badge count
+function updateNotificationBadge() {
+  const unreadCount = notifications.filter(n => !n.read).length;
+  const badge = document.getElementById('notificationCount');
+  
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+// Render notification list
+function renderNotificationList() {
+  const listContainer = document.getElementById('notificationList');
+  listContainer.innerHTML = '';
+
+  if (notifications.length === 0) {
+    listContainer.innerHTML = '<p class="text-center text-gray-500 py-4">No upcoming appointments</p>';
+    return;
+  }
+
+  notifications.forEach(notification => {
+    const appointmentDate = notification.date.toDate();
+    const leadName = notification.leadName || 'Unknown Lead';
+    
+    const notificationItem = document.createElement('div');
+    notificationItem.className = `notification-item ${!notification.read ? 'unread' : ''}`;
+    notificationItem.innerHTML = `
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="font-medium">${escapeHtml(leadName)}</h3>
+          <p class="text-sm text-gray-600">
+            ${formatDateTime(appointmentDate)} at ${escapeHtml(notification.location)}
+          </p>
+          <p class="notification-time">${formatRelativeTime(appointmentDate)}</p>
+        </div>
+        ${!notification.read ? '<span class="w-2 h-2 rounded-full bg-blue-500"></span>' : ''}
+      </div>
+      
+      ${notification.expanded ? `
+        <div class="mt-2 notification-detail">
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-2">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-circle text-yellow-400"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  Don't forget to follow-up before the appointment time to confirm.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center space-x-4 mt-2">
+            <button class="sms-notification-btn bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                    data-lead-id="${notification.leadId}">
+              <i class="fas fa-sms mr-1"></i> SMS
+            </button>
+            <button class="call-notification-btn bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                    data-phone="${notification.leadPhone}">
+              <i class="fas fa-phone mr-1"></i> Call
+            </button>
+          </div>
+        </div>
+      ` : ''}
+    `;
+    
+    notificationItem.addEventListener('click', (e) => {
+      // Don't toggle if clicking on action buttons
+      if (e.target.closest('.sms-notification-btn') || e.target.closest('.call-notification-btn')) {
+        return;
+      }
+      
+      // Toggle expanded state
+      notification.expanded = !notification.expanded;
+      renderNotificationList();
+      
+      // Mark as read when expanded
+      if (notification.expanded && !notification.read) {
+        notification.read = true;
+        updateNotificationBadge();
+      }
+    });
+    
+    listContainer.appendChild(notificationItem);
+  });
+}
+
+// Format relative time (e.g., "in 2 days")
+function formatRelativeTime(date) {
+  const now = new Date();
+  const diffInDays = Math.floor((date - now) / (1000 * 60 * 60 * 24));
+  
+  if (diffInDays < 0) {
+    return 'Past due';
+  } else if (diffInDays === 0) {
+    return 'Today';
+  } else if (diffInDays === 1) {
+    return 'Tomorrow';
+  } else {
+    return `in ${diffInDays} days`;
+  }
+}
+
+
+
+
+// Notification bell click handler
+document.getElementById('notificationBell').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('notificationModal').style.display = 'flex';
+  loadNotifications();
+});
+
+// Close notification modal
+document.getElementById('closeNotificationModal').addEventListener('click', () => {
+  document.getElementById('notificationModal').style.display = 'none';
+});
+
+// Toggle options menu
+document.getElementById('notificationOptions').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('notificationOptionsMenu');
+  menu.classList.toggle('hidden');
+});
+
+// Mark all as read
+document.getElementById('markAllRead').addEventListener('click', () => {
+  notifications.forEach(n => n.read = true);
+  updateNotificationBadge();
+  renderNotificationList();
+  document.getElementById('notificationOptionsMenu').classList.add('hidden');
+});
+
+// Mark all as unread
+document.getElementById('markAllUnread').addEventListener('click', () => {
+  notifications.forEach(n => n.read = false);
+  updateNotificationBadge();
+  renderNotificationList();
+  document.getElementById('notificationOptionsMenu').classList.add('hidden');
+});
+
+// Handle SMS from notification
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.sms-notification-btn')) {
+    const leadId = e.target.closest('.sms-notification-btn').dataset.leadId;
+    const notification = notifications.find(n => n.leadId === leadId);
+    if (notification) {
+      const phoneNumber = notification.leadPhone;
+      const leadName = notification.leadName;
+      const message = `Hi ${leadName}! This is a reminder about your appointment tomorrow. Please confirm if you'll be able to make it.`;
+      window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+    }
+  }
+  
+  if (e.target.closest('.call-notification-btn')) {
+    const phoneNumber = e.target.closest('.call-notification-btn').dataset.phone;
+    if (phoneNumber) {
+      window.open(`tel:${phoneNumber}`);
+    }
+  }
+});
+
+// Close menu when clicking elsewhere
+document.addEventListener('click', () => {
+  document.getElementById('notificationOptionsMenu').classList.add('hidden');
+});
+
+
+// Check for new notifications periodically
+setInterval(() => {
+  if (currentUser.uid) {
+    loadNotifications();
+  }
+}, 30 * 60 * 1000); // 30 minutes
+
+
+
 </script>
 </body>
 </html>
