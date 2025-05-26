@@ -369,7 +369,14 @@ input[type="file"]:hover::before {
         }
         
         
-        
+        #modalAddress {
+        word-break: break-word;
+        max-height: 100px;
+        overflow-y: auto;
+        display: inline-block;
+        text-transform: capitalize; /* This provides a fallback */
+        }
+
         
         /* Notification styles */
         .notification-item {
@@ -574,6 +581,7 @@ input[type="file"]:hover::before {
         <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
         <p><strong>Contact:</strong> <span id="modalContact"></span></p>
         <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
+        <p><strong>Address:</strong> <span id="modalAddress"></span></p>
         
         <div id="appointmentForm" style="display: none;">
         <h3 class="font-medium">Appointment</h3>
@@ -688,6 +696,7 @@ input[type="file"]:hover::before {
         const modalBirthday = document.getElementById('modalBirthday');
         const modalContact = document.getElementById('modalContact');
         const modalEmail = document.getElementById('modalEmail');
+        const modalAddress = document.getElementById('modalAddress');
         const closeModal = document.getElementById('closeModal');
         const callButton = document.getElementById('callButton');
         const smsButton = document.getElementById('smsButton');
@@ -995,11 +1004,12 @@ document.getElementById('confirmAppointmentBtn').addEventListener('click', async
             html += '<tr class="bg-white border-b">';
             
             // Name
-            html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
-                      onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
-                      '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', '${row.id}')">
-                      ${toProperCase(escapeHtml(row.Name || ""))}
-                    </td>`;
+          html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
+      onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
+      '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', 
+      '${escapeHtml(row.Address || "")}', '${row.id}')">
+      ${toProperCase(escapeHtml(row.Name || ""))}
+    </td>`;
             
             // Age
             html += `<td class="px-4 py-2 border">${escapeHtml(row.Age || "")}</td>`;
@@ -1111,12 +1121,14 @@ document.getElementById('confirmAppointmentBtn').addEventListener('click', async
     }
 
   // Modify your showModal function:
-async function showModal(name, birthday, contact, email, leadId) {
+async function showModal(name, birthday, contact, email, address, leadId) {
   currentLeadId = leadId;
   modalName.textContent = toProperCase(name);
   modalBirthday.textContent = birthday;
   modalContact.textContent = formatPhoneNumber(contact);
   modalEmail.textContent = email;
+  modalAddress.textContent = address ? toProperCase(address) : 'Not specified'; // Apply toProperCase here
+
   
   // Check for existing appointment
   const appointmentDoc = await appointmentsCollection.doc(leadId).get();
