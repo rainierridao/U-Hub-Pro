@@ -401,16 +401,11 @@ input[type="file"]:hover::before {
         }
         
         .notification-item.unread {
-          font-weight: 500;
-          border-left: 4px solid #3b82f6;
+          background-color: #f8fafc;
         }
         
         .notification-item.unread:hover {
           background-color: #ebf5ff;
-        }
-        
-        .notification-item.read {
-          opacity: 0.8;
         }
         
         .notification-item h3 {
@@ -997,7 +992,6 @@ document.getElementById('confirmAppointmentBtn').addEventListener('click', async
       leadName: modalName.textContent,
       leadPhone: modalContact.textContent,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      read: false // Add this line to ensure new appointments are unread
     });
     
     // Update lead status
@@ -1582,7 +1576,8 @@ async function loadNotifications() {
         id: doc.id,
         ...appointment,
         type: 'upcoming',
-        read: appointment.read === undefined ? false : appointment.read, // Handle undefined as false        expanded: false
+        read: appointment.read || false,
+        expanded: false
       });
     });
 
@@ -1656,12 +1651,7 @@ function renderNotificationList() {
     const leadName = notification.leadName || 'Unknown Lead';
     
     const notificationItem = document.createElement('div');
-  // Update the read status check to be more defensive
-notificationItem.className = `notification-item ${
-  (!notification.read || notification.read === undefined) 
-    ? 'unread bg-blue-50 border-l-4 border-blue-500' 
-    : ''
-}`;
+    notificationItem.className = `notification-item ${!notification.read ? 'unread bg-blue-50 border-l-4 border-blue-500' : ''}`;
     notificationItem.innerHTML = `
       <div class="flex justify-between items-start">
         <div class="flex-1">
