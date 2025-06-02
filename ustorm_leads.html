@@ -671,7 +671,9 @@ input[type="file"]:hover::before {
         <p><strong>Contact:</strong> <span id="modalContact"></span></p>
         <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
         <p><strong>Address:</strong> <span id="modalAddress"></span></p>
-        <p class="hidden"><strong>FORM:</strong> <span id="modalFormDisplay" class="hidden"></span></p>
+        <p id="formSection" class="hidden">
+        <strong>FORM:</strong> <span id="modalFormDisplay" class="hidden"></span>
+        </p>
 
 
       
@@ -1322,22 +1324,27 @@ function isAppointmentPassed(followUpDate) {
 function updateFormDisplay(formData) {
   const formDisplay = document.getElementById('modalFormDisplay');
   const formInputContainer = document.getElementById('formInputContainer');
-  const formParagraph = formDisplay.parentElement; // Get the parent <p> element
+  const formParagraph = formDisplay?.parentElement; // the <p> element containing "FORM:"
+  const toggleBtn = document.getElementById('toggleFormBtn');
   const copySummaryBtn = document.getElementById('copySummaryBtn');
-  
-  if (formData) {
+
+  // Always show copy button regardless of FORM data
+  if (copySummaryBtn) {
+    copySummaryBtn.classList.remove('hidden');
+  }
+
+  if (formData && formData.trim() !== '') {
     formDisplay.textContent = formData;
     formDisplay.classList.remove('hidden');
-    formParagraph.classList.remove('hidden');
-    copySummaryBtn.classList.remove('hidden'); // Show the copy button
-    document.getElementById('toggleFormBtn').innerHTML = '<i class="fas fa-edit"></i> Edit FORM';
+    if (formParagraph) formParagraph.classList.remove('hidden');
+    toggleBtn.innerHTML = '<i class="fas fa-edit"></i> Edit FORM';
   } else {
+    // FORM is empty – hide the whole <p> that contains it
     formDisplay.classList.add('hidden');
-    formParagraph.classList.add('hidden');
-    copySummaryBtn.classList.add('hidden'); // Hide the copy button if no FORM data
-    document.getElementById('toggleFormBtn').innerHTML = '<i class="fas fa-plus"></i> Add FORM';
+    if (formParagraph) formParagraph.classList.add('hidden');
+    toggleBtn.innerHTML = '<i class="fas fa-plus"></i> Add FORM';
   }
-  
+
   formInputContainer.classList.add('hidden');
 }
 
@@ -1394,70 +1401,64 @@ function setupFormHandlers() {
   });
 }
 
-
-// Add this to your setupFormHandlers function or wherever you set up event listeners
 document.getElementById('copySummaryBtn').addEventListener('click', async () => {
   try {
-    // Get all the data we need
-    const name = document.getElementById('modalName').textContent;
-    const birthday = document.getElementById('modalBirthday').textContent; // Format: YYYY-MM-DD
-    const address = document.getElementById('modalAddress').textContent;
+    const name = document.getElementById('modalName').textContent.trim();
+    const birthday = document.getElementById('modalBirthday').textContent.trim();
+    const address = document.getElementById('modalAddress').textContent.trim();
     const formDisplay = document.getElementById('modalFormDisplay');
-    const formText = formDisplay.textContent || 'No FORM data';
-    
-    // Calculate age from birthday (YYYY-MM-DD format)
+    const formText = formDisplay.textContent.trim();
+
+    // Check visibility
+    const isFormVisible = !!(formDisplay.offsetParent !== null && formDisplay.offsetHeight > 0 && getComputedStyle(formDisplay).visibility !== 'hidden' && getComputedStyle(formDisplay).display !== 'none');
+
+    // Calculate age
     let age = 'N/A';
     if (birthday) {
       const birthDate = new Date(birthday);
-      if (!isNaN(birthDate.getTime())) {
+      if (!isNaN(birthDate)) {
         const today = new Date();
         let ageCalculated = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
-        
-        // Adjust age if birthday hasn't occurred yet this year
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
           ageCalculated--;
         }
         age = ageCalculated;
       }
     }
-    
-    // Create the summary text
-    const summaryText = `Prospect FORM:
+
+    // Build summary
+    let summaryText = `Prospect FORM:
 Name: ${name}
 Age: ${age}
-Address: ${address}
+Address: ${address}`;
 
-FORM:
-${formText}`;
-    
+    // Append FORM only if visible and not empty
+    if (isFormVisible && formText) {
+      summaryText += `\n\nFORM:\n${formText}`;
+    }
+
     // Copy to clipboard
     await navigator.clipboard.writeText(summaryText);
-    
-  // Show feedback with offset
+
+    // Show feedback
     const copyBtn = document.getElementById('copySummaryBtn');
     const originalContent = copyBtn.innerHTML;
-    const originalWidth = copyBtn.offsetWidth;
-    
-    // Create feedback element
     const feedback = document.createElement('span');
     feedback.className = 'copied-feedback';
     feedback.innerHTML = '<i class="fas fa-check"></i> Copied!';
     feedback.style.position = 'absolute';
-    feedback.style.left = '-10px'; // 50px to the right
+    feedback.style.left = '-10px';
     feedback.style.whiteSpace = 'nowrap';
-    
-    // Clear button and add feedback
+
     copyBtn.innerHTML = '';
-    copyBtn.style.position = 'relative'; // Needed for absolute positioning of child
+    copyBtn.style.position = 'relative';
     copyBtn.appendChild(feedback);
-    
-    // Restore after 2 seconds
+
     setTimeout(() => {
       copyBtn.innerHTML = originalContent;
-    // Reset position
     }, 1000);
-    
+
   } catch (error) {
     console.error('Failed to copy summary:', error);
   }
