@@ -47,6 +47,56 @@ html, body {
   margin: auto;
 }
 
+/* Style for the copy button */
+  #copySummaryBtn {
+  margin-top: 0.5rem;
+  padding: 0.25rem;
+  color: #6b7280; /* gray-500 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  left:-261px;
+  top:-10px;
+  }
+  
+  /* Hover effect */
+  #copySummaryBtn:hover {
+  color: #374151; /* gray-700 */
+  }
+  
+  /* Tooltip */
+  #copySummaryBtn::after {
+  content: "Copy Summary";
+  position: absolute;
+  bottom: 20%;
+  left: 250%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.5rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  }
+  
+  #copySummaryBtn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  }
+  
+  /* Icon styling */
+  #copySummaryBtn i {
+  font-size: 1rem;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  }
+
+
 @media (max-width: 600px) {
   .content {
     margin-top: 60px;
@@ -121,6 +171,8 @@ position: relative;
   font-size: 0.9rem;
   padding: 0 12px;
 }
+
+
 
 /* Compact Modal */
 #leadModal > div {
@@ -246,6 +298,10 @@ input[type="file"]:hover::before {
     -ms-text-size-adjust: 100%;
   }
   
+  
+  #copySummaryBtn {
+  left:-255px;
+}
   /* Adjust layout for smaller screens */
     .content {
       max-width: 390px;
@@ -271,6 +327,8 @@ input[type="file"]:hover::before {
     .hidden {
       display: none !important;
     }
+    
+  
     
     /* Adjust table container for scrolling */
       #tableContainer {
@@ -431,6 +489,19 @@ input[type="file"]:hover::before {
           border-top: 1px dashed #e5e7eb;
         }
 
+        /* FORM styling */
+        #modalFormDisplay {
+        white-space: pre-wrap;
+        word-break: break-word;
+        display: inline-block;
+        margin-top: 4px;
+        }
+        
+        #formTextArea {
+        min-height: 100px;
+        font-size: 14px;
+        }
+
         </style>
         <body>
         
@@ -584,7 +655,12 @@ input[type="file"]:hover::before {
         <div id="leadModal">
         <div>
         <div class="flex justify-between items-start">
-        <h2 class="text-lg font-semibold">Lead Details</h2>
+        <h2 class="text-lg font-semibold">Lead Details</h2> 
+
+        <button id="copySummaryBtn">
+        <i class="fas fa-copy"></i>
+        </button>
+
         <button id="closeModal" class="text-gray-500 hover:text-gray-700 rounded-full p-1">
         <i class="fas fa-times"></i>
         </button>
@@ -595,6 +671,25 @@ input[type="file"]:hover::before {
         <p><strong>Contact:</strong> <span id="modalContact"></span></p>
         <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
         <p><strong>Address:</strong> <span id="modalAddress"></span></p>
+        <p class="hidden"><strong>FORM:</strong> <span id="modalFormDisplay" class="hidden"></span></p>
+
+
+      
+        <button id="toggleFormBtn" class="action-btn bg-gray-500 hover:bg-gray-600 mt-2" style="margin-bottom: 10px; color:white;">
+        <i class="fas fa-edit"></i> Edit FORM
+        </button>
+        <div id="formInputContainer" class="hidden mt-2">
+        <textarea id="formTextArea" class="w-full border rounded p-2" 
+        placeholder="Family, Occupation, Recreation, Motivation details..."></textarea>
+        <div class="flex space-x-2 mt-2" style="margin-bottom:20px;">
+        <button id="saveFormBtn" class="action-btn bg-green-500 hover:bg-green-600 flex-1" style="color:white;">
+        <i class="fas fa-save"></i> Save
+        </button>
+        <button id="cancelFormBtn" class="action-btn bg-gray-500 hover:bg-gray-600 flex-1" style="color:white;">
+        <i class="fas fa-times"></i> Cancel
+        </button>
+        </div>
+        </div>
         
         <div id="appointmentForm" style="display: none;">
         <h3 class="font-medium">Appointment</h3>
@@ -615,6 +710,8 @@ input[type="file"]:hover::before {
         <button id="confirmAppointmentBtn" class="mt-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 w-full">
         Confirm Appointment
         </button>
+        
+        <input type="hidden" id="isSecondAppointment" value="false">
         </div>
         
         <div class="modal-actions" style="display: flex; flex-direction: row; gap: 8px; justify-content: space-between; width: 100%;">
@@ -652,40 +749,59 @@ input[type="file"]:hover::before {
         <p><strong>Status:</strong> <span id="appointmentModalStatus"></span></p>
         
         <!-- Hidden until appointment time passes -->
+          <!-- Inside your appointment modal, replace the status update section with this: -->
           <div id="statusUpdateSection" class="hidden mt-4 border-t pt-4">
           <h3 class="font-medium mb-2">Update Outcome</h3>
           
           <!-- Sale/Enrolled Option -->
           <div class="mb-3">
           <button id="saleBtn" class="action-btn bg-green-500 w-full mb-2">
-          <i class="fas fa-check-circle"></i> Sale/Enrolled
+          <i class="fas fa-check-circle"></i> Presented (Sale/Enrolled)
           </button>
           <div id="saleFollowupForm" class="hidden bg-green-50 p-3 rounded mt-2">
-          <label class="block text-sm mb-1">Next Follow-up Date:</label>
-          <input type="date" id="saleFollowupDate" class="w-full border rounded p-2 mb-2">
-          <textarea id="saleNotes" class="w-full border rounded p-2" placeholder="Notes (e.g. product purchased, next steps)"></textarea>
+          <div class="mb-2">
+          <label class="block text-sm mb-1">Enrollment Type:</label>
+          <select id="enrollmentType" class="w-full border rounded p-2">
+          <option value="PC">Preferred Customer</option>
+          <option value="Associate">Associate</option>
+          </select>
+          </div>
+          <textarea id="saleNotes" class="w-full border rounded p-2" placeholder="Products purchased, notes..."></textarea>
           <button id="confirmSaleBtn" class="action-btn bg-green-600 mt-2 w-full">
-          Confirm Outcome
+          Confirm Enrollment
           </button>
           </div>
           </div>
           
           <!-- No Sale Option -->
-          <div>
+          <div class="mb-3">
           <button id="noSaleBtn" class="action-btn bg-yellow-500 w-full mb-2">
-          <i class="fas fa-clock"></i> No Sale (Schedule Follow-up)
+          <i class="fas fa-clock"></i> Presented (No Sale/Schedule Follow-up)
           </button>
           <div id="noSaleFollowupForm" class="hidden bg-yellow-50 p-3 rounded mt-2">
-          <label class="block text-sm mb-1">Next Appointment Date:</label>
-          <input type="date" id="noSaleFollowupDate" class="w-full border rounded p-2 mb-2">
-          <textarea id="noSaleNotes" class="w-full border rounded p-2" placeholder="Notes (e.g. objections, next steps)"></textarea>
           <button id="confirmNoSaleBtn" class="action-btn bg-yellow-600 mt-2 w-full">
-          Confirm Follow-up
+          Schedule Second Appointment
           </button>
-          </div>
           </div>
           </div>
           
+          <!-- No Show Option -->
+          <div>
+          <button id="noShowBtn" class="action-btn bg-red-500 w-full mb-2">
+          <i class="fas fa-calendar-times"></i> No Show
+          </button>
+          <div id="noShowFollowupForm" class="hidden bg-red-50 p-3 rounded mt-2">
+          <textarea id="noShowNotes" class="w-full border rounded p-2 mb-2" 
+          placeholder="Notes about the no show..."></textarea>
+          <button id="confirmNoShowBtn" class="action-btn bg-red-600 mt-2 w-full">
+          Confirm No Show
+          </button>
+          </div>
+          </div>
+
+          </div>
+          
+
           <!-- Original buttons (hidden when appointment is in future) -->
           <div id="originalActions" class="modal-actions" style="text-align:center;">
           <button id="rescheduleBtn" class="action-btn bg-blue-500">
@@ -713,6 +829,9 @@ input[type="file"]:hover::before {
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+          // Inside your auth state listener after collections are initialized
+          setupFormHandlers();
         
         // Current user data
         let currentUser = {
@@ -841,23 +960,50 @@ input[type="file"]:hover::before {
                           async function loadLeads() {
                             try {
                               document.getElementById("loader").classList.remove("hidden");
-                              const querySnapshot = await leadsCollection.get();
                               const leads = [];
-                              querySnapshot.forEach(doc => {
-                                leads.push({
-                                  id: doc.id,
-                                  ...doc.data()
-                                });
-                              });
-                              renderTable(leads);
-                            } catch (error) {
-                              console.error("Error loading leads:", error);
-                              alert("Error loading leads. Check console for details.");
-                            } finally {
-                              document.getElementById("loader").classList.add("hidden");
-                            }
-                          }
+                              
+                              // Get leads first
+                              const leadsSnapshot = await leadsCollection.get();
+                              
+                              // Then get appointments and create a map by leadId
+                              const appointmentsSnapshot = await appointmentsCollection.get();
+                              const appointmentsMap = new Map();
+                              
+                              appointmentsSnapshot.forEach(doc => {
+                                const appointment = doc.data();
+                                if (appointment.leadId) {
+                                  appointmentsMap.set(appointment.leadId, appointment);
+                                }
+                                  });
+                                  
+                                  // Process each lead
+                                  leadsSnapshot.forEach(doc => {
+                                    const leadData = doc.data();
+                                    const appointmentData = appointmentsMap.get(doc.id);
+                                    
+                                    // Only merge specific appointment fields
+                                    if (appointmentData) {
+                                      leadData.status = appointmentData.status || leadData.status;
+                                      leadData.followUpDate = appointmentData.date || leadData.followUpDate;
+                                    }
+                                      
+                                      leads.push({
+                                        id: doc.id,
+                                        ...leadData
+                                      });
+                                      });
+                                      
+                                      renderTable(leads);
+                                      } catch (error) {
+                                        console.error("Error loading leads:", error);
+                                        alert("Error loading leads. Check console for details.");
+                                      } finally {
+                                        document.getElementById("loader").classList.add("hidden");
+                                      }
+                                      }
+
                           
+
                           // Save CSV data to Firestore
                           async function saveLeadsToDB(leadsData) {
                             try {
@@ -971,6 +1117,7 @@ document.getElementById('confirmAppointmentBtn').addEventListener('click', async
   const date = document.getElementById('appointmentDate').value;
   const time = document.getElementById('appointmentTime').value;
   const customLocation = document.getElementById('customLocation').value || currentAppointmentSettings.location;
+  const isSecondAppointment = document.getElementById('isSecondAppointment').value === "true";
   
   if (!date || !time) {
     alert('Please select both date and time');
@@ -982,47 +1129,63 @@ document.getElementById('confirmAppointmentBtn').addEventListener('click', async
   try {
     document.getElementById("loader").classList.remove("hidden");
     
+    // Determine status based on the flag
+    const status = isSecondAppointment ? "Second Appointment Scheduled" : "Scheduled";
+    
     // Save appointment
     await appointmentsCollection.doc(currentLeadId).set({
       leadId: currentLeadId,
       userId: currentUser.uid,
       date: appointmentDateTime,
       location: customLocation,
-      status: "Scheduled",
+      status: status,
       leadName: modalName.textContent,
       leadPhone: modalContact.textContent,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      isSecondAppointment: isSecondAppointment
     });
     
     // Update lead status
     await leadsCollection.doc(currentLeadId).update({
-      status: "Appointment Set",
+      status: isSecondAppointment ? "Second Appointment Set" : "Appointment Set",
       lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
       followUpDate: appointmentDateTime
     });
     
-    // Set reminders
-    scheduleReminders(currentLeadId, appointmentDateTime, customLocation);
+    // Reset the flag
+    document.getElementById('isSecondAppointment').value = "false";
     
-    document.getElementById('appointmentStatus').textContent = 
-      `✓ Appointment set for ${formatDateTime(appointmentDateTime)} at ${customLocation}`;
-    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-green-600';
+    // Clear the form
+    clearAppointmentForm();
     
-    // Hide the form after successful appointment setting
-    document.getElementById('appointmentForm').style.display = 'none';
-    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-check"></i> Appointment Set';
-    document.getElementById('setAppointmentBtn').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
-    document.getElementById('setAppointmentBtn').classList.add('bg-green-500', 'hover:bg-green-600');
+    // Close the modal
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
     
-    loadLeads(); // Refresh the table
+    // Force refresh the entire table
+    await loadLeads(); // This will refresh the table
+    
+    // Show success message
+    alert('Appointment scheduled successfully!');
+    
   } catch (error) {
     console.error("Error setting appointment:", error);
-    document.getElementById('appointmentStatus').textContent = 'Error setting appointment';
-    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-red-600';
+    alert("Error setting appointment. Please try again.");
   } finally {
     document.getElementById("loader").classList.add("hidden");
   }
 });
+
+
+function clearAppointmentForm() {
+  document.getElementById('appointmentDate').value = '';
+  document.getElementById('appointmentTime').value = '';
+  document.getElementById('customLocation').value = '';
+  document.getElementById('isSecondAppointment').value = "false";
+}
+
 
 
     // Schedule reminders
@@ -1063,7 +1226,7 @@ function renderTable(data) {
     html += '<tr class="bg-white border-b">';
     
     // Name
-    html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
+  html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
   onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
   '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', 
   '${escapeHtml(row.Address || "")}', '${row.id}')">
@@ -1077,15 +1240,10 @@ function renderTable(data) {
     // Occupation
     html += `<td class="px-4 py-2 border">${escapeHtml(row.Occupation || "")}</td>`;
     
-    // Status
-    html += `<td class="px-4 py-2 border">
-      ${row.status === "Appointment Set" ? 
-        `<span class="text-blue-600 cursor-pointer underline" 
-            onclick="showAppointmentModal('${row.id}')">
-          View Appointment
-        </span>` : 
-        escapeHtml(row.status || "Not Set")}
-    </td>`;
+// Status
+html += `<td class="px-4 py-2 border">${getStatusHTML(row)}</td>`;
+
+
     
     // Last Contacted
     html += `<td class="px-4 py-2 border">${formatFirestoreDate(row.lastContacted)}</td>`;
@@ -1110,6 +1268,225 @@ function renderTable(data) {
 
   html += '</tbody></table>';
   tableContainer.innerHTML = html;
+}
+
+
+function getStatusHTML(row) {
+  let statusClass = "text-gray-600";
+  let statusText = escapeHtml(row.status || "Not Set");
+  
+  // Handle different status cases
+  if (row.status === "Appointment Set") {
+    statusClass = isAppointmentPassed(row.followUpDate) 
+      ? "text-purple-600" 
+      : "text-blue-600";
+    statusText = "First Appointment"; // More consistent naming
+  } 
+  else if (row.status === "Second Appointment Set") {
+    statusClass = isAppointmentPassed(row.followUpDate)
+      ? "text-purple-800"
+      : "text-blue-800";
+    statusText = "Second Appointment";
+  }
+  else if (row.status && row.status.startsWith('Enrolled')) {
+    statusClass = "text-green-600";
+  } 
+  else if (row.status === "Presented with no sale (Set for Second Appointment)") {
+    statusClass = "text-yellow-600";
+    statusText = "Needs 2nd Appt"; // Shorter for display
+  } 
+  else if (row.status === "No Show (For Reschedule)") {
+    statusClass = "text-red-600";
+    statusText = "No Show"; // Shorter for display
+  }
+  else if (row.status === "Presented (To set second appointment)") {
+    statusClass = "text-yellow-700";
+    statusText = "Pending 2nd Appt";
+  }
+
+  // Make ALL status cells clickable to show appointment modal
+  return `<span class="${statusClass} cursor-pointer underline font-medium" 
+            onclick="showAppointmentModal('${row.id}')">
+            ${statusText}
+          </span>`;
+}
+
+
+function isAppointmentPassed(followUpDate) {
+  if (!followUpDate) return false;
+  const appointmentDate = new Date(followUpDate.seconds * 1000);
+  return appointmentDate <= new Date();
+}
+
+
+function updateFormDisplay(formData) {
+  const formDisplay = document.getElementById('modalFormDisplay');
+  const formInputContainer = document.getElementById('formInputContainer');
+  const formParagraph = formDisplay.parentElement; // Get the parent <p> element
+  const copySummaryBtn = document.getElementById('copySummaryBtn');
+  
+  if (formData) {
+    formDisplay.textContent = formData;
+    formDisplay.classList.remove('hidden');
+    formParagraph.classList.remove('hidden');
+    copySummaryBtn.classList.remove('hidden'); // Show the copy button
+    document.getElementById('toggleFormBtn').innerHTML = '<i class="fas fa-edit"></i> Edit FORM';
+  } else {
+    formDisplay.classList.add('hidden');
+    formParagraph.classList.add('hidden');
+    copySummaryBtn.classList.add('hidden'); // Hide the copy button if no FORM data
+    document.getElementById('toggleFormBtn').innerHTML = '<i class="fas fa-plus"></i> Add FORM';
+  }
+  
+  formInputContainer.classList.add('hidden');
+}
+
+
+
+function setupFormHandlers() {
+  // Toggle FORM editor
+  document.getElementById('toggleFormBtn').addEventListener('click', async () => {
+    const formInputContainer = document.getElementById('formInputContainer');
+    const formDisplay = document.getElementById('modalFormDisplay');
+    
+    if (formInputContainer.classList.contains('hidden')) {
+      // Get current FORM data if it exists
+      const leadDoc = await leadsCollection.doc(currentLeadId).get();
+      const formData = leadDoc.data().FORM || '';
+      document.getElementById('formTextArea').value = formData;
+      
+      formInputContainer.classList.remove('hidden');
+      formDisplay.classList.add('hidden');
+    } else {
+      formInputContainer.classList.add('hidden');
+      if (formDisplay.textContent.trim()) {
+        formDisplay.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Save FORM
+  document.getElementById('saveFormBtn').addEventListener('click', async () => {
+    const formText = document.getElementById('formTextArea').value.trim();
+    
+    try {
+      await leadsCollection.doc(currentLeadId).update({
+        FORM: formText,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      updateFormDisplay(formText);
+      document.getElementById('formInputContainer').classList.add('hidden');
+      loadLeads(); // Refresh the table if needed
+    } catch (error) {
+      console.error("Error saving FORM:", error);
+      alert("Error saving FORM details");
+    }
+  });
+
+  // Cancel FORM editing
+  document.getElementById('cancelFormBtn').addEventListener('click', () => {
+    document.getElementById('formInputContainer').classList.add('hidden');
+    const formDisplay = document.getElementById('modalFormDisplay');
+    if (formDisplay.textContent.trim()) {
+      formDisplay.classList.remove('hidden');
+    }
+  });
+}
+
+
+// Add this to your setupFormHandlers function or wherever you set up event listeners
+document.getElementById('copySummaryBtn').addEventListener('click', async () => {
+  try {
+    // Get all the data we need
+    const name = document.getElementById('modalName').textContent;
+    const birthday = document.getElementById('modalBirthday').textContent; // Format: YYYY-MM-DD
+    const address = document.getElementById('modalAddress').textContent;
+    const formDisplay = document.getElementById('modalFormDisplay');
+    const formText = formDisplay.textContent || 'No FORM data';
+    
+    // Calculate age from birthday (YYYY-MM-DD format)
+    let age = 'N/A';
+    if (birthday) {
+      const birthDate = new Date(birthday);
+      if (!isNaN(birthDate.getTime())) {
+        const today = new Date();
+        let ageCalculated = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        // Adjust age if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          ageCalculated--;
+        }
+        age = ageCalculated;
+      }
+    }
+    
+    // Create the summary text
+    const summaryText = `Prospect FORM:
+Name: ${name}
+Age: ${age}
+Address: ${address}
+
+FORM:
+${formText}`;
+    
+    // Copy to clipboard
+    await navigator.clipboard.writeText(summaryText);
+    
+  // Show feedback with offset
+    const copyBtn = document.getElementById('copySummaryBtn');
+    const originalContent = copyBtn.innerHTML;
+    const originalWidth = copyBtn.offsetWidth;
+    
+    // Create feedback element
+    const feedback = document.createElement('span');
+    feedback.className = 'copied-feedback';
+    feedback.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    feedback.style.position = 'absolute';
+    feedback.style.left = '-10px'; // 50px to the right
+    feedback.style.whiteSpace = 'nowrap';
+    
+    // Clear button and add feedback
+    copyBtn.innerHTML = '';
+    copyBtn.style.position = 'relative'; // Needed for absolute positioning of child
+    copyBtn.appendChild(feedback);
+    
+    // Restore after 2 seconds
+    setTimeout(() => {
+      copyBtn.innerHTML = originalContent;
+    // Reset position
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Failed to copy summary:', error);
+  }
+});
+
+
+async function markAsPresented(leadId) {
+  try {
+    // Update lead status to "Presented"
+    await leadsCollection.doc(leadId).update({
+      status: "Presented",
+      lastContacted: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Also update the corresponding appointment if exists
+    const appointmentDoc = await appointmentsCollection.doc(leadId).get();
+    if (appointmentDoc.exists) {
+      await appointmentsCollection.doc(leadId).update({
+        status: "Presented",
+        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    
+    loadLeads(); // Refresh the table
+    showAppointmentModal(leadId); // Show the appointment modal with status update options
+  } catch (error) {
+    console.error("Error marking as presented:", error);
+    alert("Error updating status. Please try again.");
+  }
 }
 
 
@@ -1205,28 +1582,77 @@ async function showModal(name, birthday, contact, email, address, leadId) {
     modal.classList.add('show');
   }, 10);
 }
+async function showModal(name, birthday, contact, email, address, leadId, expandForm = false) {
+  currentLeadId = leadId;
+  modalName.textContent = toProperCase(name);
+  modalBirthday.textContent = birthday;
+  modalContact.textContent = formatPhoneNumber(contact);
+  modalEmail.textContent = email;
+  modalAddress.textContent = address ? toProperCase(address) : 'Not specified';
+
+  // Check for existing appointment
+  const appointmentDoc = await appointmentsCollection.doc(leadId).get();
+  // Get the FORM data if it exists
+  const leadDoc = await leadsCollection.doc(leadId).get();
+  const leadData = leadDoc.data();
+  
+  // Update the FORM display
+  updateFormDisplay(leadData.FORM);
+  
+  if (appointmentDoc.exists) {
+    const appointment = appointmentDoc.data();
+    const appointmentDate = appointment.date.toDate();
+    
+    document.getElementById('appointmentStatus').textContent = 
+      `✓ Appointment set for ${formatDateTime(appointmentDate)} at ${appointment.location}`;
+    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-green-600';
+    
+    // Only hide form if not explicitly told to expand it
+    document.getElementById('appointmentForm').style.display = expandForm ? 'block' : 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-edit"></i> Reschedule';
+  } else {
+    document.getElementById('appointmentForm').style.display = expandForm ? 'block' : 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-plus"></i> Set Appointment';
+    document.getElementById('appointmentStatus').textContent = '';
+  }
+  
+  // Style the button appropriately if form is expanded
+  if (expandForm) {
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-times"></i> Cancel';
+    document.getElementById('setAppointmentBtn').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+    document.getElementById('setAppointmentBtn').classList.add('bg-gray-500', 'hover:bg-gray-600');
+  }
+  
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+}
 
 
-// Add to your existing JavaScript
 // Modify showAppointmentModal function
 async function showAppointmentModal(leadId) {
   try {
-
-  // Mark as read in Firestore when opened
-    await appointmentsCollection.doc(leadId).update({
-      read: true,
-      readAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    document.getElementById("loader").classList.remove("hidden");
     
+    // Get the most recent appointment for this lead
+    const appointmentQuery = await appointmentsCollection
+      .where('leadId', '==', leadId)
+      .orderBy('date', 'desc')
+      .limit(1)
+      .get();
 
-
-    const appointmentDoc = await appointmentsCollection.doc(leadId).get();
-    
-    if (appointmentDoc.exists) {
+    if (!appointmentQuery.empty) {
+      const appointmentDoc = appointmentQuery.docs[0];
       const appointment = appointmentDoc.data();
       const appointmentDate = appointment.date.toDate();
       const now = new Date();
       
+      // Store both IDs in the modal's dataset
+      const modal = document.getElementById('appointmentModal');
+      modal.dataset.leadId = leadId;
+      modal.dataset.appointmentId = appointmentDoc.id;
+
       // Display basic info
       document.getElementById('appointmentModalDate').textContent = 
         appointmentDate.toLocaleDateString();
@@ -1237,20 +1663,27 @@ async function showAppointmentModal(leadId) {
       document.getElementById('appointmentModalStatus').textContent = 
         appointment.status;
       
-      // Store current appointment ID
-      document.getElementById('appointmentModal').dataset.appointmentId = leadId;
-      
-      // Show/hide sections based on time
+      // Show/hide sections based on status and time
       const statusUpdateSection = document.getElementById('statusUpdateSection');
       const originalActions = document.getElementById('originalActions');
       
-      if (appointmentDate <= now) {
+    // In the "No Show" condition block:
+if (appointment.status === "No Show") {
+  // For "No Show" status, always show original actions (Reschedule/Cancel)
+  statusUpdateSection.classList.add('hidden');
+  originalActions.classList.remove('hidden');
+  
+  // Update the reschedule button to include a data attribute
+  document.getElementById('rescheduleBtn').dataset.isReschedule = "true";
+}
+
+      else if (appointmentDate <= now) {
         // Appointment has passed - show outcome options
         statusUpdateSection.classList.remove('hidden');
         originalActions.classList.add('hidden');
         
         // Initialize outcome buttons
-        setupOutcomeButtons(leadId, appointment);
+        setupOutcomeButtons();
       } else {
         // Future appointment - show original buttons
         statusUpdateSection.classList.add('hidden');
@@ -1259,108 +1692,236 @@ async function showAppointmentModal(leadId) {
       
       // Show modal
       document.getElementById('appointmentModal').style.display = 'flex';
+    } else {
+      alert('No appointment found for this lead');
     }
   } catch (error) {
     console.error("Error loading appointment:", error);
+    alert("Error loading appointment details");
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
   }
 }
 
+
 // Handle outcome selection
-function setupOutcomeButtons(leadId, appointment) {
+// Handle outcome selection
+function setupOutcomeButtons() {
+  // Clear any existing event listeners to prevent duplicates
+  document.getElementById('confirmSaleBtn').replaceWith(document.getElementById('confirmSaleBtn').cloneNode(true));
+  document.getElementById('confirmNoSaleBtn').replaceWith(document.getElementById('confirmNoSaleBtn').cloneNode(true));
+  document.getElementById('confirmNoShowBtn').replaceWith(document.getElementById('confirmNoShowBtn').cloneNode(true));
+
   // Sale/Enrolled flow
   document.getElementById('saleBtn').addEventListener('click', () => {
     document.getElementById('saleFollowupForm').classList.remove('hidden');
     document.getElementById('noSaleFollowupForm').classList.add('hidden');
+    document.getElementById('noShowFollowupForm').classList.add('hidden');
   });
   
   // No Sale flow
   document.getElementById('noSaleBtn').addEventListener('click', () => {
     document.getElementById('noSaleFollowupForm').classList.remove('hidden');
     document.getElementById('saleFollowupForm').classList.add('hidden');
+    document.getElementById('noShowFollowupForm').classList.add('hidden');
   });
   
-  // Confirm Sale
+  // No Show flow
+  document.getElementById('noShowBtn').addEventListener('click', () => {
+    document.getElementById('noShowFollowupForm').classList.remove('hidden');
+    document.getElementById('saleFollowupForm').classList.add('hidden');
+    document.getElementById('noSaleFollowupForm').classList.add('hidden');
+  });
+  
+  // Confirm Sale/Enrolled
   document.getElementById('confirmSaleBtn').addEventListener('click', async () => {
-    const followupDate = document.getElementById('saleFollowupDate').value;
+    const enrollmentType = document.getElementById('enrollmentType').value;
     const notes = document.getElementById('saleNotes').value;
     
-    if (!followupDate) {
-      alert('Please select a follow-up date');
+    if (!notes) {
+      alert('Please add notes about the sale/enrollment');
       return;
     }
     
-    await updateAppointmentOutcome(
-      leadId, 
-      'Sale/Enrolled', 
-      notes, 
-      new Date(followupDate),
-      appointment.leadName,
-      appointment.leadPhone
-    );
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      await updateAppointmentOutcome(
+        `Enrolled as ${enrollmentType === 'PC' ? 'Preferred Customer' : 'Associate'}`,
+        notes,
+        null,
+        enrollmentType
+      );
+      loadLeads(); // Refresh the table
+    } catch (error) {
+      console.error("Error confirming sale:", error);
+      alert("Error confirming sale. Please try again.");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
   });
   
   // Confirm No Sale
-  document.getElementById('confirmNoSaleBtn').addEventListener('click', async () => {
-    const followupDate = document.getElementById('noSaleFollowupDate').value;
-    const notes = document.getElementById('noSaleNotes').value;
-    
-    if (!followupDate) {
-      alert('Please select a follow-up date');
-      return;
+  document.getElementById('confirmNoSaleBtn').addEventListener('click', async function() {
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      
+      // Set the hidden flag to true
+      document.getElementById('isSecondAppointment').value = "true";
+      
+      // Get the modal reference
+      const modal = document.getElementById('appointmentModal');
+      const leadId = modal.dataset.leadId;
+      
+      // Close the appointment modal
+      document.getElementById('appointmentModal').style.display = 'none';
+      
+      // Get the lead data
+      const leadDoc = await leadsCollection.doc(leadId).get();
+      const lead = leadDoc.data();
+      
+      // Update the lead status first
+      await leadsCollection.doc(leadId).update({
+        status: "Presented (To set second appointment)",
+        lastContacted: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Show the lead modal with form expanded
+      await showModal(
+        lead.Name, 
+        lead.Birthday, 
+        lead.Contact, 
+        lead.Email, 
+        lead.Address, 
+        leadId
+      );
+      
+      // Expand the appointment form
+      document.getElementById('appointmentForm').style.display = 'block';
+      document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-times"></i> Cancel';
+      document.getElementById('setAppointmentBtn').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+      document.getElementById('setAppointmentBtn').classList.add('bg-gray-500', 'hover:bg-gray-600');
+      
+      loadLeads(); // Refresh the table
+    } catch (error) {
+      console.error("Error confirming no sale:", error);
+      alert("Error processing no sale. Please try again.");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
     }
+  });
+
+  // Confirm No Show
+  document.getElementById('confirmNoShowBtn').addEventListener('click', async () => {
+    const notes = document.getElementById('noShowNotes').value || "No show - no reason given";
     
-    await updateAppointmentOutcome(
-      leadId, 
-      'No Sale (Follow-up Scheduled)', 
-      notes, 
-      new Date(followupDate),
-      appointment.leadName,
-      appointment.leadPhone
-    );
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      
+      // Get the modal reference
+      const modal = document.getElementById('appointmentModal');
+      const leadId = modal.dataset.leadId;
+      const appointmentId = modal.dataset.appointmentId;
+
+      if (!leadId || !appointmentId) {
+        throw new Error('Missing lead or appointment reference');
+      }
+
+      // Update the documents
+      await leadsCollection.doc(leadId).update({
+        status: "No Show",
+        lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+        notes: notes,
+        followUpDate: null
+      });
+
+      await appointmentsCollection.doc(appointmentId).update({
+        status: "No Show",
+        outcomeNotes: notes,
+        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Close modals and refresh
+      document.getElementById('appointmentModal').style.display = 'none';
+      document.getElementById('noShowFollowupForm').classList.add('hidden');
+      loadLeads(); // Refresh the table
+      loadNotifications();
+    } catch (error) {
+      console.error("Error marking as No Show:", error);
+      alert("Error updating status. Please try again.");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
   });
 }
 
 // Update Firestore with outcome
-// Update Firestore with outcome
-async function updateAppointmentOutcome(leadId, outcome, notes, followupDate, leadName, leadPhone) {
+async function updateAppointmentOutcome(outcome, notes, followupDate, enrollmentType = null) {
+  const modal = document.getElementById('appointmentModal');
+  const leadId = modal.dataset.leadId;
+  const appointmentId = modal.dataset.appointmentId;
+
+  if (!leadId || !appointmentId) {
+    alert('Error: Missing lead or appointment reference');
+    return;
+  }
+
   try {
-    // Update original appointment
-    await appointmentsCollection.doc(leadId).update({
+    document.getElementById("loader").classList.remove("hidden");
+    
+    // 1. Update the LEAD document
+    const leadUpdate = {
+      status: outcome,
+      lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+      notes: notes
+    };
+    
+    if (followupDate) {
+      leadUpdate.followUpDate = firebase.firestore.Timestamp.fromDate(followupDate);
+    }
+
+    await leadsCollection.doc(leadId).update(leadUpdate);
+
+    // 2. Update the APPOINTMENT document
+    const appointmentUpdate = {
       status: outcome,
       outcomeNotes: notes,
       completedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    
-    // Create new follow-up appointment if date is in future
-    if (followupDate > new Date()) {
+    };
+
+    if (enrollmentType) {
+      appointmentUpdate.enrollmentType = enrollmentType;
+    }
+
+    await appointmentsCollection.doc(appointmentId).update(appointmentUpdate);
+
+    // 3. Create new follow-up appointment if needed
+    if (followupDate) {
+      const leadDoc = await leadsCollection.doc(leadId).get();
+      const leadData = leadDoc.data();
+      
       await appointmentsCollection.add({
         leadId: leadId,
         userId: currentUser.uid,
         date: followupDate,
         location: currentAppointmentSettings.location,
         status: "Scheduled",
-        leadName: leadName,
-        leadPhone: leadPhone,
+        leadName: leadData.Name,
+        leadPhone: leadData.Contact,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         isFollowup: true,
+        previousAppointmentId: appointmentId,
         previousOutcome: outcome
       });
     }
-    
-    // Update lead status
-    await leadsCollection.doc(leadId).update({
-      status: outcome.includes('Sale') ? 'Customer' : 'Follow-up Needed',
-      lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
-      followUpDate: followupDate,
-      notes: notes
-    });
-    
-    alert('Outcome recorded successfully!');
-document.getElementById('appointmentModal').style.display = 'none';
-    loadLeads(); // Refresh data
+
+    loadLeads(); // Refresh the table
+    loadNotifications();
+    document.getElementById('appointmentModal').style.display = 'none';
   } catch (error) {
     console.error("Error updating outcome:", error);
-    alert("Error saving outcome");
+    alert("Failed to update. Check console.");
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
   }
 }
 
@@ -1373,11 +1934,15 @@ document.getElementById('closeAppointmentModal').addEventListener('click', () =>
 // Cancel appointment
 document.getElementById('cancelAppointmentBtn').addEventListener('click', async function() {
   if (confirm("Are you sure you want to cancel this appointment?")) {
-    const appointmentId = document.getElementById('appointmentModal').dataset.appointmentId;
+    const modal = document.getElementById('appointmentModal');
+    const leadId = modal.dataset.leadId;
+    const appointmentId = modal.dataset.appointmentId;
     
     try {
+      document.getElementById("loader").classList.remove("hidden");
+      
       // Update lead status
-      await leadsCollection.doc(appointmentId).update({
+      await leadsCollection.doc(leadId).update({
         status: "Followed Up",
         followUpDate: null
       });
@@ -1387,27 +1952,80 @@ document.getElementById('cancelAppointmentBtn').addEventListener('click', async 
       
       // Refresh data
       loadLeads();
+      loadNotifications();
       document.getElementById('appointmentModal').style.display = 'none';
       alert("Appointment cancelled successfully");
     } catch (error) {
       console.error("Error cancelling appointment:", error);
       alert("Error cancelling appointment");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
     }
   }
 });
 
+
 // Reschedule appointment
-document.getElementById('rescheduleBtn').addEventListener('click', function() {
-  const appointmentId = document.getElementById('appointmentModal').dataset.appointmentId;
+document.getElementById('rescheduleBtn').addEventListener('click', async function() {
+  const leadId = document.getElementById('appointmentModal').dataset.leadId;
+  
+  // Close appointment modal
   document.getElementById('appointmentModal').style.display = 'none';
-  showModalFromAppointment(appointmentId);
+  
+  // Get lead data
+  const leadDoc = await leadsCollection.doc(leadId).get();
+  if (!leadDoc.exists) return;
+  
+  const lead = leadDoc.data();
+
+  // Clear the form inputs
+  clearAppointmentForm();
+
+  // Show lead modal with form already expanded
+  showModal(
+    lead.Name, 
+    lead.Birthday, 
+    lead.Contact, 
+    lead.Email, 
+    lead.Address, 
+    leadId,
+    true // This flag forces form expansion
+  );
+  
+  // Additional form setup
+  setupExpandedForm();
 });
+
+function setupExpandedForm() {
+  // Expand the form
+  const form = document.getElementById('appointmentForm');
+  form.style.display = 'block';
+  
+  // Update button appearance
+  const btn = document.getElementById('setAppointmentBtn');
+  btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+  btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+  btn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+  
+  // Only set default values if form is empty
+  if (!document.getElementById('appointmentDate').value) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('appointmentDate').value = tomorrow.toISOString().split('T')[0];
+    document.getElementById('appointmentTime').value = '10:00';
+    document.getElementById('customLocation').value = currentAppointmentSettings.location;
+  }
+  
+  // Mark as reschedule
+  document.getElementById('isSecondAppointment').value = "true";
+}
+
 
 async function showModalFromAppointment(leadId) {
   const leadDoc = await leadsCollection.doc(leadId).get();
   const lead = leadDoc.data();
   
-  showModal(lead.Name, lead.Birthday, lead.Contact, lead.Email, leadId);
+  showModal(lead.Name, lead.Birthday, lead.Contact, lead.Email, lead.Address, leadId);
   
   // Open the appointment form
   document.getElementById('appointmentForm').style.display = 'block';
@@ -1625,6 +2243,7 @@ async function loadNotifications() {
 
 // Update notification badge count
 function updateNotificationBadge() {
+  if (!notifications) return;  // Add this check
   const unreadCount = notifications.filter(n => !n.read).length;
   const badge = document.getElementById('notificationCount');
   
@@ -1639,6 +2258,7 @@ function updateNotificationBadge() {
 // Render notification list
 function renderNotificationList() {
   const listContainer = document.getElementById('notificationList');
+  if (!listContainer || !notifications) return;  // Add null checks
   listContainer.innerHTML = '';
 
   if (notifications.length === 0) {
@@ -1816,3 +2436,5 @@ setInterval(() => {
 </script>
 </body>
 </html>
+
+
