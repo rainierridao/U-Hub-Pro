@@ -800,6 +800,31 @@ select, input[type="number"], input[type="date"] {
   -ms-user-select: none;
 }
 
+
+/* Add to your CSS */
+#oldOrdersBtn {
+  transition: all 0.2s ease;
+  background-color: #0b72c9;
+  color: white;
+  position: relative;
+  top: 7px;
+}
+
+#oldOrdersBtn:hover {
+background-color: #0859a6;
+  
+}
+
+.view-details-btn {
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.view-details-btn:hover {
+  background-color: #eff6ff;
+}
+
 </style>
 <body>
 
@@ -999,9 +1024,12 @@ select, input[type="number"], input[type="date"] {
                     <!-- Sales Tab -->
                     <div id="sales-tab" class="tab-content">
                     
+                    
+                  
+
                     <div class="view-toggle-container" style="margin-top: 20px;">
                   <div class="mb-4">
-                  <input type="text" id="customerSearch" placeholder="Search customers..." 
+                  <input style="display:none;" type="text" id="customerSearch" placeholder="Search customers..." 
                   class="p-2 border rounded w-full max-w-md">
                   </div>
                   <div id="customerReportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -1013,25 +1041,27 @@ select, input[type="number"], input[type="date"] {
                   </div>
                   </div>
                         <div class="sales-filters">
-                        <!-- Add any sales-specific filter controls -->
-                        </div>
+                  <!-- Add this near the view toggle container in the sales-tab section -->
+                  <button id="oldOrdersBtn" class="px-3 py-1 bg-orange-100 text-orange-800 rounded text-sm">
+                  Show Orders (4+ weeks)
+                  </button>
+                  </div>
                         </div>
                         
                         <div class="overflow-x-auto">
-                        <table>
-                        <thead>
-                        <tr>
-                        <th>Customer</th>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                        </tr>
-                        </thead>
-                        <tbody id="salesHistoryBody">
-                        <!-- Sales data will be loaded here -->
-                        </tbody>
-                        </table>
+                  <!-- In the sales-tab section -->
+                  <table class="w-full">
+                  <thead id="salesHistoryHeader">
+                  <tr>
+                  <th class="p-2 text-left">Customer</th>
+                  <th class="p-2 text-left">Product</th>
+                  <th class="p-2 text-center">Qty</th>
+                  <th class="p-2 text-left">Date</th> <!-- Default view shows Date -->
+                  <th class="p-2 text-center">Action</th>
+                  </tr>
+                  </thead>
+                  <tbody id="salesHistoryBody"></tbody>
+                  </table>
                         </div>
                         </div>
                 
@@ -1324,15 +1354,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-  // Data loading function (updated with all new features)
+
+
+// Add this global variable
+let showOldOrdersView = false;
+
+
+
+// Updated loadSalesHistory function
 async function loadSalesHistory() {
   const salesHistoryBody = document.getElementById('salesHistoryBody');
-  if (!salesHistoryBody) return;
+  const salesHistoryHeader = document.getElementById('salesHistoryHeader');
+  if (!salesHistoryBody || !salesHistoryHeader) return;
   
   const user = auth.currentUser;
   if (!user) return;
   
-  // Show loading state
   salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Loading sales history...</td></tr>';
   
   try {
@@ -1347,113 +1384,156 @@ async function loadSalesHistory() {
       customersMap[doc.id] = { id: doc.id, ...doc.data() };
     });
     
-    // Load sales history
-    const snapshot = await db.collection('users')
-      .doc(user.uid)
-      .collection('sales')
-      .orderBy('saleDate', 'desc')
-      .get();
+    // Calculate date threshold (4 weeks ago)
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
     
-    salesHistoryBody.innerHTML = '';
-    
-    if (snapshot.empty) {
-      salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">No sales found</td></tr>';
-      return;
+    // Load all sales (we'll filter in code)
+              const snapshot = await db.collection('users')
+              .doc(user.uid)
+              .collection('sales')
+              .orderBy('saleDate', 'desc')
+              .get();
+              
+              salesHistoryBody.innerHTML = '';
+              
+              if (snapshot.empty) {
+                salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">No sales found</td></tr>';
+                return;
+              }
+                
+                const salesByCustomer = {};
+                const oldOrdersMap = {}; // For tracking oldest orders per product
+                
+                snapshot.forEach(doc => {
+                  const sale = doc.data();
+                  const customerId = sale.customerId || '';
+                  const saleDate = sale.saleDate.toDate();
+                  const weeksAgo = Math.floor((new Date() - saleDate) / (7 * 24 * 60 * 60 * 1000));
+                  
+                  // Build customer sales history
+                  if (!salesByCustomer[customerId]) {
+                    salesByCustomer[customerId] = [];
+                  }
+                    salesByCustomer[customerId].push({ id: doc.id, ...sale });
+                    
+                    // Process for old orders view if enabled
+                      if (showOldOrdersView && weeksAgo >= 4) {
+                        (sale.items || []).forEach(item => {
+                          const productKey = `${customerId}_${item.name}`;
+                          
+                          // Track the oldest order per product (most weeks ago)
+                          if (!oldOrdersMap[productKey] || oldOrdersMap[productKey].weeksAgo < weeksAgo) {
+                            oldOrdersMap[productKey] = {
+                              customerId,
+                              customerName: sale.customerName || customersMap[customerId]?.name || 'Unknown',
+                              productName: item.name || 'Unnamed Product',
+                              quantity: item.quantity || 0,
+                              weeksAgo: weeksAgo,
+                              lastOrderDate: saleDate.toLocaleDateString(),
+                              saleId: doc.id
+                            };
+                          }
+                            });
+                            }
+                            });
+                            
+                            if (showOldOrdersView) {
+                              // Set headers for old orders view
+                                salesHistoryHeader.innerHTML = `
+        <tr>
+          <th class="p-2 text-left">Customer</th>
+          <th class="p-2 text-left">Product</th>
+          <th class="p-2 text-center">Qty</th>
+          <th class="p-2 text-center">Weeks</th>
+      
+        </tr>
+      `;
+                                
+                                // Display old orders view
+                                if (Object.keys(oldOrdersMap).length === 0) {
+                                  salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">No orders older than 4 weeks found</td></tr>';
+                                  return;
+                                }
+                                  
+                                  Object.values(oldOrdersMap).forEach(order => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+          <td class="p-2 customer-name" 
+            data-customer-id="${order.customerId}"
+            data-customer-name="${order.customerName}"
+            data-customer-phone="${customersMap[order.customerId]?.phone || 'Not provided'}"
+            data-customer-address="${customersMap[order.customerId]?.address || 'Not provided'}">
+            <div class="customer-name-inner">${order.customerName}</div>
+          </td>
+          <td class="p-2">${order.productName}</td>
+          <td class="p-2 text-center">${order.quantity}</td>
+          <td class="p-2 text-center">${order.weeksAgo}</td>
+                  `;
+                                    salesHistoryBody.appendChild(row);
+                                  });
+                                } else {
+                                  // Set headers for normal sales view
+                                    salesHistoryHeader.innerHTML = `
+        <tr>
+          <th class="p-2 text-left">Customer</th>
+          <th class="p-2 text-left">Product</th>
+          <th class="p-2 text-center">Qty</th>
+          <th class="p-2 text-left">Date</th>
+          <th class="p-2 text-center">Action</th>
+        </tr>
+      `;
+                                    
+                                    // Original sales display
+                                    snapshot.forEach((doc) => {
+        const sale = doc.data();
+        const customerId = sale.customerId || '';
+        const customerData = customersMap[customerId] || {};
+        const customerName = sale.customerName || customerData.name || 'Unknown';
+        const saleDate = sale.saleDate.toDate().toLocaleDateString();
+
+        (sale.items || []).forEach((item, itemIndex) => {
+          const row = document.createElement('tr');
+          row.dataset.saleId = doc.id;
+          row.dataset.itemIndex = itemIndex;
+          row.innerHTML = `
+            <td class="p-2 customer-name" 
+              data-customer-id="${customerId}"
+              data-customer-name="${customerName}"
+              data-customer-phone="${customerData.phone || 'Not provided'}"
+              data-customer-address="${customerData.address || 'Not provided'}">
+              <div class="customer-name-inner">${customerName}</div>
+            </td>
+            <td class="p-2">${item.name || 'Unnamed Product'}</td>
+            <td class="p-2 text-center">${item.quantity || 0}</td>
+            <td class="p-2">${saleDate}</td>
+            <td class="p-2 text-center">
+              <button class="delete-sale-btn text-red-500 hover:text-red-700" title="Delete this sale">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </td>
+          `;
+          salesHistoryBody.appendChild(row);
+        });
+      });
     }
     
-    // Build sales by customer for purchase history
-    const salesByCustomer = {};
-    snapshot.forEach(doc => {
-      const sale = doc.data();
-      const customerId = sale.customerId || '';
-      if (!salesByCustomer[customerId]) {
-        salesByCustomer[customerId] = [];
-      }
-      salesByCustomer[customerId].push({ id: doc.id, ...sale });
-    });
-    
-    snapshot.forEach((doc) => {
-      const sale = doc.data();
-      const customerId = sale.customerId || '';
-      const customerData = customersMap[customerId] || {};
-      const customerName = sale.customerName || customerData.name || 'Unknown';
-      const saleDate = sale.saleDate.toDate().toLocaleDateString();
-
-      (sale.items || []).forEach((item, itemIndex) => {
-        const row = document.createElement('tr');
-        row.dataset.saleId = doc.id;
-        row.dataset.itemIndex = itemIndex;
-        row.innerHTML = `
-          <td class="p-2 customer-name" 
-            data-customer-id="${customerId}"
-            data-customer-name="${customerName}"
-            data-customer-phone="${customerData.phone || 'Not provided'}"
-            data-customer-address="${customerData.address || 'Not provided'}">
-            <div class="customer-name-inner">${customerName}</div>
-          </td>
-          <td class="p-2">${item.name || 'Unnamed Product'}</td>
-          <td class="p-2 text-center">${item.quantity || 0}</td>
-          <td class="p-2">${saleDate}</td>
-          <td class="p-2 text-center">
-            <button class="delete-sale-btn text-red-500 hover:text-red-700" title="Delete this sale">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </td>
-        `;
-        salesHistoryBody.appendChild(row);
-      });
-    });
-    
     setupCustomerClick(customersMap, salesByCustomer);
-    
-    // Add event listeners to all delete buttons
-    document.querySelectorAll('.delete-sale-btn').forEach(button => {
-      button.addEventListener('click', async (e) => {
-        const row = e.target.closest('tr');
-        const saleId = row.dataset.saleId;
-        const itemIndex = parseInt(row.dataset.itemIndex);
-        
-        try {
-          // Get the sale document
-          const saleRef = db.collection('users').doc(user.uid).collection('sales').doc(saleId);
-          const saleDoc = await saleRef.get();
-          
-          if (!saleDoc.exists) {
-            alert('Sale not found!');
-            return;
-          }
-          
-          const saleData = saleDoc.data();
-          const items = saleData.items || [];
-          
-          if (items.length <= 1) {
-            // If this is the only item, delete the entire sale
-            if (confirm('Are you sure you want to delete this sale record?')) {
-              await saleRef.delete();
-              row.remove();
-            }
-          } else {
-            // If there are multiple items, remove just this item
-            if (confirm('Are you sure you want to delete this item from the sale?')) {
-              items.splice(itemIndex, 1);
-              await saleRef.update({ items });
-              row.remove();
-            }
-          }
-        } catch (error) {
-          console.error('Error deleting sale:', error);
-          alert('Error deleting sale. Please try again.');
-        }
-      });
-    });
     
   } catch (error) {
     console.error('Error loading sales history:', error);
     salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Error loading sales history</td></tr>';
   }
 }
+
+// Add this event listener (in your initialization code)
+document.getElementById('oldOrdersBtn').addEventListener('click', function() {
+  showOldOrdersView = !showOldOrdersView;
+  this.textContent = showOldOrdersView ? 'Show All Sales' : 'Show Orders (4+ weeks)';
+  loadSalesHistory();
+});
 
 
 function setupCustomerClick(customersMap, salesByCustomer) {
