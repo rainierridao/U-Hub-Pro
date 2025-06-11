@@ -1355,11 +1355,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-
 // Add this global variable
 let showOldOrdersView = false;
-
-
 
 // Updated loadSalesHistory function
 async function loadSalesHistory() {
@@ -1404,61 +1401,80 @@ async function loadSalesHistory() {
                 
                 const salesByCustomer = {};
                 const oldOrdersMap = {}; // For tracking oldest orders per product
+                const recentProductOrders = new Set(); // Track products ordered recently
                 
+                // First pass: Identify all products ordered in last 4 weeks
                 snapshot.forEach(doc => {
                   const sale = doc.data();
                   const customerId = sale.customerId || '';
                   const saleDate = sale.saleDate.toDate();
-                  const weeksAgo = Math.floor((new Date() - saleDate) / (7 * 24 * 60 * 60 * 1000));
+                  const isRecent = saleDate >= fourWeeksAgo;
                   
-                  // Build customer sales history
-                  if (!salesByCustomer[customerId]) {
-                    salesByCustomer[customerId] = [];
+                  if (isRecent) {
+                    (sale.items || []).forEach(item => {
+                      const productKey = `${customerId}_${item.name}`;
+                      recentProductOrders.add(productKey);
+                    });
                   }
-                    salesByCustomer[customerId].push({ id: doc.id, ...sale });
+                    });
                     
-                    // Process for old orders view if enabled
-                      if (showOldOrdersView && weeksAgo >= 4) {
-                        (sale.items || []).forEach(item => {
-                          const productKey = `${customerId}_${item.name}`;
-                          
-                          // Track the oldest order per product (most weeks ago)
-                          if (!oldOrdersMap[productKey] || oldOrdersMap[productKey].weeksAgo < weeksAgo) {
-                            oldOrdersMap[productKey] = {
-                              customerId,
-                              customerName: sale.customerName || customersMap[customerId]?.name || 'Unknown',
-                              productName: item.name || 'Unnamed Product',
-                              quantity: item.quantity || 0,
-                              weeksAgo: weeksAgo,
-                              lastOrderDate: saleDate.toLocaleDateString(),
-                              saleId: doc.id
-                            };
-                          }
-                            });
-                            }
-                            });
-                            
-                            if (showOldOrdersView) {
-                              // Set headers for old orders view
-                                salesHistoryHeader.innerHTML = `
+                    // Second pass: Process all sales
+                    snapshot.forEach(doc => {
+                      const sale = doc.data();
+                      const customerId = sale.customerId || '';
+                      const saleDate = sale.saleDate.toDate();
+                      const weeksAgo = Math.floor((new Date() - saleDate) / (7 * 24 * 60 * 60 * 1000));
+                      
+                      // Build customer sales history
+                      if (!salesByCustomer[customerId]) {
+                        salesByCustomer[customerId] = [];
+                      }
+                        salesByCustomer[customerId].push({ id: doc.id, ...sale });
+                        
+                        // Process for old orders view if enabled
+                          if (showOldOrdersView && weeksAgo >= 4) {
+                            (sale.items || []).forEach(item => {
+                              const productKey = `${customerId}_${item.name}`;
+                              
+                              // Only include if there's no recent order of this product
+          if (!recentProductOrders.has(productKey)) {
+            // Track the oldest order per product (most weeks ago)
+            if (!oldOrdersMap[productKey] || oldOrdersMap[productKey].weeksAgo < weeksAgo) {
+              oldOrdersMap[productKey] = {
+                customerId,
+                customerName: sale.customerName || customersMap[customerId]?.name || 'Unknown',
+                productName: item.name || 'Unnamed Product',
+                quantity: item.quantity || 0,
+                weeksAgo: weeksAgo,
+                lastOrderDate: saleDate.toLocaleDateString(),
+                saleId: doc.id
+              };
+            }
+          }
+        });
+      }
+    });
+    
+    if (showOldOrdersView) {
+      // Set headers for old orders view
+      salesHistoryHeader.innerHTML = `
         <tr>
           <th class="p-2 text-left">Customer</th>
           <th class="p-2 text-left">Product</th>
           <th class="p-2 text-center">Qty</th>
           <th class="p-2 text-center">Weeks</th>
-      
         </tr>
       `;
-                                
-                                // Display old orders view
-                                if (Object.keys(oldOrdersMap).length === 0) {
-                                  salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">No orders older than 4 weeks found</td></tr>';
-                                  return;
-                                }
-                                  
-                                  Object.values(oldOrdersMap).forEach(order => {
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
+      
+      // Display old orders view
+      if (Object.keys(oldOrdersMap).length === 0) {
+        salesHistoryBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">No orders older than 4 weeks found (without more recent orders)</td></tr>';
+        return;
+      }
+      
+      Object.values(oldOrdersMap).forEach(order => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
           <td class="p-2 customer-name" 
             data-customer-id="${order.customerId}"
             data-customer-name="${order.customerName}"
@@ -1469,12 +1485,12 @@ async function loadSalesHistory() {
           <td class="p-2">${order.productName}</td>
           <td class="p-2 text-center">${order.quantity}</td>
           <td class="p-2 text-center">${order.weeksAgo}</td>
-                  `;
-                                    salesHistoryBody.appendChild(row);
-                                  });
-                                } else {
-                                  // Set headers for normal sales view
-                                    salesHistoryHeader.innerHTML = `
+        `;
+        salesHistoryBody.appendChild(row);
+      });
+    } else {
+      // Set headers for normal sales view
+      salesHistoryHeader.innerHTML = `
         <tr>
           <th class="p-2 text-left">Customer</th>
           <th class="p-2 text-left">Product</th>
@@ -1483,9 +1499,9 @@ async function loadSalesHistory() {
           <th class="p-2 text-center">Action</th>
         </tr>
       `;
-                                    
-                                    // Original sales display
-                                    snapshot.forEach((doc) => {
+      
+      // Original sales display
+      snapshot.forEach((doc) => {
         const sale = doc.data();
         const customerId = sale.customerId || '';
         const customerData = customersMap[customerId] || {};
@@ -1528,12 +1544,13 @@ async function loadSalesHistory() {
   }
 }
 
-// Add this event listener (in your initialization code)
+// Toggle button event listener
 document.getElementById('oldOrdersBtn').addEventListener('click', function() {
   showOldOrdersView = !showOldOrdersView;
   this.textContent = showOldOrdersView ? 'Show All Sales' : 'Show Orders (4+ weeks)';
   loadSalesHistory();
 });
+
 
 
 function setupCustomerClick(customersMap, salesByCustomer) {
