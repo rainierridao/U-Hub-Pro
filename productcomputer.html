@@ -212,7 +212,7 @@ display: inline-block; /* Show fee input when toggled */
         <select id="priceType" onchange="renderProducts()" style="height: 37px !important;">
         <option value="member">Member</option>
         <option value="srp">SRP</option>
-        <option value="subscribe + save">subscribe + save</option>
+        <option value="ao">Subs.+Save</option>
         </select>
         </label>
         <div>
@@ -228,7 +228,7 @@ display: inline-block; /* Show fee input when toggled */
         <div class="total-bar">
         <div class="total-info">
         <span class="total-label">Total: ₱<span id="totalAmount">0</span></span>
-        <span class="sp-label">SP: <span id="spAmount">0</span></span>
+        <span class="svp-label">SVP: <span id="svpAmount">0</span></span>
         
         <!-- Compact delivery toggle -->
         <span class="delivery-toggle">
@@ -257,7 +257,7 @@ display: inline-block; /* Show fee input when toggled */
 
 <script>
 
-        let currentSortMode = 0; // 0 = A-Z, 1 = Price High-Low, 2 = sp High-Low
+        let currentSortMode = 0; // 0 = A-Z, 1 = Price High-Low, 2 = SVP High-Low
         
         function toggleSort() {
             currentSortMode = (currentSortMode + 1) % 3;
@@ -268,7 +268,7 @@ display: inline-block; /* Show fee input when toggled */
         function updateSortButtonText() {
             const sortButton = document.getElementById('sortButton');
             const icons = [];
-            const texts = ['A-Z', 'PHP↓', 'SP↓'];
+            const texts = ['A-Z', 'PHP↓', 'SVP↓'];
             
             // Remove all icon classes and add the current one
             sortButton.querySelector('i').className = 'fas ' + icons[currentSortMode];
@@ -281,8 +281,8 @@ display: inline-block; /* Show fee input when toggled */
             switch(currentSortMode) {
                 case 1: // Price High-Low
                     return productsArray.sort((a, b) => b[1][selectedPrice] - a[1][selectedPrice]);
-        case 2: // sp High-Low
-            return productsArray.sort((a, b) => b[1].sp - a[1].sp);
+        case 2: // SVP High-Low
+            return productsArray.sort((a, b) => b[1].svp - a[1].svp);
         default: // A-Z
             return productsArray.sort((a, b) => a[0].localeCompare(b[0]));
                     }
@@ -291,56 +291,56 @@ display: inline-block; /* Show fee input when toggled */
 
                     const products = {
                         supplements: {
-                            "Active+": { member: 1950, srp: 2340, subscribe + save: 1755, sp: 15, unitCount: 84, unitType: "tablet" },
-                            "Advanced Collagen": { member: 2100, srp: 2520, subscribe + save: 1890, sp: 12, unitCount: 14, unitType: "serving" },
-                            "BiOmega": { member: 2250, srp: 2700, subscribe + save: 2025, sp: 14, unitCount: 56, unitType: "gelcap" },
-                            "Cellsentials": { member: 3690, srp: 4430, subscribe + save: 3321, sp: 34, unitCount: 224, unitType: "tablet" },
-                            "CoQuinone30": { member: 3420, srp: 4105, subscribe + save: 3078, sp: 32, unitCount: 56, unitType: "gelcap" },
-                            "CopaPrime+": { member: 2580, srp: 3100, subscribe + save: 2322, sp: 20, unitCount: 56, unitType: "tablet" },
-                            "Digestive Enzyme": { member: 1680, srp: 2020, subscribe + save: 1512, sp: 14, unitCount: 56, unitType: "tablet" },
-                            "Electrolyte Replacement Drink": { member: 2300, srp: 2760, subscribe + save: 2070, sp: 10, unitCount: 28, unitType: "packets" },
-                            "Fibergy Active": { member: 1850, srp: 2220, subscribe + save: 1665, sp: 14, unitCount: 28, unitType: "serving" },
-                            "Hepasil DTX": { member: 2940, srp: 3530, subscribe + save: 2646, sp: 24, unitCount: 84, unitType: "tablet" },
-                            "Magnecal D": { member: 1950, srp: 2340, subscribe + save: 1755, sp: 15, unitCount: 112, unitType: "tablet" },
-                            "Mini Cellsentials": { member: 1110, srp: 1335, subscribe + save: 999, sp: 7, unitCount: 28, unitType: "tablet" },
-                            "Nutrimeal Choco": { member: 1950, srp: 2340, subscribe + save: 1755, sp: 12, unitCount: 9, unitType: "serving" },
-                            "Nutrimeal Vanilla": { member: 1950, srp: 2340, subscribe + save: 1755, sp: 12, unitCount: 9, unitType: "serving" },
-                            "Nutrimeal Strawberry": { member: 1950, srp: 2340, subscribe + save: 1755, sp: 12, unitCount: 9, unitType: "serving" },
-                            "Palmetto Plus": { member: 2730, srp: 3280, subscribe + save: 2457, sp: 25, unitCount: 30, unitType: "gelcap" },
-                            "Poly C": { member: 1600, srp: 1920, subscribe + save: 1440, sp: 10, unitCount: 120, unitType: "tablet" },
-                            "Procalm+": { member: 1680, srp: 2020, subscribe + save: 1512, sp: 12, unitCount: 56, unitType: "tablet" },
-                            "Procosa": { member: 2580, srp: 3100, subscribe + save: 2322, sp: 19, unitCount: 84, unitType: "tablet" },
-                            "Proflavanol C100": { member: 3100, srp: 3720, subscribe + save: 2790, sp: 30, unitCount: 56, unitType: "tablet" },
-                            "Proglucamune": { member: 2200, srp: 2640, subscribe + save: 1980, sp: 15, unitCount: 56, unitType: "tablet" },
-                            "Pure Rest": { member: 1160, srp: 1400, subscribe + save: 1044, sp: 8, unitCount: 56, unitType: "tablet" },
-                            "USANA DTX Tea Mix": { member: 1530, srp: 1840, subscribe + save: 1377, sp: 8, unitCount: 28, unitType: "packet" },
-                            "USANA Probiotic": { member: 1700, srp: 2040, subscribe + save: 1530, sp: 10, unitCount: 14, unitType: "packet" },
-                            "Usanimals": { member: 1400, srp: 1680, subscribe + save: 1260, sp: 8, unitCount: 56, unitType: "tablet" },
-                            "Visionex": { member: 2730, srp: 3280, subscribe + save: 2457, sp: 25, unitCount: 56, unitType: "tablet" },
-                            "Whitening Toothpaste": { member: 540, srp: 580, subscribe + save: 486, sp: 3, unitCount: 1, unitType: "tube" }
+                            "Active+": { member: 1950, srp: 2340, ao: 1755, svp: 15, unitCount: 84, unitType: "tablet" },
+                            "Advanced Collagen": { member: 2100, srp: 2520, ao: 1890, svp: 12, unitCount: 14, unitType: "serving" },
+                            "BiOmega": { member: 2250, srp: 2700, ao: 2025, svp: 14, unitCount: 56, unitType: "gelcap" },
+                            "Cellsentials": { member: 3690, srp: 4430, ao: 3321, svp: 34, unitCount: 224, unitType: "tablet" },
+                            "CoQuinone30": { member: 3420, srp: 4105, ao: 3078, svp: 32, unitCount: 56, unitType: "gelcap" },
+                            "CopaPrime+": { member: 2580, srp: 3100, ao: 2322, svp: 20, unitCount: 56, unitType: "tablet" },
+                            "Digestive Enzyme": { member: 1680, srp: 2020, ao: 1512, svp: 14, unitCount: 56, unitType: "tablet" },
+                            "Electrolyte Replacement Drink": { member: 2300, srp: 2760, ao: 2070, svp: 10, unitCount: 28, unitType: "packets" },
+                            "Fibergy Active": { member: 1850, srp: 2220, ao: 1665, svp: 14, unitCount: 28, unitType: "serving" },
+                            "Hepasil DTX": { member: 2940, srp: 3530, ao: 2646, svp: 24, unitCount: 84, unitType: "tablet" },
+                            "Magnecal D": { member: 1950, srp: 2340, ao: 1755, svp: 15, unitCount: 112, unitType: "tablet" },
+                            "Mini Cellsentials": { member: 1110, srp: 1335, ao: 999, svp: 7, unitCount: 28, unitType: "tablet" },
+                            "Nutrimeal Choco": { member: 1950, srp: 2340, ao: 1755, svp: 12, unitCount: 9, unitType: "serving" },
+                            "Nutrimeal Vanilla": { member: 1950, srp: 2340, ao: 1755, svp: 12, unitCount: 9, unitType: "serving" },
+                            "Nutrimeal Strawberry": { member: 1950, srp: 2340, ao: 1755, svp: 12, unitCount: 9, unitType: "serving" },
+                            "Palmetto Plus": { member: 2730, srp: 3280, ao: 2457, svp: 25, unitCount: 30, unitType: "gelcap" },
+                            "Poly C": { member: 1600, srp: 1920, ao: 1440, svp: 10, unitCount: 120, unitType: "tablet" },
+                            "Procalm+": { member: 1680, srp: 2020, ao: 1512, svp: 12, unitCount: 56, unitType: "tablet" },
+                            "Procosa": { member: 2580, srp: 3100, ao: 2322, svp: 19, unitCount: 84, unitType: "tablet" },
+                            "Proflavanol C100": { member: 3100, srp: 3720, ao: 2790, svp: 30, unitCount: 56, unitType: "tablet" },
+                            "Proglucamune": { member: 2200, srp: 2640, ao: 1980, svp: 15, unitCount: 56, unitType: "tablet" },
+                            "Pure Rest": { member: 1160, srp: 1400, ao: 1044, svp: 8, unitCount: 56, unitType: "tablet" },
+                            "USANA DTX Tea Mix": { member: 1530, srp: 1840, ao: 1377, svp: 8, unitCount: 28, unitType: "packet" },
+                            "USANA Probiotic": { member: 1700, srp: 2040, ao: 1530, svp: 10, unitCount: 14, unitType: "packet" },
+                            "Usanimals": { member: 1400, srp: 1680, ao: 1260, svp: 8, unitCount: 56, unitType: "tablet" },
+                            "Visionex": { member: 2730, srp: 3280, ao: 2457, svp: 25, unitCount: 56, unitType: "tablet" },
+                            "Whitening Toothpaste": { member: 540, srp: 580, ao: 486, svp: 3, unitCount: 1, unitType: "tube" }
                         },
                         skincare: {
-                            "Creamy Foam Cleanser": { member: 1890, srp: 2270, subscribe + save: 1890, sp: 14, unitCount: 70, unitType: "application" },
-                            "Daily Mineral Protective Cream": { member: 1890, srp: 2270, subscribe + save: 1890, sp: 16, unitCount: 70, unitType: "application" },
-                            "Exfoliating Scrub + Mask": { member: 1580, srp: 1900, subscribe + save: 1580, sp: 10, unitCount: 40, unitType: "application" },
-                            "Gentle Milk Cleanser": { member: 1890, srp: 2270, subscribe + save: 1890, sp: 14, unitCount: 70, unitType: "application" },
-                            "Hydrating Eye Essence": { member: 2940, srp: 3530, subscribe + save: 2940, sp: 22, unitCount: 70, unitType: "application" },
-                            "Hydrating Sheet Mask": { member: 1260, srp: 1520, subscribe + save: 1260, sp: 9, unitCount: 3, unitType: "sheet" },
-                            "Luminous Moisture Cream": { member: 2310, srp: 2780, subscribe + save: 2310, sp: 22, unitCount: 40, unitType: "application" },
-                            "Protective Day Cream": { member: 2000, srp: 2400, subscribe + save: 2000, sp: 16, unitCount: 70, unitType: "application" },
-                            "Protective Day Lotion": { member: 2000, srp: 2400, subscribe + save: 2000, sp: 16, unitCount: 70, unitType: "application" },
-                            "Perfecting Toner": { member: 1950, srp: 2350, subscribe + save: 1950, sp: 14, unitCount: 70, unitType: "application" },
-                            "Vitalizing Serum": { member: 2940, srp: 3530, subscribe + save: 2940, sp: 22, unitCount: 70, unitType: "application" },
-                            "Replenishing Night Cream": { member: 2000, srp: 2400, subscribe + save: 2000, sp: 16, unitCount: 70, unitType: "application" },
-                            "Replenishing Night Gel": { member: 2000, srp: 2400, subscribe + save: 2000, sp: 16, unitCount: 70, unitType: "application" },
+                            "Creamy Foam Cleanser": { member: 1890, srp: 2270, ao: 1890, svp: 14, unitCount: 70, unitType: "application" },
+                            "Daily Mineral Protective Cream": { member: 1890, srp: 2270, ao: 1890, svp: 16, unitCount: 70, unitType: "application" },
+                            "Exfoliating Scrub + Mask": { member: 1580, srp: 1900, ao: 1580, svp: 10, unitCount: 40, unitType: "application" },
+                            "Gentle Milk Cleanser": { member: 1890, srp: 2270, ao: 1890, svp: 14, unitCount: 70, unitType: "application" },
+                            "Hydrating Eye Essence": { member: 2940, srp: 3530, ao: 2940, svp: 22, unitCount: 70, unitType: "application" },
+                            "Hydrating Sheet Mask": { member: 1260, srp: 1520, ao: 1260, svp: 9, unitCount: 3, unitType: "sheet" },
+                            "Luminous Moisture Cream": { member: 2310, srp: 2780, ao: 2310, svp: 22, unitCount: 40, unitType: "application" },
+                            "Protective Day Cream": { member: 2000, srp: 2400, ao: 2000, svp: 16, unitCount: 70, unitType: "application" },
+                            "Protective Day Lotion": { member: 2000, srp: 2400, ao: 2000, svp: 16, unitCount: 70, unitType: "application" },
+                            "Perfecting Toner": { member: 1950, srp: 2350, ao: 1950, svp: 14, unitCount: 70, unitType: "application" },
+                            "Vitalizing Serum": { member: 2940, srp: 3530, ao: 2940, svp: 22, unitCount: 70, unitType: "application" },
+                            "Replenishing Night Cream": { member: 2000, srp: 2400, ao: 2000, svp: 16, unitCount: 70, unitType: "application" },
+                            "Replenishing Night Gel": { member: 2000, srp: 2400, ao: 2000, svp: 16, unitCount: 70, unitType: "application" },
+                            "Resurfacing 4-in-1 Serum": { member: 5500, srp: 6600, ao: 5500, svp: 60, unitCount: 70, unitType: "application" }
                         },                
-                            "Resurfacing 4-in-1 Serum": { member: 5500, srp: 6600, subscribe + save: 5500, sp: 60, unitCount: 70, unitType: "application" }
     packages: {
         "Healthy Lifestyle Pack 3BC": {
             member: 55990,
             srp: 55990,
-            subscribe + save: 55990,
-            sp: 500,
+            ao: 55990,
+            svp: 500,
             contents: [
                 "4 CellSentials",
                 "3 Proflavanol C100",
@@ -362,8 +362,8 @@ display: inline-block; /* Show fee input when toggled */
         "Healthy Foundation Pack 1BC": {
             member: 32490,
             srp: 32490,
-            subscribe + save: 32490,
-            sp: 300,
+            ao: 32490,
+            svp: 300,
             contents: [
                 "4 CellSentials",
                 "3 Proflavanol C100",
@@ -379,8 +379,8 @@ display: inline-block; /* Show fee input when toggled */
         "Cellsentials Pack 1BC": {
             member: 23130,
             srp: 23130,
-            subscrie + save: 23130,
-            sp: 204,
+            ao: 23130,
+            svp: 204,
             contents: [
                 "6 CellSentials",
                 "1 Business Development System"
@@ -481,7 +481,7 @@ else if (product.unitCount && product.unitType) {
                 <div style="display: flex; align-items: center; gap: 10px; position: relative;">
                     <div style="text-align: right;">
                         <div class="product-price" style="font-weight: 600;">₱${product[selectedPrice]}</div>
-                        <div class="product-sp" style="color: #666; font-size: 0.9em;">sp: ${product.sp}</div>
+                        <div class="product-svp" style="color: #666; font-size: 0.9em;">SVP: ${product.svp}</div>
                     </div>
                     ${qty > 0 ? `
                     <div class="product-controls" style="
@@ -535,27 +535,27 @@ else if (product.unitCount && product.unitType) {
 
                             function updateTotal() {
                                 let total = 0;
-                                let spTotal = 0;
+                                let svpTotal = 0;
                                 for (let name in cart) {
                                     const product = products.supplements[name] || products.skincare[name] || products.packages[name];
                                     total += product[selectedPrice] * cart[name];
-                                    spTotal += product.sp * cart[name];
+                                    svpTotal += product.svp * cart[name];
                                 }
                                     document.getElementById("totalAmount").innerText = total.toLocaleString();
-                                    document.getElementById("spAmount").innerText = spTotal;
+                                    document.getElementById("svpAmount").innerText = svpTotal;
                                     }
                                     
                                     
                                     
     function updateTotal() {
     let subtotal = 0;
-    let spTotal = 0;
+    let svpTotal = 0;
     
     // Calculate product totals
     for (let name in cart) {
         const product = products.supplements[name] || products.skincare[name] || products.packages[name];
         subtotal += product[selectedPrice] * cart[name];
-        spTotal += product.sp * cart[name];
+        svpTotal += product.svp * cart[name];
     }
 
     // Apply delivery fee if enabled
@@ -569,16 +569,16 @@ else if (product.unitCount && product.unitType) {
     
     // Update UI
     document.getElementById("totalAmount").innerText = total.toLocaleString();
-    document.getElementById("spAmount").innerText = spTotal;
+    document.getElementById("svpAmount").innerText = svpTotal;
     
     // Return values for copySummary
-    return { subtotal, deliveryFee, total, spTotal };
+    return { subtotal, deliveryFee, total, svpTotal };
 }
                         
                                     
                     function copySummary() {
     // Calculate totals including delivery fee
-    const { subtotal, deliveryFee, total, spTotal } = updateTotal();
+    const { subtotal, deliveryFee, total, svpTotal } = updateTotal();
     
     let text = `🛒 Order Summary\n`;
     text += `📅 ${new Date().toLocaleDateString()}\n`;
@@ -592,7 +592,7 @@ else if (product.unitCount && product.unitType) {
             const itemTotal = product[selectedPrice] * qty;
             text += `➤ ${name}\n`;
             text += `   ${qty} × ₱${product[selectedPrice].toLocaleString()} = ₱${itemTotal.toLocaleString()}\n`;
-            text += `   (${product.sp * qty} sp)\n`;
+            text += `   (${product.svp * qty} SVP)\n`;
             
             // Add package contents if this is a package
             if (product.contents) {
@@ -621,8 +621,614 @@ else if (product.unitCount && product.unitType) {
     if (deliveryToggle.checked && deliveryFee > 0) {
         text += `Delivery Fee: ₱${deliveryFee.toLocaleString()}\n`;
     }
-    text += `Total sp: ${spTotal}\n`;
+    text += `Total SVP: ${svpTotal}\n`;
+    text += `───────────\n`;<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U Hub Pro - Product Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="Firebasenameandlogout.js"></script>
+</head>
+<style>
+/* Remove all horizontal scrolling */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Prevent any flex overflow from main-content */
+.main-content {
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+/* Optional: make sure sidebar doesnt push layout */
+.sidebar {
+    max-width: 80px;
+    overflow-x: hidden;
+}
+
+/* Delivery toggle styles */
+.delivery-toggle {
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.delivery-toggle label {
+    cursor: pointer;
+    color: #666;
+}
+.delivery-toggle input[type="number"] {
+    padding: 2px 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: none; /* Hidden by default */
+}
+#deliveryToggle:checked ~ input[type="number"] {
+    display: inline-block; /* Show fee input when toggled */
+}
+
+.product-quantity {
+    position:absolute;
+    margin-top: -10px;
+    margin-right: -8px;
+}
+
+.remove-btn {
+    position:relative !important;
+    margin-top: 36px !important;
+    margin-right: 341px !important;
+    line-height: 2 !important;
+}
+
+@media (max-width: 600px) {
+    .content {
+        margin-top: 60px;
+        padding-bottom: 8.5rem;
+        width: 300px;
+    }
+    .price-type-label {
+        display: none;
+    }
+    select {
+        margin-left: 5px;
+    }
+    .product-quantity {
+        position:relative;
+        margin-top: -4px;
+        margin-right: 0px;
+    }
+    .remove-btn {
+        position:relative !important;
+        margin-top: 0px !important;
+        margin-right: -2px !important;
+        line-height: 1.5 !important;
+    }
+}
+
+.product-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.product-quantity {
+    order: 1; /* Moves quantity to bottom */
+}
+.remove-btn {
+    order: 2; /* Moves button to top */
+    padding: 0 4px;
+}
+
+.package-contents {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.toggle-contents.active + .package-contents {
+    max-height: 1000px; /* Adjust based on content size */
+}
+</style>
+<body>
+
+<!-- Topbar Icons -->
+<div class="topbar">
+    <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" class="active" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <a href="ustorm_leads.html" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+    </a>
+</div>
+<div class="header">
+    <div class="logo">
+        <span style="margin-left: 0px;">Calculator</span>
+    </div>
+</div>
+    
+<div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+        <a href="productcomputer.html" class="active" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+        <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+        <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+        <a href="ustorm_leads.html" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+        <!-- Logout Button in Sidebar -->
+        <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+        <!-- Header with ID instead of class -->
+        <header id="mainHeader">
+            <p id="greeting" class="greeting-text">Hi, User</p>
+        </header>
+        
+        <div class="controls">
+            <div>
+                <button onclick="setCategory('supplements')">
+                    <span class="full-text">Nutritionals</span>
+                    <span class="short-text">N</span>
+                </button>
+                <button onclick="setCategory('skincare')">
+                    <span class="full-text">Celavive</span>
+                    <span class="short-text">C</span>
+                </button>
+                <button onclick="setCategory('packages')">
+                    <span class="full-text">Packages</span>
+                    <span class="short-text">P</span>
+                </button>
+            </div>
+            
+            <div class="controls-right-group">
+                <label>
+                    <span class="price-type-label">Price Type:</span>
+                    <select id="priceType" onchange="renderProducts()" style="height: 37px !important;">
+                        <option value="member">Member</option>
+                        <option value="srp">SRP</option>
+                        <option value="ao">Subscribe + Save</option>
+                    </select>
+                </label>
+                <div>
+                    <button id="sortButton" onclick="toggleSort()" style="padding: 5px 10px; background: #e0e0e0; border-radius: 4px; width:70px;">
+                        <i class="fas fa-random"></i>
+                    </button>
+                </div>
+            </div>
+        </div>        
+        
+        <div class="product-grid" id="productGrid"></div>
+        
+        <div class="total-bar">
+            <div class="total-info">
+                <span class="total-label">Total: ₱<span id="totalAmount">0</span></span>
+                <span class="sp-label">SP: <span id="spAmount">0</span></span>
+                
+                <!-- Compact delivery toggle -->
+                <span class="delivery-toggle">
+                    <label title="Add delivery fee">
+                        <i class="fas fa-truck"></i>
+                        <input type="checkbox" id="deliveryToggle" hidden>
+                    </label>
+                    <input type="number" id="feeAmount" placeholder="₱" min="0" style="width: 70px; color:black;" inputmode="numeric" pattern="[0-9]*">
+                </span>
+            </div>
+            
+            <div class="button-container">
+                <button class="btn-clear" onclick="clearAll()">Clear</button>
+                <button class="btn-clear copy-summary" onclick="copySummary()">Copy Summary</button>
+            </div>
+        </div>        
+    </div>
+</div>
+
+<script>
+let currentSortMode = 0; // 0 = A-Z, 1 = Price High-Low, 2 = SP High-Low
+        
+function toggleSort() {
+    currentSortMode = (currentSortMode + 1) % 3;
+    renderProducts();
+    updateSortButtonText();
+}
+        
+function updateSortButtonText() {
+    const sortButton = document.getElementById('sortButton');
+    const icons = [];
+    const texts = ['A-Z', 'PHP↓', 'SP↓'];
+    
+    // Remove all icon classes and add the current one
+    sortButton.querySelector('i').className = 'fas ' + icons[currentSortMode];
+    sortButton.innerHTML = `<i class="fas ${icons[currentSortMode]}"></i> ${texts[currentSortMode]}`;
+}
+        
+function sortProducts(productList) {
+    const productsArray = Object.entries(productList);
+    
+    switch(currentSortMode) {
+        case 1: // Price High-Low
+            return productsArray.sort((a, b) => b[1][selectedPrice] - a[1][selectedPrice]);
+        case 2: // SP High-Low
+            return productsArray.sort((a, b) => b[1].sp - a[1].sp);
+        default: // A-Z
+            return productsArray.sort((a, b) => a[0].localeCompare(b[0]));
+    }
+}
+
+const products = {
+    supplements: {
+        "Active+": { member: 1950, srp: 2340, ao: 1755, sp: 15, unitCount: 84, unitType: "tablet" },
+        "Advanced Collagen": { member: 2100, srp: 2520, ao: 1890, sp: 12, unitCount: 14, unitType: "serving" },
+        "BiOmega": { member: 2250, srp: 2700, ao: 2025, sp: 14, unitCount: 56, unitType: "gelcap" },
+        "Cellsentials": { member: 3690, srp: 4430, ao: 3321, sp: 34, unitCount: 224, unitType: "tablet" },
+        "CoQuinone30": { member: 3420, srp: 4105, ao: 3078, sp: 32, unitCount: 56, unitType: "gelcap" },
+        "CopaPrime+": { member: 2580, srp: 3100, ao: 2322, sp: 20, unitCount: 56, unitType: "tablet" },
+        "Digestive Enzyme": { member: 1680, srp: 2020, ao: 1512, sp: 14, unitCount: 56, unitType: "tablet" },
+        "Electrolyte Replacement Drink": { member: 2300, srp: 2760, ao: 2070, sp: 10, unitCount: 28, unitType: "packets" },
+        "Fibergy Active": { member: 1850, srp: 2220, ao: 1665, sp: 14, unitCount: 28, unitType: "serving" },
+        "Hepasil DTX": { member: 2940, srp: 3530, ao: 2646, sp: 24, unitCount: 84, unitType: "tablet" },
+        "Magnecal D": { member: 1950, srp: 2340, ao: 1755, sp: 15, unitCount: 112, unitType: "tablet" },
+        "Mini Cellsentials": { member: 1110, srp: 1335, ao: 999, sp: 7, unitCount: 28, unitType: "tablet" },
+        "Nutrimeal Choco": { member: 1950, srp: 2340, ao: 1755, sp: 12, unitCount: 9, unitType: "serving" },
+        "Nutrimeal Vanilla": { member: 1950, srp: 2340, ao: 1755, sp: 12, unitCount: 9, unitType: "serving" },
+        "Nutrimeal Strawberry": { member: 1950, srp: 2340, ao: 1755, sp: 12, unitCount: 9, unitType: "serving" },
+        "Palmetto Plus": { member: 2730, srp: 3280, ao: 2457, sp: 25, unitCount: 30, unitType: "gelcap" },
+        "Poly C": { member: 1600, srp: 1920, ao: 1440, sp: 10, unitCount: 120, unitType: "tablet" },
+        "Procalm+": { member: 1680, srp: 2020, ao: 1512, sp: 12, unitCount: 56, unitType: "tablet" },
+        "Procosa": { member: 2580, srp: 3100, ao: 2322, sp: 19, unitCount: 84, unitType: "tablet" },
+        "Proflavanol C100": { member: 3100, srp: 3720, ao: 2790, sp: 30, unitCount: 56, unitType: "tablet" },
+        "Proglucamune": { member: 2200, srp: 2640, ao: 1980, sp: 15, unitCount: 56, unitType: "tablet" },
+        "Pure Rest": { member: 1160, srp: 1400, ao: 1044, sp: 8, unitCount: 56, unitType: "tablet" },
+        "USANA DTX Tea Mix": { member: 1530, srp: 1840, ao: 1377, sp: 8, unitCount: 28, unitType: "packet" },
+        "USANA Probiotic": { member: 1700, srp: 2040, ao: 1530, sp: 10, unitCount: 14, unitType: "packet" },
+        "Usanimals": { member: 1400, srp: 1680, ao: 1260, sp: 8, unitCount: 56, unitType: "tablet" },
+        "Visionex": { member: 2730, srp: 3280, ao: 2457, sp: 25, unitCount: 56, unitType: "tablet" },
+        "Whitening Toothpaste": { member: 540, srp: 580, ao: 486, sp: 3, unitCount: 1, unitType: "tube" }
+    },
+    skincare: {
+        "Creamy Foam Cleanser": { member: 1890, srp: 2270, ao: 1890, sp: 14, unitCount: 70, unitType: "application" },
+        "Daily Mineral Protective Cream": { member: 1890, srp: 2270, ao: 1890, sp: 16, unitCount: 70, unitType: "application" },
+        "Exfoliating Scrub + Mask": { member: 1580, srp: 1900, ao: 1580, sp: 10, unitCount: 40, unitType: "application" },
+        "Gentle Milk Cleanser": { member: 1890, srp: 2270, ao: 1890, sp: 14, unitCount: 70, unitType: "application" },
+        "Hydrating Eye Essence": { member: 2940, srp: 3530, ao: 2940, sp: 22, unitCount: 70, unitType: "application" },
+        "Hydrating Sheet Mask": { member: 1260, srp: 1520, ao: 1260, sp: 9, unitCount: 3, unitType: "sheet" },
+        "Luminous Moisture Cream": { member: 2310, srp: 2780, ao: 2310, sp: 22, unitCount: 40, unitType: "application" },
+        "Protective Day Cream": { member: 2000, srp: 2400, ao: 2000, sp: 16, unitCount: 70, unitType: "application" },
+        "Protective Day Lotion": { member: 2000, srp: 2400, ao: 2000, sp: 16, unitCount: 70, unitType: "application" },
+        "Perfecting Toner": { member: 1950, srp: 2350, ao: 1950, sp: 14, unitCount: 70, unitType: "application" },
+        "Vitalizing Serum": { member: 2940, srp: 3530, ao: 2940, sp: 22, unitCount: 70, unitType: "application" },
+        "Replenishing Night Cream": { member: 2000, srp: 2400, ao: 2000, sp: 16, unitCount: 70, unitType: "application" },
+        "Replenishing Night Gel": { member: 2000, srp: 2400, ao: 2000, sp: 16, unitCount: 70, unitType: "application" },
+        "Resurfacing 4-in-1 Serum": { member: 5500, srp: 6600, ao: 5500, sp: 60, unitCount: 70, unitType: "application" }
+    },                
+    packages: {
+        "Healthy Lifestyle Pack 3BC": {
+            member: 55990,
+            srp: 55990,
+            ao: 55990,
+            sp: 500,
+            contents: [
+                "4 CellSentials",
+                "3 Proflavanol C100",
+                "4 BiOmega",
+                "2 CoQuinone 30",
+                "3 MagneCal D",
+                "1 Visionex",
+                "2 Hepasil DTX",
+                "1 Nutrimeal Dutch Chocolate",
+                "1 Nutrimeal French Vanilla",
+                "1 Small Blender Bottle",
+                "2 Usanimals",
+                "1 Proglucamune",
+                "10 Cycles of Business Accelerator Suite",
+                "1 Business Development System"
+            ],
+            description: "By enrolling in this exclusive package, you gain access to premium USANA products worth ₱80,000 (SRP) at the significantly reduced cost of ₱55,990."
+        },
+        "Healthy Foundation Pack 1BC": {
+            member: 32490,
+            srp: 32490,
+            ao: 32490,
+            sp: 300,
+            contents: [
+                "4 CellSentials",
+                "3 Proflavanol C100",
+                "2 MagneCal D",
+                "2 BiOmega",
+                "2 CoQuinone 30",
+                "1 Whitening Toothpaste",
+                "5 Cycles of Business Accelerator Suite",
+                "1 Business Development System"
+            ],
+            description: "Get ₱50,000 (SRP) worth of USANA products for only ₱32,490 - premium nutrition and business tools at outstanding value."
+        },
+        "Cellsentials Pack 1BC": {
+            member: 23130,
+            srp: 23130,
+            ao: 23130,
+            sp: 204,
+            contents: [
+                "6 CellSentials",
+                "1 Business Development System"
+            ],
+            description: "Get ₱27,000 worth of USANA products for only ₱23,130 – premium nutrition and essential business tools at exceptional value!"
+        }
+    }
+};
+                    
+let selectedCategory = 'supplements';
+let selectedPrice = 'member';
+const cart = {};
+
+function setCategory(cat) {
+    selectedCategory = cat;
+    renderProducts();
+}
+
+function addToCart(name) {
+    if (!cart[name]) cart[name] = 0;
+    cart[name]++;
+    renderProducts();
+    updateTotal();
+}
+        
+function removeFromCart(name) {
+    if (cart[name]) {
+        cart[name]--;
+        if (cart[name] <= 0) delete cart[name];
+        renderProducts();
+        updateTotal();
+    }
+}
+                    
+function clearAll() {
+    for (let item in cart) cart[item] = 0;
+    updateTotal();
+    renderProducts();
+}
+                            
+function renderProducts() {
+    selectedPrice = document.getElementById("priceType").value;
+    const grid = document.getElementById("productGrid");
+    grid.innerHTML = "";
+    const list = products[selectedCategory];
+    
+    // Get sorted products
+    const sortedProducts = sortProducts(list);
+    
+    // Render sorted products
+    sortedProducts.forEach(([name, product]) => {
+        const qty = cart[name] || 0;
+        const div = document.createElement("div");
+        div.className = "product";
+        
+        // Determine the unit price display based on product type
+        let unitPriceDisplay = '';
+        if (product.contents) {
+            // Package product display with toggle functionality
+            unitPriceDisplay = `
+                <div class="product-unit-price" style="font-size: 0.8em; color: #666; text-align: left;">
+                    <span class="toggle-contents" 
+                          style="cursor: pointer; color: #0066cc; font-weight: bold;"
+                          onclick="togglePackageDetails(this, event)">
+                        ► Show Contents
+                    </span>
+                    <div class="package-contents" style="display: none;">
+                        <ul style="margin: 5px 0 0 15px; padding: 0; font-size: 0.75em;">
+                            ${product.contents.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                        ${product.description ? `
+                        <div style="font-style: italic; margin-top: 5px;">
+                            ${product.description}
+                        </div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        else if (product.unitCount && product.unitType) {
+            // Regular product display
+            unitPriceDisplay = `
+                <div class="product-unit-price" style="font-size: 0.8em; color: #666; text-align: left;">
+                    (₱${Math.round(product[selectedPrice]/product.unitCount)} per ${product.unitType})
+                </div>
+            `;
+        }
+        
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <div style="flex: 1; min-width: 0; padding-right: 10px;">
+                    <div class="product-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${name}
+                    </div>
+                    ${unitPriceDisplay}
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+                    <div style="text-align: right;">
+                        <div class="product-price" style="font-weight: 600;">₱${product[selectedPrice]}</div>
+                        <div class="product-sp" style="color: #666; font-size: 0.9em;">SP: ${product.sp}</div>
+                    </div>
+                    ${qty > 0 ? `
+                    <div class="product-controls" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        height: 45px;
+                        width: 40px;
+                        min-width: 40px;
+                        text-align: center;
+                        gap: 2px;
+                        ${window.innerWidth >= 768 ? `
+                            position: relative;
+                            padding-left: 30px;
+                        ` : ''}
+                    ">
+                        <div class="product-quantity" style="
+                            font-size: 0.85em;
+                            ${window.innerWidth >= 768 ? 'margin-left: 10px;' : ''}
+                        ">${qty}</div>
+                        <button class="remove-btn" onclick="event.stopPropagation(); removeFromCart('${name}')" style="
+                            width: 24px;
+                            height: 24px;
+                            font-size: 16px;
+                            padding: 0;
+                            line-height: 1;
+                            border: none;
+                            background: #ccc;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            ${window.innerWidth >= 768 ? `
+                                position: absolute;
+                                left: 0px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                            ` : ''}
+                        ">−</button>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+        
+        div.onclick = () => addToCart(name);
+        grid.appendChild(div);
+    });
+    
+    updateTotal();
+}
+
+function updateTotal() {
+    let subtotal = 0;
+    let spTotal = 0;
+    
+    // Calculate product totals
+    for (let name in cart) {
+        const product = products.supplements[name] || products.skincare[name] || products.packages[name];
+        subtotal += product[selectedPrice] * cart[name];
+        spTotal += product.sp * cart[name];
+    }
+
+    // Apply delivery fee if enabled
+    let deliveryFee = 0;
+    const deliveryToggle = document.getElementById("deliveryToggle");
+    if (deliveryToggle.checked) {
+        deliveryFee = parseFloat(document.getElementById("feeAmount").value) || 0;
+    }
+
+    const total = subtotal + deliveryFee;
+    
+    // Update UI
+    document.getElementById("totalAmount").innerText = total.toLocaleString();
+    document.getElementById("spAmount").innerText = spTotal;
+    
+    // Return values for copySummary
+    return { subtotal, deliveryFee, total, spTotal };
+}
+                        
+function copySummary() {
+    // Calculate totals including delivery fee
+    const { subtotal, deliveryFee, total, spTotal } = updateTotal();
+    
+    let text = `🛒 Order Summary\n`;
+    text += `📅 ${new Date().toLocaleDateString()}\n`;
+    text += `💰 ${document.getElementById('priceType').value === 'ao' ? 'Subscribe + Save' : document.getElementById('priceType').value.toUpperCase()} Price\n\n`;
+    
+    // Products
+    for (let name in cart) {
+        const product = products.supplements[name] || products.skincare[name] || products.packages[name];
+        const qty = cart[name];
+        if (qty > 0) {
+            const itemTotal = product[selectedPrice] * qty;
+            text += `➤ ${name}\n`;
+            text += `   ${qty} × ₱${product[selectedPrice].toLocaleString()} = ₱${itemTotal.toLocaleString()}\n`;
+            text += `   (${product.sp * qty} SP)\n`;
+            
+            // Add package contents if this is a package
+            if (product.contents) {
+                text += `   📦 Package includes:\n`;
+                product.contents.forEach(item => {
+                    text += `      • ${item}\n`;
+                });
+                if (product.description) {
+                    text += `\n   ℹ️ ${product.description}\n`;
+                }
+            }
+            
+            text += `\n`;
+        }
+    }
+    
+    // Delivery fee
+    const deliveryToggle = document.getElementById("deliveryToggle");
+    if (deliveryToggle.checked && deliveryFee > 0) {
+        text += `🚚 Delivery Fee: ₱${deliveryFee.toLocaleString()}\n\n`;
+    }
+    
+    // Totals
     text += `───────────\n`;
+    text += `Subtotal: ₱${subtotal.toLocaleString()}\n`;
+    if (deliveryToggle.checked && deliveryFee > 0) {
+        text += `Delivery Fee: ₱${deliveryFee.toLocaleString()}\n`;
+    }
+    text += `Total SP: ${spTotal}\n`;
+    text += `───────────\n`;
+    text += `TOTAL: ₱${total.toLocaleString()}\n`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Order summary copied to clipboard!");
+    });
+}
+
+// Initialize delivery toggle
+document.getElementById("deliveryToggle").addEventListener("change", function() {
+    const feeInput = document.getElementById("feeAmount");
+    feeInput.style.display = this.checked ? "inline-block" : "none";
+    if (this.checked) feeInput.focus();
+    updateTotal();
+});
+
+// Update total when delivery fee amount changes
+document.getElementById("feeAmount").addEventListener("input", updateTotal);
+
+// Initialize the sort button text
+updateSortButtonText();
+renderProducts();
+
+function togglePackageDetails(element, event) {
+    event.stopPropagation(); // Prevent the click from bubbling up to the product div
+    const contentsDiv = element.nextElementSibling;
+    const isHidden = contentsDiv.style.display === 'none';
+    
+    contentsDiv.style.display = isHidden ? 'block' : 'none';
+    element.textContent = isHidden ? '▼ Hide Contents' : '► Show Contents';
+}
+
+// Initialize the app
+renderProducts();
+</script>
+</body>
+</html>
     text += `TOTAL: ₱${total.toLocaleString()}\n`;
     
     navigator.clipboard.writeText(text).then(() => {
