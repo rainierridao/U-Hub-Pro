@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USANA BC Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="Firebasenameandlogout.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="styles.css">
+
+<style>
+@media (max-width: 600px) {
+    .content {
+        margin-top: 60px;
+        padding-bottom: 70px;
+        }
+}
+</style>
+</head>
+<body>
+
+                    <div id="loading-screen">
+                    <!-- Loader -->
+                    <div id="loader" class="loader-overlay">
+                    <div class="loader-spinner"></div>
+                    </div>
+                    </div>
+                    
+                    
+                    
+
+
+<!-- Topbar Icons -->
+<div class="topbar">
+<a href="dashboard.html" class="active"  title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+<a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+<a href="blueguide.html"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+<a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+<a href="ustorm_leads.html" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+<!-- Logout Button in Sidebar -->
+<a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+<i class="fas fa-sign-out-alt"></i>
+</a>
+</div>
+    <div class="header">
+    <div class="logo">
+    
+    <span style="margin-left: 7px;">BC Tracker</span>
+    
+    
+    </div>
+
+    
+    </div>
+    
+    <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+    <a href="dashboard.html" class="active"  title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <a href="ustorm_leads.html" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+    <i class="fas fa-sign-out-alt"></i>
+    </a>
+    </div>
+    
+    <!-- Content Area -->
+    <div class="content">
+    <!-- Header with ID instead of class -->
+    <header id="mainHeader">
+    <p id="greeting" class="greeting-text">Hi, User</p>
+    </header>
+    
+    
+    <div class="main-content">
+    <!-- Left Section -->
+    <div class="left-section">
+    <div class="card">
+    <h3>My Business Centers: 3</h3>
+    <p style="text-align: center; margin: 0; padding: 0;">Set your Default Points</p>
+    
+    <table id="bc-table">
+    <tr>
+    <th>Business Center</th>
+    <th>Left Total</th>
+    <th>Right Total</th>
+    </tr>
+    <tr>
+    <td>001</td>
+    <td contenteditable="true"  inputmode="numeric"
+    pattern="[0-9]*">0</td>
+    <td contenteditable="true"  inputmode="numeric"
+    pattern="[0-9]*">0</td>
+    </tr>
+    <tr>
+    <td class="bc-name" data-bc="002">002</td>
+    <td contenteditable="true"  inputmode="numeric"
+    pattern="[0-9]*">0</td>
+    <td contenteditable="true"  inputmode="numeric"
+    pattern="[0-9]*">0</td>
+    </tr>
+    <tr>
+    <td class="bc-name" data-bc="003">003</td>
+    <td contenteditable="true"  inputmode="numeric"
+    pattern="[0-9]*">0</td>
+    <td contenteditable="true"  inputmode="numeric"
+    pattern="[0-9]*">0</td>
+    </tr>
+    </table>
+    
+    <div class="income-section">
+    <p><span class="income-label">Total Income:</span> <span class="income-value">$0</span></p>
+    <p><span class="rank-income">No Rank</span></p>
+    </div>
+    </div>
+    </div>
+    
+    <!-- Right Section -->
+    <div class="right-section">
+    <div class="card tree-container">
+    <h3>Binary Tree View</h3>
+    
+    <!-- Root Node -->
+    <div class="tree2">
+    <div class="tree">
+    <span class="node-value left-value" id="left-001">0</span>
+    <div class="node" id="node-001">001</div>
+    <span class="node-value right-value" id="right-001">0</span>
+    </div>
+    </div>
+    
+    <!-- First Level -->
+    <div class="tree tree-level">
+    <div class="tree">
+    <span class="node-value left-value" id="left-002">0</span>
+    <div class="node" id="node-002">002</div>
+    <span class="node-value right-value" id="right-002">0</span>
+    </div>
+    <div class="tree">
+    <span class="node-value left-value" id="left-003">0</span>
+    <div class="node" id="node-003">003</div>
+    <span class="node-value right-value" id="right-003">0</span>
+    </div>
+    </div>
+    </div>
+    
+    <!-- Inputs -->
+    <div class="input-container">
+    <div class="inputs-wrapper">
+    <!-- BC2 Inputs -->
+    <div class="bc-inputs">
+    <input type="text" id="input-left-002" class="binary-input" placeholder="BC2 Left"  inputmode="numeric"
+    pattern="[0-9]*">
+    <input type="text" id="input-right-002" class="binary-input" placeholder="BC2 Right"  inputmode="numeric"
+    pattern="[0-9]*">
+    </div>
+    
+    <!-- BC3 Inputs -->
+    <div class="bc-inputs">
+    <input type="text" id="input-left-003" class="binary-input" placeholder="BC3 Left"  inputmode="numeric"
+    pattern="[0-9]*">
+    <input type="text" id="input-right-003" class="binary-input" placeholder="BC3 Right"  inputmode="numeric"
+    pattern="[0-9]*">
+    </div>
+    </div>
+    </div>
+    </div> <!-- End Right Section -->
+    </div> <!-- End Main Content -->
+    </div> <!-- End Content -->
+    </div> <!-- End Dashboard -->
+
+
+<!-- BC Input Modal -->
+<div id="bc-input-modal" class="modal" style="display:none;">
+<div class="modal-content">
+<span class="close-button">&times;</span>
+<h2 id="modal-title">Edit BC Points</h2>
+
+<div class="bc-inputs">
+<input type="text" id="modal-input-left" class="binary-input" placeholder="Left Points" inputmode="numeric" pattern="[0-9]*">
+<input type="text" id="modal-input-right" class="binary-input" placeholder="Right Points" inputmode="numeric" pattern="[0-9]*">
+</div>
+
+<button id="modal-save">Save</button>
+</div>
+</div>
+
+
+    <script src="script.js">
+    </script>           
+    
+
+</body>
+</html>

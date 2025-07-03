@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USANA Storm Leads Pipeline</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">USANA Storm Leads Pipeline</h1>
+
+    <input type="file" id="csvFile" accept=".csv" class="mb-4" />
+    <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
+  </div>
+
+  <!-- Modal -->
+  <div id="leadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
+      <p><strong>Name:</strong> <span id="modalName"></span></p>
+      <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
+      <p><strong>Contact:</strong> <span id="modalContact"></span></p>
+      <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button id="callButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center">
+          <i class="fas fa-phone mr-2"></i> Call
+        </button>
+        <button id="smsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
+          <i class="fas fa-sms mr-2"></i> SMS
+        </button>
+        <button id="secondSmsButton" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center">
+          <i class="fas fa-sms mr-2"></i> Follow-up SMS
+        </button>
+        <button id="closeModal" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tableContainer = document.getElementById('tableContainer');
+    const modal = document.getElementById('leadModal');
+    const modalName = document.getElementById('modalName');
+    const modalBirthday = document.getElementById('modalBirthday');
+    const modalContact = document.getElementById('modalContact');
+    const modalEmail = document.getElementById('modalEmail');
+    const closeModal = document.getElementById('closeModal');
+    const callButton = document.getElementById('callButton');
+    const smsButton = document.getElementById('smsButton');
+    const secondSmsButton = document.getElementById('secondSmsButton');
+
+    // Current user details (you can modify these)
+    const currentUser = {
+      name: "Your Name",
+      location: "Your Location",
+      offerExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() // 7 days from now
+    };
+
+    document.getElementById('csvFile').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            const data = results.data;
+            renderTable(data);
+          }
+        });
+      }
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    callButton.addEventListener('click', () => {
+      const phoneNumber = modalContact.textContent.trim();
+      if (phoneNumber) {
+        const cleanNumber = phoneNumber.replace(/\D/g, '');
+        window.open(`tel:${cleanNumber}`);
+      } else {
+        alert('No phone number available for this contact');
+      }
+    });
+
+    smsButton.addEventListener('click', () => {
+      const phoneNumber = modalContact.textContent.trim();
+      const leadName = modalName.textContent.trim();
+      
+      if (phoneNumber) {
+        const cleanNumber = phoneNumber.replace(/\D/g, '');
+        const message = `Hi Ma'am ${leadName}! 😊 This is ${currentUser.name} from USANA.
+
+Great news — you've been selected for a FREE Celavive skincare experience!
+
+Are you near ${currentUser.location}? We'd love to pamper you! 🎉
+
+Just reply to book your slot — you can claim this offer until ${currentUser.offerExpiry}.
+Let us know what time works best for you, and we'll handle the rest!`;
+        
+        window.open(`sms:${cleanNumber}?body=${encodeURIComponent(message)}`);
+      } else {
+        alert('No phone number available for this contact');
+      }
+    });
+
+    secondSmsButton.addEventListener('click', () => {
+      const phoneNumber = modalContact.textContent.trim();
+      const leadName = modalName.textContent.trim();
+      
+      if (phoneNumber) {
+        const cleanNumber = phoneNumber.replace(/\D/g, '');
+        const message = `Hi Ma'am ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
+
+We still have slots available this week at ${currentUser.location}! Would you like to book your session on [specific day] at [specific time]?
+
+This exclusive offer is only available until ${currentUser.offerExpiry}. Let me know if this works for you or if you'd prefer another time. Can't wait to pamper you! 💆‍♀️✨`;
+        
+        window.open(`sms:${cleanNumber}?body=${encodeURIComponent(message)}`);
+      } else {
+        alert('No phone number available for this contact');
+      }
+    });
+
+    function renderTable(data) {
+      let html = '<table class="min-w-full text-sm text-left text-gray-800">';
+      html += '<thead class="bg-blue-100 text-xs uppercase font-semibold text-gray-700">';
+      html += '<tr>';
+
+      const visibleHeaders = ["Name", "Age", "Address", "Occupation", "Event", "Lead Status", "Next Follow-Up", "Notes"];
+
+      visibleHeaders.forEach(header => {
+        html += `<th class="px-4 py-2 border">${header}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      data.forEach((row, rowIndex) => {
+        html += '<tr class="bg-white border-b">';
+        visibleHeaders.forEach(header => {
+          if (header === "Name") {
+            html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" onclick="showModal('${escapeHtml(row["Name"])}', '${escapeHtml(row["Birthday"])}', '${escapeHtml(row["Contact"])}', '${escapeHtml(row["Email"])}')">${escapeHtml(row["Name"])}</td>`;
+          } else if (header === "Lead Status") {
+            html += `<td class="px-4 py-2 border">
+                        <select class="border p-1 rounded">
+                          <option>New</option>
+                          <option>Contacted</option>
+                          <option>Presented</option>
+                          <option>Followed Up</option>
+                          <option>Closed - Won</option>
+                          <option>Closed - Lost</option>
+                        </select>
+                      </td>`;
+          } else if (header === "Next Follow-Up") {
+            html += `<td class="px-4 py-2 border">
+                        <input type="date" class="border p-1 rounded" />
+                      </td>`;
+          } else if (header === "Notes") {
+            html += `<td class="px-4 py-2 border">
+                        <textarea rows="2" class="w-full border p-1 rounded"></textarea>
+                      </td>`;
+          } else {
+            html += `<td class="px-4 py-2 border">${escapeHtml(row[header] || "")}</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      tableContainer.innerHTML = html;
+    }
+
+    function showModal(name, birthday, contact, email) {
+      modalName.textContent = name;
+      modalBirthday.textContent = birthday;
+      modalContact.textContent = contact;
+      modalEmail.textContent = email;
+      modal.classList.remove('hidden');
+    }
+
+    // Helper function to escape HTML special characters
+    function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe
+        .toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Make functions available globally
+    window.showModal = showModal;
+    window.escapeHtml = escapeHtml;
+  </script>
+</body>
+</html>

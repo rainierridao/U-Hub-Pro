@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U Hub Pro - The Blue Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="Firebasenameandlogout.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<style>
+/* Remove all horizontal scrolling */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+#illnessDetails {
+overflow: visible !important;
+max-height: none !important;
+}
+
+
+/* Prevent any flex overflow from main-content */
+.main-content {
+    max-width: 100vw;
+    box-sizing: border-box;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Tables should be responsive within bounds */
+table {
+    width: 100%;
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+    .sidebar {
+        max-width: 80px;
+        overflow-x: hidden;
+    }
+
+    /* Prevent layout shifts due to large content */
+    .content, .dashboard {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+
+.download-btn {
+    background-color: #1a4aa8;
+    color: white;
+    border: none;
+    padding: 8px 12px;  /* Reduced padding */
+    border-radius: 0 5px 5px 0; /* Right side only */
+    cursor: pointer;
+    font-size: 14px;    /* Smaller font */
+    transition: all 0.3s ease;
+    margin: 10px 0;     /* Reduced margin */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;           /* Space between icon and text */
+}
+
+.download-btn:hover {
+    background-color: #3f86f9;
+    transform: scale(1.02); /* Subtle hover effect */
+}
+
+/* If you want an even more compact version */
+.download-btn.compact {
+    padding: 6px 10px;
+    font-size: 13px;
+    gap: 4px;
+}
+
+
+
+@media (max-width: 600px) {
+    .content {
+        margin-top: 60px;
+    }
+}
+
+</style>
+<body>
+
+<!-- Topbar Icons -->
+    <div class="topbar">
+    <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html" class="active"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <a href="ustorm_leads.html" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+    <i class="fas fa-sign-out-alt"></i>
+    </a>
+    </div>
+
+<div class="header">
+<div class="logo">
+<span style="margin-left: 0px;">Blue Guide</span>
+
+
+</div>
+
+
+</div>
+    
+    <div class="dashboard">
+    
+    <div class="sidebar">
+    <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+    <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+    <a href="blueguide.html" class="active"  title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+    <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+    <a href="ustorm_leads.html" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+    <!-- Logout Button in Sidebar -->
+    <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+    <i class="fas fa-sign-out-alt"></i>
+    </a>
+    </div>
+    
+    
+    <!-- Content -->
+    <div class="content">
+    <!-- Header with ID instead of class -->
+    <header id="mainHeader">
+    <p id="greeting" class="greeting-text">Hi, User</p>
+    </header>
+    <div class="main-content blue-guide" style="background-color: #fff; display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+    
+    <!-- Illness Dropdown -->
+    <div style="flex: 0 0 300px; margin-top: 0px;">
+    <div class="input-container" style="flex: 0 0 300px; margin-top: 0px;">
+    <label for="illnessSelect"><strong>Select an Illness:</strong></label>
+        <select id="illnessSelect" style="width: 100%; padding: 8px; font-size: 16px; height: 39px !important;    border-radius: 8px 0 0 8px !important;">
+        <option value="" selected disabled>Loading...</option>
+        </select>
+        <button id="saveResultsBtn" class="download-btn compact" title="Save as image"  style="margin: 0; height: 38px;">
+        <i class="fas fa-camera"></i>
+        </button>
+            </div>
+            
+            
+
+        
+        
+
+                <!-- Illness Title + Description RIGHT AFTER the dropdown -->
+        <div id="illnessIntro" style="margin-top: -10px; max-width: 600px;">
+        <h3 id="illnessTitle" style="color: #1a4aa8;"></h3>
+        <p id="illnessDescription" style="text-align: justify;"></p>
+        </div>
+                
+</div>
+            
+        <!-- Illness Title & Description -->
+        
+        
+        <!-- Illness Details -->
+        <div id="illnessDetails" class="illness-details">
+        
+        <!-- Optimal Dose Section -->
+        <div class="dose-section">
+        <h4 style="color: #1a4aa8; font-weight: 700;">Optimal Dose</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #3f86f9; color: #fff;">
+        <tr>
+        <th style="padding: 0.5rem; text-align: left; width: 35%;">Product</th>
+        <th style="padding: 0.5rem; text-align: center;">Breakfast</th>
+        <th style="padding: 0.5rem; text-align: center;">Lunch</th>
+        <th style="padding: 0.5rem; text-align: center;">Dinner</th>
+        </tr>
+        </thead>
+        <tbody id="optimalDoseTableBody" style="background-color: #f9f9f9;">
+        <!-- Dynamic rows go here -->
+        </tbody>
+        </table>
+        </div>
+        
+        <!-- Minimal Dose Section -->
+        <div class="dose-section" style="margin-top: 2rem;">
+        <h4 style="color: #1a4aa8; font-weight: 700;">Minimal Dose</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #3f86f9; color: #fff;">
+        <tr>
+        <th style="padding: 0.5rem; text-align: left; width: 35%;">Product</th>
+        <th style="padding: 0.5rem; text-align: center;">Breakfast</th>
+        <th style="padding: 0.5rem; text-align: center;">Lunch</th>
+        <th style="padding: 0.5rem; text-align: center;">Dinner</th>
+        </tr>
+        </thead>
+        <tbody id="minimalDoseTableBody" style="background-color: #f9f9f9;">
+        <!-- Dynamic rows go here -->
+        </tbody>
+        </table>
+        </div>
+        
+        </div>
+
+        
+        
+        <!-- Loader -->
+        <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        </div>
+
+
+        <script src="script.js" defer></script>
+        <script src="script_theblueguide.js" defer></script>
+
+<script>
+        document.getElementById('saveResultsBtn').addEventListener('click', async function () {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            
+            try {
+                // Create container
+                const captureContainer = document.createElement('div');
+                captureContainer.style.padding = '20px';
+                captureContainer.style.backgroundColor = 'white';
+                captureContainer.style.width = '600px';
+                captureContainer.style.boxSizing = 'border-box';
+                
+                // Clone elements
+                const title = document.getElementById('illnessTitle').cloneNode(true);
+                title.style.fontSize = '26px';
+                title.style.fontWeight = 'bold';
+                title.style.marginBottom = '20px';
+
+                const description = document.getElementById('illnessDescription').cloneNode(true);
+                const details = document.getElementById('illnessDetails').cloneNode(true);
+                
+                // Style content
+                const tables = details.querySelectorAll('table');
+                tables.forEach(table => {
+                    table.style.fontSize = '16px';
+                    
+                    // Get all headers to identify column indexes
+                    const headers = table.querySelectorAll('th');
+                    const breakfastIndex = [];
+                    headers.forEach((header, i) => {
+        const text = header.innerText.toLowerCase();
+        header.style.fontSize = '16px';
+        header.style.padding = '10px 12px';
+        
+        if (['breakfast', 'lunch', 'dinner'].some(word => text.includes(word))) {
+                        header.style.textAlign = 'center';
+                        breakfastIndex.push(i);
+                    } else {
+                        header.style.textAlign = 'left';
+                    }
+                });
+                
+                // Style all rows and align B/L/D columns to center
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach((cell, i) => {
+            cell.style.fontSize = '15px';
+            cell.style.padding = '8px 12px';
+            cell.style.textAlign = breakfastIndex.includes(i) ? 'center' : 'left';
+        });
+    });
+
+    // Optional: style section headers above table (e.g. h4)
+    const sectionHeader = table.previousElementSibling;
+    if (sectionHeader && sectionHeader.tagName === 'H4') {
+        sectionHeader.style.fontSize = '20px';
+        sectionHeader.style.marginBottom = '15px';
+    }
+
+    // Style the description
+    description.style.fontSize = '17px';
+    description.style.lineHeight = '1.5';
+    description.style.margin = '0 10px 45px 10px';
+    description.style.textAlign = 'justify';
+});
+
+                        
+                        // Apply fix to prevent cut-off
+                        details.style.overflow = 'visible';
+                        details.style.maxHeight = 'none';
+                        details.style.height = 'auto';
+                        
+                        // Add to container
+                        captureContainer.appendChild(title);
+                        captureContainer.appendChild(description);
+                        captureContainer.appendChild(details);
+                        
+                        // Temporarily add to DOM
+                        captureContainer.style.position = 'absolute';
+                        captureContainer.style.left = '-9999px';
+                        captureContainer.style.top = '0';
+                        captureContainer.style.overflow = 'visible';
+                        document.body.appendChild(captureContainer);
+                        
+                        // Wait for layout
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                            
+                            const containerWidth = captureContainer.scrollWidth;
+                            const containerHeight = captureContainer.scrollHeight;
+                            
+                            // Apply final dimensions
+                            captureContainer.style.height = containerHeight + 'px';
+                            
+                            // Render to canvas
+                            const canvas = await html2canvas(captureContainer, {
+                                scale: 2,
+                                width: containerWidth,
+                                height: containerHeight,
+                                scrollX: 0,
+                                scrollY: -window.scrollY,
+                                windowWidth: containerWidth,
+                                windowHeight: containerHeight,
+                                backgroundColor: '#ffffff',
+                                useCORS: true,
+                                allowTaint: true,
+                                letterRendering: true,
+                                onclone: function (clonedDoc) {
+                                    const clonedDetails = clonedDoc.getElementById('illnessDetails');
+                                    if (clonedDetails) {
+                                        clonedDetails.style.overflow = 'visible';
+                                        clonedDetails.style.maxHeight = 'none';
+                                        clonedDetails.style.height = 'auto';
+                                    }
+                                        
+                                        const clonedContainer = clonedDoc.body.querySelector('div');
+                                        if (clonedContainer) {
+                                            clonedContainer.style.overflow = 'visible';
+                                            clonedContainer.style.maxHeight = 'none';
+                                            clonedContainer.style.height = 'auto';
+                                        }
+                                            }
+                                            });
+                                            
+                                            // Convert to image and trigger download
+                                            canvas.toBlob(function (blob) {
+                                                const link = document.createElement('a');
+                                                const illnessName = document.getElementById('illnessTitle').innerText || 'BlueGuide';
+                                                link.download = `${illnessName.replace(/\s+/g, '-')}-Recommendations.png`;
+                                                link.href = URL.createObjectURL(blob);
+                                                
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                                URL.revokeObjectURL(link.href);
+                                                document.body.removeChild(captureContainer);
+                                            }, 'image/png', 1);
+                                            } catch (error) {
+                                                console.error('Error generating image:', error);
+                                                alert('Could not generate image. Please try again.');
+                                            } finally {
+                                                loader.style.display = 'none';
+                                            }
+                                            });
+        </script>
+
+</body>
+</html>
+            

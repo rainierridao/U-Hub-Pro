@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="apple-mobile-web-app-title" content="U Hub Pro">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>U Hub Pro - UStorm Leads Flow</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="styles.css">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<style>
+/* Remove all horizontal scrolling */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Prevent any flex overflow from main-content */
+.main-content {
+  max-width: 100vw;
+  box-sizing: border-box;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar {
+  max-width: 80px;
+  overflow-x: hidden;
+}
+
+.content {
+  max-width: auto;
+  margin: auto;
+}
+
+/* Style for the copy button */
+  #copySummaryBtn {
+  margin-top: 0.5rem;
+  padding: 0.25rem;
+  color: #6b7280; /* gray-500 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  left:-261px;
+  top:-10px;
+  }
+  
+  /* Hover effect */
+  #copySummaryBtn:hover {
+  color: #374151; /* gray-700 */
+  }
+  
+  /* Tooltip */
+  #copySummaryBtn::after {
+  content: "Copy Summary";
+  position: absolute;
+  bottom: 20%;
+  left: 250%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.5rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  }
+  
+  #copySummaryBtn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  }
+  
+  /* Icon styling */
+  #copySummaryBtn i {
+  font-size: 1rem;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  }
+
+
+@media (max-width: 600px) {
+  .content {
+    margin-top: 60px;
+  }
+}
+
+/* Modal Styles */
+#leadModal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+z-index: 1000;
+justify-content: center;
+align-items: center;
+opacity: 0;
+transition: opacity 0.3s ease;
+}
+
+#leadModal.show {
+opacity: 1;
+}
+
+#leadModal > div {
+background-color: white;
+padding: 20px;
+border-radius: 8px;
+max-width: 500px;
+width: 90%;
+max-height: 90vh;
+overflow-y: auto;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+position: relative;
+}
+
+.settings-bar {
+  background-color: #f8fafc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.settings-bar h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.settings-bar .grid {
+  gap: 8px;
+}
+
+.settings-bar label {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #64748b;
+}
+
+.settings-bar input {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+  height: 36px;
+}
+
+.settings-bar button {
+  height: 36px;
+  font-size: 0.9rem;
+  padding: 0 12px;
+}
+
+
+
+/* Compact Modal */
+#leadModal > div {
+max-width: 420px;
+padding: 16px;
+width: 95%;
+}
+
+#leadModal h2 {
+font-size: 1.1rem;
+margin-bottom: 12px;
+padding-right: 30px;
+}
+
+#leadModal p {
+font-size: 0.9rem;
+margin-bottom: 8px;
+display: flex;
+}
+
+#leadModal p strong {
+width: 80px;
+flex-shrink: 0;
+}
+
+#closeModal {
+position: absolute;
+top: 8px;
+right: 8px;
+background: transparent;
+border: none;
+font-size: 1.2rem;
+cursor: pointer;
+width: 32px;
+height: 32px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 50%;
+transition: background-color 0.2s;
+}
+
+#closeModal:hover {
+background-color: rgba(0, 0, 0, 0.05);
+}
+
+.modal-section {
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.modal-section h3 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.modal-section .grid {
+  gap: 8px;
+}
+
+.modal-section label {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.modal-section input {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+  height: 36px;
+}
+
+//* Modal Actions - Force single row layout */
+.modal-actions {
+  display: flex;
+  flex-wrap: nowrap; /* Prevent wrapping to new line */
+  gap: 0.5rem; /* 8px spacing between buttons */
+  width: 100%;
+  margin-top: 16px;
+}
+
+.modal-actions .action-btn {
+  flex: 1 1 0; /* Grow and shrink equally, starting from 0 width */
+  min-width: 0; /* Allow buttons to shrink below content width */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis if text overflows */
+    padding: 0.5rem 0.75rem; /* Consistent padding */
+    text-align: center; /* Center button text */
+    color: white;
+    transition: all 0.2s ease;
+    }
+
+/* Table Container */
+#tableContainer {
+padding: 12px !important;
+}
+
+/* Make file input look consistent with other inputs */
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+input[type="file"]::before {
+  content: 'Upload CSV';
+  display: inline-block;
+  color: #4b5563;
+  font-size: 0.75rem;
+}
+input[type="file"]:hover::before {
+  color: #1e40af;
+}
+    
+    
+    #appointmentForm {
+    margin-bottom: 1rem;
+    }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Prevent zooming on mobile */
+  html {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  
+  #copySummaryBtn {
+  left:-220px;
+}
+  /* Adjust layout for smaller screens */
+    .content {
+      max-width: 390px;
+      padding: 0 8px;
+      margin-top: 80px;
+    }
+    
+    /* Make settings bar stack vertically */
+    .settings-bar > div {
+      flex-direction: column;
+    }
+    
+    .settings-bar > div > div {
+      width: 100% !important;
+      margin-bottom: 8px;
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+  
+    
+    /* Adjust table container for scrolling */
+      #tableContainer {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      display: block;
+      padding: 8px !important;
+      }
+      
+      /* Make table scroll horizontally */
+      #tableContainer table {
+      min-width: 700px;
+      width: 100%;
+      margin: 0;
+      }
+      
+      /* Adjust table cells */
+      #tableContainer th, 
+      #tableContainer td {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      }
+      
+      /* Modal adjustments */
+      #leadModal > div {
+      width: 95%;
+      max-width: 95%;
+      padding: 12px;
+      }
+      
+      /* Stack modal action buttons */
+      .modal-actions {
+        flex-direction: column;
+        overflow-x: auto; /* Enable horizontal scrolling if needed */
+          padding-bottom: 4px; /* Space for scrollbar */
+      }
+      
+      .modal-actions button {
+        width: 100%;
+        margin-bottom: 6px;
+      }
+      
+      /* Adjust form elements in modal */
+      .modal-section .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      /* Greeting text */
+      .greeting-text {
+        font-size: 0.9rem;
+      }
+      
+      /* Adjust action buttons on mobile */
+      .action-btn {
+        min-width: auto;
+        width: 100%;
+        justify-content: flex-start;
+        padding: 10px 12px;
+      }
+      }
+      
+      /* Prevent textarea zoom on iOS */
+      textarea, input, select {
+        font-size: 16px !important;
+      }
+        
+        /* Disable double-tap zoom */
+        * {
+          touch-action: manipulation;
+        }
+        
+        
+        
+        .modal-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        .modal-content {
+          background-color: white;
+          padding: 20px;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 500px;
+          position: relative;
+        }
+        
+        .modal-close {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+        }
+        
+        
+        #modalAddress {
+        word-break: break-word;
+        max-height: 100px;
+        overflow-y: auto;
+        display: inline-block;
+        text-transform: capitalize; /* This provides a fallback */
+        }
+
+        
+        /* Notification styles */
+        .notification-item {
+          padding: 12px 16px;
+          border-bottom: 1px solid #e5e7eb;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          text-align: left; /* Ensure text is left-aligned */
+        }
+        
+        .notification-item:hover {
+          background-color: #f0f4f8;
+        }
+        
+        .notification-item.unread {
+          background-color: #f8fafc;
+        }
+        
+        .notification-item.unread:hover {
+          background-color: #ebf5ff;
+        }
+        
+        .notification-item h3 {
+          font-weight: 600;
+          color: #1e40af;
+          margin-bottom: 4px;
+        }
+        
+        .notification-item p {
+          margin: 0;
+          color: #4b5563;
+        }
+        
+        .notification-time {
+          font-size: 0.75rem;
+          color: #6b7280;
+          margin-top: 4px;
+        }
+        
+        .notification-detail {
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px dashed #e5e7eb;
+        }
+
+        /* FORM styling */
+        #modalFormDisplay {
+        white-space: pre-wrap;
+        word-break: break-word;
+        display: inline-block;
+        margin-top: 4px;
+        }
+        
+        #formTextArea {
+        min-height: 100px;
+        font-size: 14px;
+        }
+
+        </style>
+        <body>
+        
+        <!-- Your existing HTML structure remains unchanged -->
+        <div class="topbar">
+        <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+        <a href="productcomputer.html"  title="Product Calculator"><i class="fas fa-calculator"></i></a>
+        <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+        <a href="product_inv.html"  title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+        <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+        <a id="topbarLogoutBtn" class="sidebar-logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        </a>
+        </div>
+        
+        <div class="header">
+        <div class="logo">
+        <span style="margin-left: 0px;">Storm Leads</span>
+        </div>
+        </div>
+        
+        <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+        <a href="dashboard.html" title="BC Tracker"><i class="fas fa-sitemap"></i></a>
+        <a href="productcomputer.html" title="Product Calculator"><i class="fas fa-calculator"></i></a>
+        <a href="blueguide.html" title="The Blue Guide"><i class="fas fa-stethoscope"></i></a>
+        <a href="product_inv.html" title="Inventory Tool"><i class="fas fa-chart-line"></i></a>
+        <a href="ustorm_leads.html" class="active" title="UStorm Leads Flow"><i class="fas fa-bolt"></i></a>
+        
+        <a id="sidebarLogoutBtn" class="sidebar-logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        </a>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+        <header id="mainHeader">
+        <p id="greeting" class="greeting-text">Hi, User</p>
+        
+        
+        <!-- Add this right after the greeting in your header -->
+        <div class="relative inline-block ml-4">
+        <button id="notificationBell" class="relative">
+        <i class="fas fa-bell text-gray-600 hover:text-blue-600"></i>
+        <span id="notificationCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+        </button>
+        </div>
+
+        </header>
+        
+        
+        
+        <!-- Notification Modal -->
+        <div id="notificationModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+        <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Follow-up Reminders</h2>
+        <div class="flex items-center">
+        <button id="notificationOptions" class="mr-2 text-gray-500 hover:text-gray-700" style="position: relative;
+  left: -3px;
+  top: -4px;">
+        <i class="fas fa-ellipsis-v"></i>
+        </button>
+        <button id="closeNotificationModal" class="modal-close">&times;</button>
+        </div>
+        </div>
+        
+        <!-- Options dropdown (hidden by default) -->
+        <div id="notificationOptionsMenu" class="absolute right-12 top-12 bg-white shadow-lg rounded-md py-1 z-10 hidden" style="min-width: 180px;">
+        <button id="markAllRead" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mark All as Read</button>
+        <button id="markAllUnread" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mark All as Unread</button>
+        </div>
+        
+        <div id="notificationList" class="max-h-96 overflow-y-auto">
+        <!-- Notifications will be loaded here -->
+        </div>
+        </div>
+        </div>
+        
+        <!-- Notification Detail Modal -->
+        <div id="notificationDetailModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+        <button id="closeNotificationDetailModal" class="modal-close">&times;</button>
+        <h2 id="detailModalTitle" class="text-lg font-semibold mb-2">Appointment Details</h2>
+        <div id="detailModalContent" class="mb-4">
+        <!-- Detailed content will be loaded here -->
+        </div>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+        <div class="flex">
+        <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-circle text-yellow-400"></i>
+        </div>
+        <div class="ml-3">
+        <p class="text-sm text-yellow-700">
+        Don't forget to follow-up before the appointment time to confirm and ensure the appointment isn't cancelled or ignored.
+        </p>
+        </div>
+        </div>
+        </div>
+        <div class="flex justify-center space-x-4 mt-4">
+        <button id="smsFromNotification" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <i class="fas fa-sms mr-2"></i>Send SMS
+        </button>
+        <button id="callFromNotification" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        <i class="fas fa-phone mr-2"></i>Call Now
+        </button>
+        </div>
+        </div>
+        </div>
+        
+        
+        
+        <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        </div>
+        
+        <div class="settings-bar">
+        <h3 class="text-sm font-medium mb-2">Current Week Settings</h3>
+        <div class="flex flex-col sm:flex-row gap-2 items-end">
+        <!-- CSV Upload -->
+        <div class="flex-1 min-w-[120px]">
+        <input type="file" id="csvFile" accept=".csv" class="w-full text-xs border rounded py-1 px-2">
+        </div>
+        
+        <!-- Claim Date -->
+        <div class="flex-1 min-w-[150px]">
+        <input type="date" id="settingsClaimDate" class="w-full text-xs border rounded py-1 px-2" style="width: 353px;">
+        </div>
+        
+        <!-- Location -->
+        <div class="flex-1 min-w-[150px]">
+        <input type="text" id="settingsLocation" placeholder="Default Location" class="w-full text-xs border rounded py-1 px-2">
+        </div>
+        
+        <!-- Save Button -->
+        <div class="flex-0">
+        <button onclick="saveSettings()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded hover:bg-blue-700 whitespace-nowrap">
+        Save Settings
+        </button>
+        </div>
+        </div>
+        </div>
+        
+        
+        <div class="max-w-7xl mx-auto">
+        
+        <div id="tableContainer" class="overflow-auto bg-white shadow rounded-lg"></div>
+        </div>
+        
+        <div id="leadModal">
+        <div>
+        <div class="flex justify-between items-start">
+        <h2 class="text-lg font-semibold">Lead Details</h2> 
+
+        <button id="copySummaryBtn">
+        <i class="fas fa-copy"></i>
+        </button>
+
+        <button id="closeModal" class="text-gray-500 hover:text-gray-700 rounded-full p-1">
+        <i class="fas fa-times"></i>
+        </button>
+        </div>
+        
+        <p><strong>Name:</strong> <span id="modalName" class="truncate"></span></p>
+        <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
+        <p><strong>Contact:</strong> <span id="modalContact"></span></p>
+        <p><strong>Email:</strong> <span id="modalEmail" class="truncate"></span></p>
+        <p><strong>Address:</strong> <span id="modalAddress"></span></p>
+        <p class="hidden"><strong>FORM:</strong> <span id="modalFormDisplay" class="hidden"></span></p>
+
+
+      
+        <button id="toggleFormBtn" class="action-btn bg-gray-500 hover:bg-gray-600 mt-2" style="margin-bottom: 10px; color:white;">
+        <i class="fas fa-edit"></i> Edit FORM
+        </button>
+        <div id="formInputContainer" class="hidden mt-2">
+        <textarea id="formTextArea" class="w-full border rounded p-2" 
+        placeholder="Family, Occupation, Recreation, Motivation details..."></textarea>
+        <div class="flex space-x-2 mt-2" style="margin-bottom:20px;">
+        <button id="saveFormBtn" class="action-btn bg-green-500 hover:bg-green-600 flex-1" style="color:white;">
+        <i class="fas fa-save"></i> Save
+        </button>
+        <button id="cancelFormBtn" class="action-btn bg-gray-500 hover:bg-gray-600 flex-1" style="color:white;">
+        <i class="fas fa-times"></i> Cancel
+        </button>
+        </div>
+        </div>
+        
+        <div id="appointmentForm" style="display: none;">
+        <h3 class="font-medium">Appointment</h3>
+        <div class="grid grid-cols-2 gap-4">
+        <div>
+        <label class="block text-xs">Date:</label>
+        <input type="date" id="appointmentDate" class="w-full border rounded">
+        </div>
+        <div>
+        <label class="block text-xs">Time:</label>
+        <input type="time" id="appointmentTime" class="w-full border rounded">
+        </div>
+        </div>
+        <div class="mt-2">
+        <label class="block text-xs">Location:</label>
+        <input type="text" id="customLocation" class="w-full border rounded">
+        </div>
+        <button id="confirmAppointmentBtn" class="mt-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 w-full">
+        Confirm Appointment
+        </button>
+        
+        <input type="hidden" id="isSecondAppointment" value="false">
+        </div>
+        
+        <div class="modal-actions" style="display: flex; flex-direction: row; gap: 8px; justify-content: space-between; width: 100%;">
+        <button id="callButton" class="action-btn bg-green-500 hover:bg-green-600" style="flex: 1;">
+        <i class="fas fa-phone"></i> Call
+        </button>
+        <button id="smsButton" class="action-btn bg-blue-500 hover:bg-blue-600" style="flex: 1;">
+        <i class="fas fa-sms"></i> SMS
+        </button>
+        <button id="secondSmsButton" class="action-btn bg-purple-500 hover:bg-purple-600" style="flex: 1;">
+        <i class="fas fa-sms"></i> Follow-up
+        </button>
+        <button id="setAppointmentBtn" class="action-btn bg-indigo-500 hover:bg-indigo-600" style="flex: 1;">
+        <i class="fas fa-calendar-plus"></i> Set Appointment
+        </button>
+        </div>
+        
+        <div id="appointmentStatus" class="text-xs mt-2"></div>
+        </div>
+        </div>
+        
+        </div>
+        </div>
+        
+        
+        <div id="appointmentModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:left;">
+        <button id="closeAppointmentModal" class="modal-close">&times;</button>
+        <h2>Appointment Details</h2>
+        
+        <div class="modal-body">
+        <p><strong>Date:</strong> <span id="appointmentModalDate"></span></p>
+        <p><strong>Time:</strong> <span id="appointmentModalTime"></span></p>
+        <p><strong>Location:</strong> <span id="appointmentModalLocation"></span></p>
+        <p><strong>Status:</strong> <span id="appointmentModalStatus"></span></p>
+        
+        <!-- Hidden until appointment time passes -->
+          <!-- Inside your appointment modal, replace the status update section with this: -->
+          <div id="statusUpdateSection" class="hidden mt-4 border-t pt-4">
+          <h3 class="font-medium mb-2">Update Outcome</h3>
+          
+          <!-- Sale/Enrolled Option -->
+          <div class="mb-3">
+          <button id="saleBtn" class="action-btn bg-green-500 w-full mb-2">
+          <i class="fas fa-check-circle"></i> Presented (Sale/Enrolled)
+          </button>
+          <div id="saleFollowupForm" class="hidden bg-green-50 p-3 rounded mt-2">
+          <div class="mb-2">
+          <label class="block text-sm mb-1">Enrollment Type:</label>
+          <select id="enrollmentType" class="w-full border rounded p-2">
+          <option value="PC">Preferred Customer</option>
+          <option value="Associate">Associate</option>
+          </select>
+          </div>
+          <textarea id="saleNotes" class="w-full border rounded p-2" placeholder="Products purchased, notes..."></textarea>
+          <button id="confirmSaleBtn" class="action-btn bg-green-600 mt-2 w-full">
+          Confirm Enrollment
+          </button>
+          </div>
+          </div>
+          
+          <!-- No Sale Option -->
+          <div class="mb-3">
+          <button id="noSaleBtn" class="action-btn bg-yellow-500 w-full mb-2">
+          <i class="fas fa-clock"></i> Presented (No Sale/Schedule Follow-up)
+          </button>
+          <div id="noSaleFollowupForm" class="hidden bg-yellow-50 p-3 rounded mt-2">
+          <button id="confirmNoSaleBtn" class="action-btn bg-yellow-600 mt-2 w-full">
+          Schedule Second Appointment
+          </button>
+          </div>
+          </div>
+          
+          <!-- No Show Option -->
+          <div>
+          <button id="noShowBtn" class="action-btn bg-red-500 w-full mb-2">
+          <i class="fas fa-calendar-times"></i> No Show
+          </button>
+          <div id="noShowFollowupForm" class="hidden bg-red-50 p-3 rounded mt-2">
+          <textarea id="noShowNotes" class="w-full border rounded p-2 mb-2" 
+          placeholder="Notes about the no show..."></textarea>
+          <button id="confirmNoShowBtn" class="action-btn bg-red-600 mt-2 w-full">
+          Confirm No Show
+          </button>
+          </div>
+          </div>
+
+          </div>
+          
+
+          <!-- Original buttons (hidden when appointment is in future) -->
+          <div id="originalActions" class="modal-actions" style="text-align:center;">
+          <button id="rescheduleBtn" class="action-btn bg-blue-500">
+          <i class="fas fa-calendar-edit"></i> Reschedule
+          </button>
+          <button id="cancelAppointmentBtn" class="action-btn bg-red-500">
+          <i class="fas fa-calendar-times"></i> Cancel
+          </button>
+          </div>
+          </div>
+          </div>
+          </div>        
+        
+        <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyC8Yn92BRWaUw6KElX5UIdIa4RjPdxYESg",
+          authDomain: "usana-bc-tracker-signup.firebaseapp.com",
+          projectId: "usana-bc-tracker-signup",
+          storageBucket: "usana-bc-tracker-signup.appspot.com",
+          messagingSenderId: "605379613292",
+          appId: "1:605379613292:web:b50b8d185c2d20db82fe49"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+          // Inside your auth state listener after collections are initialized
+          setupFormHandlers();
+        
+        // Current user data
+        let currentUser = {
+          uid: null,
+          fullname: "",
+          location: "",
+          phone: ""
+        };
+        
+        // Current appointment settings
+        let currentAppointmentSettings = {
+          claimDate: "",
+          location: ""
+        };
+        
+        // Current lead being viewed in modal
+        let currentLeadId = null;
+        
+        // Collection references (will be initialized after auth)
+        let leadsCollection;
+        let appointmentSettingsCollection;
+        let appointmentsCollection;
+        const usersCollection = db.collection("users");
+        
+        // DOM elements
+        const tableContainer = document.getElementById('tableContainer');
+        const modal = document.getElementById('leadModal');
+        const modalName = document.getElementById('modalName');
+        const modalBirthday = document.getElementById('modalBirthday');
+        const modalContact = document.getElementById('modalContact');
+        const modalEmail = document.getElementById('modalEmail');
+        const modalAddress = document.getElementById('modalAddress');
+        const closeModal = document.getElementById('closeModal');
+        const callButton = document.getElementById('callButton');
+        const smsButton = document.getElementById('smsButton');
+        const secondSmsButton = document.getElementById('secondSmsButton');
+        const setAppointmentBtn = document.getElementById('setAppointmentBtn');
+        
+        // Initialize auth state listener
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            currentUser.uid = user.uid;
+            
+            // Initialize collections with user-specific paths
+            leadsCollection = db.collection("users").doc(currentUser.uid).collection("leads");
+            appointmentSettingsCollection = db.collection("users").doc(currentUser.uid).collection("appointmentSettings");
+            appointmentsCollection = db.collection("users").doc(currentUser.uid).collection("appointments");
+            
+            // Get user data
+            const userDoc = await usersCollection.doc(user.uid).get();
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              currentUser.fullname = userData.fullname || "Your Name";
+              currentUser.location = userData.location || "Your Location";
+              currentUser.phone = userData.phone || "";
+              document.getElementById("greeting").innerText = `Hi, ${currentUser.fullname}!`;
+            }
+              
+              // Load settings and leads
+              await loadSettings();
+              await loadLeads();
+              await loadNotifications(); // Add this line
+              
+              // Hide loader after everything is loaded
+              document.getElementById("loader").classList.add("hidden");
+            } else {
+              console.warn("No user is logged in. Redirecting...");
+              window.location.href = "index.html";
+            }
+              });
+              
+              // Load settings from Firestore
+              async function loadSettings() {
+                try {
+                  const settingsDoc = await appointmentSettingsCollection.doc("current").get();
+                  if (settingsDoc.exists) {
+                    currentAppointmentSettings = settingsDoc.data();
+                    updateSettingsUI();
+                  } else {
+                    // Set default settings if none exist
+                      const defaultDate = new Date();
+                      defaultDate.setDate(defaultDate.getDate() + 7);
+                      currentAppointmentSettings = {
+                        claimDate: defaultDate.toISOString().split('T')[0],
+                        location: currentUser.location
+                      };
+                      await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
+                      updateSettingsUI();
+                      }
+                      } catch (error) {
+                        console.error("Error loading settings:", error);
+                      }
+                      }
+                      
+                      // Update settings UI
+                      function updateSettingsUI() {
+                        document.getElementById("settingsClaimDate").value = currentAppointmentSettings.claimDate;
+                        document.getElementById("settingsLocation").value = currentAppointmentSettings.location;
+                      }
+                      
+                      // Save settings
+                      async function saveSettings() {
+                        const newClaimDate = document.getElementById("settingsClaimDate").value;
+                        const newLocation = document.getElementById("settingsLocation").value;
+                        
+                        if (!newClaimDate || !newLocation) {
+                          alert("Please fill in all fields");
+                          return;
+                        }
+                          
+                          currentAppointmentSettings = {
+                            claimDate: newClaimDate,
+                            location: newLocation
+                          };
+                          
+                          try {
+                            await appointmentSettingsCollection.doc("current").set(currentAppointmentSettings);
+                            alert("Settings updated successfully!");
+                          } catch (error) {
+                            console.error("Error saving settings:", error);
+                            alert("Error saving settings. Check console for details.");
+                          }
+                          }
+                          
+                          // Load leads from Firestore
+                          async function loadLeads() {
+                            try {
+                              document.getElementById("loader").classList.remove("hidden");
+                              const leads = [];
+                              
+                              // Get leads first
+                              const leadsSnapshot = await leadsCollection.get();
+                              
+                              // Then get appointments and create a map by leadId
+                              const appointmentsSnapshot = await appointmentsCollection.get();
+                              const appointmentsMap = new Map();
+                              
+                              appointmentsSnapshot.forEach(doc => {
+                                const appointment = doc.data();
+                                if (appointment.leadId) {
+                                  appointmentsMap.set(appointment.leadId, appointment);
+                                }
+                                  });
+                                  
+                                  // Process each lead
+                                  leadsSnapshot.forEach(doc => {
+                                    const leadData = doc.data();
+                                    const appointmentData = appointmentsMap.get(doc.id);
+                                    
+                                    // Only merge specific appointment fields
+                                    if (appointmentData) {
+                                      leadData.status = appointmentData.status || leadData.status;
+                                      leadData.followUpDate = appointmentData.date || leadData.followUpDate;
+                                    }
+                                      
+                                      leads.push({
+                                        id: doc.id,
+                                        ...leadData
+                                      });
+                                      });
+                                      
+                                      renderTable(leads);
+                                      } catch (error) {
+                                        console.error("Error loading leads:", error);
+                                        alert("Error loading leads. Check console for details.");
+                                      } finally {
+                                        document.getElementById("loader").classList.add("hidden");
+                                      }
+                                      }
+
+                          
+
+                          // Save CSV data to Firestore
+                          async function saveLeadsToDB(leadsData) {
+                            try {
+                              document.getElementById("loader").classList.remove("hidden");
+                              const batch = db.batch();
+                              
+                              leadsData.forEach(lead => {
+                                const leadRef = leadsCollection.doc(); // Auto-generated ID
+                                batch.set(leadRef, {
+                                  ...lead,
+                                  userId: currentUser.uid,
+                                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                  status: "New",
+                                  lastContacted: null,
+                                  notes: "",
+                                  followUpDate: null
+                                });
+                              });
+                              
+                              await batch.commit();
+                              loadLeads(); // Refresh the table
+                              alert("Leads imported successfully!");
+                            } catch (error) {
+                              console.error("Error saving leads:", error);
+                              alert("Error saving leads. Check console for details.");
+                            } finally {
+                              document.getElementById("loader").classList.add("hidden");
+                            }
+                          }
+                          
+                          // Update the CSV import handler
+                          document.getElementById('csvFile').addEventListener('change', function (e) {
+                            const file = e.target.files[0];
+                            if (file) {
+                              Papa.parse(file, {
+                                header: true,
+                                skipEmptyLines: true,
+                                complete: async function (results) {
+                                  if (results.data.length > 0) {
+                                    await saveLeadsToDB(results.data);
+                                  } else {
+                                    alert("No valid data found in CSV file");
+                                  }
+                                    },
+                                    error: function(error) {
+                                      console.error("CSV parsing error:", error);
+                                      alert("Error parsing CSV file. Please check the format.");
+                                    }
+                                    });
+                                    }
+                                    });
+                                    
+                                    // Enhanced SMS functions
+                                    smsButton.addEventListener('click', () => {
+                                      const phoneNumber = modalContact.textContent.trim();
+                                      const leadName = modalName.textContent.trim();
+                                      
+                                      if (phoneNumber) {
+                                        const formattedDate = formatDate(new Date(currentAppointmentSettings.claimDate));
+                                        const message = `Hi ${leadName}! 😊 This is ${currentUser.fullname} from USANA.
+
+Great news — you've been selected for a FREE Celavive skincare experience!
+
+Are you near ${currentAppointmentSettings.location}? We'd love to pamper you! 🎉
+
+Just reply YES to book your slot — you can claim this offer until ${formattedDate}.
+Let us know what time works best for you!`;
+            
+            // Save SMS sent timestamp
+            leadsCollection.doc(currentLeadId).update({
+                lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+                status: "Contacted"
+            }).then(() => {
+                loadLeads(); // Refresh the table
+            });
+            
+            window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+        } else {
+            alert('No phone number available for this contact');
+        }
+    });
+
+    secondSmsButton.addEventListener('click', () => {
+        const phoneNumber = modalContact.textContent.trim();
+        const leadName = modalName.textContent.trim();
+        
+        if (phoneNumber) {
+            const formattedDate = formatDate(new Date(currentAppointmentSettings.claimDate));
+            const message = `Hi ${leadName}! 😊 Just following up on my previous message about your FREE Celavive skincare experience.
+
+We still have slots available this week at ${currentAppointmentSettings.location}! Would you like to book your session?
+
+This exclusive offer is only available until ${formattedDate}. Let me know if you're interested. Can't wait to pamper you! 💆‍♀️✨`;
+            
+            // Save SMS sent timestamp
+            leadsCollection.doc(currentLeadId).update({
+                lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+                status: "Followed Up"
+            }).then(() => {
+                loadLeads(); // Refresh the table
+            });
+            
+            window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+        } else {
+            alert('No phone number available for this contact');
+        }
+    });
+
+  // Update the appointment confirmation button
+document.getElementById('confirmAppointmentBtn').addEventListener('click', async function() {
+  const date = document.getElementById('appointmentDate').value;
+  const time = document.getElementById('appointmentTime').value;
+  const customLocation = document.getElementById('customLocation').value || currentAppointmentSettings.location;
+  const isSecondAppointment = document.getElementById('isSecondAppointment').value === "true";
+  
+  if (!date || !time) {
+    alert('Please select both date and time');
+    return;
+  }
+  
+  const appointmentDateTime = new Date(`${date}T${time}`);
+  
+  try {
+    document.getElementById("loader").classList.remove("hidden");
+    
+    // Determine status based on the flag
+    const status = isSecondAppointment ? "Second Appointment Scheduled" : "Scheduled";
+    
+    // Save appointment
+    await appointmentsCollection.doc(currentLeadId).set({
+      leadId: currentLeadId,
+      userId: currentUser.uid,
+      date: appointmentDateTime,
+      location: customLocation,
+      status: status,
+      leadName: modalName.textContent,
+      leadPhone: modalContact.textContent,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      isSecondAppointment: isSecondAppointment
+    });
+    
+    // Update lead status
+    await leadsCollection.doc(currentLeadId).update({
+      status: isSecondAppointment ? "Second Appointment Set" : "Appointment Set",
+      lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+      followUpDate: appointmentDateTime
+    });
+    
+    // Reset the flag
+    document.getElementById('isSecondAppointment').value = "false";
+    
+    // Clear the form
+    clearAppointmentForm();
+    
+    // Close the modal
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+    
+    // Force refresh the entire table
+    await loadLeads(); // This will refresh the table
+    
+    // Show success message
+    alert('Appointment scheduled successfully!');
+    
+  } catch (error) {
+    console.error("Error setting appointment:", error);
+    alert("Error setting appointment. Please try again.");
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
+  }
+});
+
+
+function clearAppointmentForm() {
+  document.getElementById('appointmentDate').value = '';
+  document.getElementById('appointmentTime').value = '';
+  document.getElementById('customLocation').value = '';
+  document.getElementById('isSecondAppointment').value = "false";
+}
+
+
+
+    // Schedule reminders
+    function scheduleReminders(leadId, appointmentDate, location) {
+        console.log(`Scheduled reminders for appointment ${leadId} on ${appointmentDate} at ${location}`);
+    }
+
+    // Render table with leads data
+  // Render table with leads data
+function renderTable(data) {
+  if (data.length === 0) {
+    tableContainer.innerHTML = '<p class="p-4 text-center text-gray-500">No leads found. Import a CSV file to get started.</p>';
+    return;
+  }
+
+  // Sort data alphabetically by Name
+  data.sort((a, b) => {
+    const nameA = (a.Name || '').toUpperCase(); // handle undefined names
+    const nameB = (b.Name || '').toUpperCase(); // handle undefined names
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+
+  let html = '<table class="min-w-full text-sm text-left text-gray-800">';
+  // Rest of your table generation code remains the same...
+  html += '<thead class="bg-blue-100 text-xs uppercase font-semibold text-gray-700">';
+  html += '<tr>';
+
+  const visibleHeaders = ["Name", "Age", "Occupation", "Status", "Last Contacted", "Follow Up", "Actions"];
+
+  visibleHeaders.forEach(header => {
+    html += `<th class="px-4 py-2 border">${header}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  data.forEach((row) => {
+    html += '<tr class="bg-white border-b">';
+    
+    // Name
+  html += `<td class="px-4 py-2 border text-blue-600 cursor-pointer" 
+  onclick="showModal('${escapeHtml(row.Name || "")}', '${escapeHtml(row.Birthday || "")}', 
+  '${escapeHtml(row.Contact || "")}', '${escapeHtml(row.Email || "")}', 
+  '${escapeHtml(row.Address || "")}', '${row.id}')">
+  ${toProperCase(escapeHtml(row.Name || ""))}
+  </td>`;
+    
+    // Rest of your row generation code remains the same...
+    // Age
+    html += `<td class="px-4 py-2 border">${escapeHtml(row.Age || "")}</td>`;
+    
+    // Occupation
+    html += `<td class="px-4 py-2 border">${escapeHtml(row.Occupation || "")}</td>`;
+    
+// Status
+html += `<td class="px-4 py-2 border">${getStatusHTML(row)}</td>`;
+
+
+    
+    // Last Contacted
+    html += `<td class="px-4 py-2 border">${formatFirestoreDate(row.lastContacted)}</td>`;
+    
+    // Follow Up
+    html += `<td class="px-4 py-2 border">
+          <input type="date" class="border p-1 rounded followup-date" 
+              data-lead-id="${row.id}" 
+              value="${row.followUpDate ? new Date(row.followUpDate.seconds * 1000).toISOString().split('T')[0] : ''}"
+              onchange="updateFollowUpDate('${row.id}', this.value)">
+        </td>`;
+    
+    // Actions
+    html += `<td class="px-4 py-2 border">
+          <button class="text-red-500 hover:text-red-700" onclick="deleteLead('${row.id}')">
+            <i style="position:relative; left:23px;" class="fas fa-trash"></i>
+          </button>
+        </td>`;
+    
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  tableContainer.innerHTML = html;
+}
+
+
+function getStatusHTML(row) {
+  let statusClass = "text-gray-600";
+  let statusText = escapeHtml(row.status || "Not Set");
+  
+  // Handle different status cases
+  if (row.status === "Appointment Set") {
+    statusClass = isAppointmentPassed(row.followUpDate) 
+      ? "text-purple-600" 
+      : "text-blue-600";
+    statusText = "First Appointment"; // More consistent naming
+  } 
+  else if (row.status === "Second Appointment Set") {
+    statusClass = isAppointmentPassed(row.followUpDate)
+      ? "text-purple-800"
+      : "text-blue-800";
+    statusText = "Second Appointment";
+  }
+  else if (row.status && row.status.startsWith('Enrolled')) {
+    statusClass = "text-green-600";
+  } 
+  else if (row.status === "Presented with no sale (Set for Second Appointment)") {
+    statusClass = "text-yellow-600";
+    statusText = "Needs 2nd Appt"; // Shorter for display
+  } 
+  else if (row.status === "No Show (For Reschedule)") {
+    statusClass = "text-red-600";
+    statusText = "No Show"; // Shorter for display
+  }
+  else if (row.status === "Presented (To set second appointment)") {
+    statusClass = "text-yellow-700";
+    statusText = "Pending 2nd Appt";
+  }
+
+  // Make ALL status cells clickable to show appointment modal
+  return `<span class="${statusClass} cursor-pointer underline font-medium" 
+            onclick="showAppointmentModal('${row.id}')">
+            ${statusText}
+          </span>`;
+}
+
+
+function isAppointmentPassed(followUpDate) {
+  if (!followUpDate) return false;
+  const appointmentDate = new Date(followUpDate.seconds * 1000);
+  return appointmentDate <= new Date();
+}
+
+
+          function updateFormDisplay(formData) {
+            const formDisplay = document.getElementById('modalFormDisplay');
+            const formInputContainer = document.getElementById('formInputContainer');
+            const formParagraph = formDisplay.parentElement; // Get the parent <p> element
+            
+            if (formData) {
+              formDisplay.textContent = formData;
+              formDisplay.classList.remove('hidden');
+              formParagraph.classList.remove('hidden');
+              document.getElementById('toggleFormBtn').innerHTML = '<i class="fas fa-edit"></i> Edit FORM';
+            } else {
+              formDisplay.classList.add('hidden');
+              formParagraph.classList.add('hidden');
+              document.getElementById('toggleFormBtn').innerHTML = '<i class="fas fa-plus"></i> Add FORM';
+            }
+            
+            formInputContainer.classList.add('hidden');
+          }
+
+
+
+function setupFormHandlers() {
+  // Toggle FORM editor
+  document.getElementById('toggleFormBtn').addEventListener('click', async () => {
+    const formInputContainer = document.getElementById('formInputContainer');
+    const formDisplay = document.getElementById('modalFormDisplay');
+    
+    if (formInputContainer.classList.contains('hidden')) {
+      // Get current FORM data if it exists
+      const leadDoc = await leadsCollection.doc(currentLeadId).get();
+      const formData = leadDoc.data().FORM || '';
+      document.getElementById('formTextArea').value = formData;
+      
+      formInputContainer.classList.remove('hidden');
+      formDisplay.classList.add('hidden');
+    } else {
+      formInputContainer.classList.add('hidden');
+      if (formDisplay.textContent.trim()) {
+        formDisplay.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Save FORM
+  document.getElementById('saveFormBtn').addEventListener('click', async () => {
+    const formText = document.getElementById('formTextArea').value.trim();
+    
+    try {
+      await leadsCollection.doc(currentLeadId).update({
+        FORM: formText,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      updateFormDisplay(formText);
+      document.getElementById('formInputContainer').classList.add('hidden');
+      loadLeads(); // Refresh the table if needed
+    } catch (error) {
+      console.error("Error saving FORM:", error);
+      alert("Error saving FORM details");
+    }
+  });
+
+  // Cancel FORM editing
+  document.getElementById('cancelFormBtn').addEventListener('click', () => {
+    document.getElementById('formInputContainer').classList.add('hidden');
+    const formDisplay = document.getElementById('modalFormDisplay');
+    if (formDisplay.textContent.trim()) {
+      formDisplay.classList.remove('hidden');
+    }
+  });
+}
+
+
+          // Add this to your setupFormHandlers function or wherever you set up event listeners
+          document.getElementById('copySummaryBtn').addEventListener('click', async () => {
+            try {
+              // Get all the data we need
+              const name = document.getElementById('modalName').textContent;
+              const birthday = document.getElementById('modalBirthday').textContent; // Format: YYYY-MM-DD
+              const address = document.getElementById('modalAddress').textContent;
+              const formDisplay = document.getElementById('modalFormDisplay');
+              
+              // Calculate age from birthday (YYYY-MM-DD format)
+              let age = 'N/A';
+              if (birthday) {
+                const birthDate = new Date(birthday);
+                if (!isNaN(birthDate.getTime())) {
+                  const today = new Date();
+                  let ageCalculated = today.getFullYear() - birthDate.getFullYear();
+                  const monthDiff = today.getMonth() - birthDate.getMonth();
+                  
+                  // Adjust age if birthday hasn't occurred yet this year
+                  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    ageCalculated--;
+                  }
+                  age = ageCalculated;
+                }
+              }
+              
+              // Check if FORM section is visible
+              const formText = formDisplay.classList.contains('hidden') 
+              ? '' 
+              : `\nFORM:\n${formDisplay.textContent}`;
+              
+              // Create the summary text
+              const summaryText = `Prospect Information:
+Name: ${name}
+Age: ${age}
+Address: ${address}${formText}`;
+              
+              // Copy to clipboard
+              await navigator.clipboard.writeText(summaryText);
+              
+              // Show feedback with offset
+              const copyBtn = document.getElementById('copySummaryBtn');
+              const originalContent = copyBtn.innerHTML;
+              const originalWidth = copyBtn.offsetWidth;
+              
+              // Create feedback element
+              const feedback = document.createElement('span');
+              feedback.className = 'copied-feedback';
+              feedback.innerHTML = '<i class="fas fa-check"></i> Copied!';
+              feedback.style.position = 'absolute';
+              feedback.style.left = '-10px'; // 50px to the right
+              feedback.style.whiteSpace = 'nowrap';
+              
+              // Clear button and add feedback
+              copyBtn.innerHTML = '';
+              copyBtn.style.position = 'relative'; // Needed for absolute positioning of child
+              copyBtn.appendChild(feedback);
+              
+              // Restore after 2 seconds
+              setTimeout(() => {
+                copyBtn.innerHTML = originalContent;
+                // Reset position
+              }, 1000);
+              
+            } catch (error) {
+              console.error('Failed to copy summary:', error);
+            }
+          });
+
+async function markAsPresented(leadId) {
+  try {
+    // Update lead status to "Presented"
+    await leadsCollection.doc(leadId).update({
+      status: "Presented",
+      lastContacted: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Also update the corresponding appointment if exists
+    const appointmentDoc = await appointmentsCollection.doc(leadId).get();
+    if (appointmentDoc.exists) {
+      await appointmentsCollection.doc(leadId).update({
+        status: "Presented",
+        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    
+    loadLeads(); // Refresh the table
+    showAppointmentModal(leadId); // Show the appointment modal with status update options
+  } catch (error) {
+    console.error("Error marking as presented:", error);
+    alert("Error updating status. Please try again.");
+  }
+}
+
+
+    // Update lead status
+    async function updateStatus(leadId, status) {
+        try {
+            await leadsCollection.doc(leadId).update({
+                status: status,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Error updating status. Check console for details.");
+            loadLeads(); // Refresh to revert changes
+        }
+    }
+
+    // Update follow-up date
+    async function updateFollowUpDate(leadId, date) {
+        try {
+            await leadsCollection.doc(leadId).update({
+                followUpDate: date ? firebase.firestore.Timestamp.fromDate(new Date(date)) : null,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error updating follow-up date:", error);
+            alert("Error updating follow-up date. Check console for details.");
+            loadLeads(); // Refresh to revert changes
+        }
+    }
+
+    // Update notes
+    async function updateNotes(leadId, notes) {
+        try {
+            await leadsCollection.doc(leadId).update({
+                notes: notes,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error updating notes:", error);
+            alert("Error updating notes. Check console for details.");
+        }
+    }
+
+    // Delete lead
+    async function deleteLead(leadId) {
+        if (confirm("Are you sure you want to delete this lead?")) {
+            try {
+                document.getElementById("loader").classList.remove("hidden");
+                await leadsCollection.doc(leadId).delete();
+                loadLeads(); // Refresh the table
+            } catch (error) {
+                console.error("Error deleting lead:", error);
+                alert("Error deleting lead. Check console for details.");
+            } finally {
+                document.getElementById("loader").classList.add("hidden");
+            }
+        }
+    }
+
+  // Modify your showModal function:
+async function showModal(name, birthday, contact, email, address, leadId) {
+  currentLeadId = leadId;
+  modalName.textContent = toProperCase(name);
+  modalBirthday.textContent = birthday;
+  modalContact.textContent = formatPhoneNumber(contact);
+  modalEmail.textContent = email;
+  modalAddress.textContent = address ? toProperCase(address) : 'Not specified'; // Apply toProperCase here
+
+  
+  // Check for existing appointment
+  const appointmentDoc = await appointmentsCollection.doc(leadId).get();
+  
+  if (appointmentDoc.exists) {
+    const appointment = appointmentDoc.data();
+    const appointmentDate = appointment.date.toDate();
+    
+    document.getElementById('appointmentStatus').textContent = 
+      `✓ Appointment set for ${formatDateTime(appointmentDate)} at ${appointment.location}`;
+    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-green-600';
+    
+    document.getElementById('appointmentForm').style.display = 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-edit"></i> Reschedule';
+  } else {
+    // No appointment - show form
+    document.getElementById('appointmentForm').style.display = 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-plus"></i> Set Appointment';
+    document.getElementById('appointmentStatus').textContent = '';
+  }
+  
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+}
+async function showModal(name, birthday, contact, email, address, leadId, expandForm = false) {
+  currentLeadId = leadId;
+  modalName.textContent = toProperCase(name);
+  modalBirthday.textContent = birthday;
+  modalContact.textContent = formatPhoneNumber(contact);
+  modalEmail.textContent = email;
+  modalAddress.textContent = address ? toProperCase(address) : 'Not specified';
+
+  // Check for existing appointment
+  const appointmentDoc = await appointmentsCollection.doc(leadId).get();
+  // Get the FORM data if it exists
+  const leadDoc = await leadsCollection.doc(leadId).get();
+  const leadData = leadDoc.data();
+  
+  // Update the FORM display
+  updateFormDisplay(leadData.FORM);
+  
+  if (appointmentDoc.exists) {
+    const appointment = appointmentDoc.data();
+    const appointmentDate = appointment.date.toDate();
+    
+    document.getElementById('appointmentStatus').textContent = 
+      `✓ Appointment set for ${formatDateTime(appointmentDate)} at ${appointment.location}`;
+    document.getElementById('appointmentStatus').className = 'text-xs mt-2 text-green-600';
+    
+    // Only hide form if not explicitly told to expand it
+    document.getElementById('appointmentForm').style.display = expandForm ? 'block' : 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-edit"></i> Reschedule';
+  } else {
+    document.getElementById('appointmentForm').style.display = expandForm ? 'block' : 'none';
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-calendar-plus"></i> Set Appointment';
+    document.getElementById('appointmentStatus').textContent = '';
+  }
+  
+  // Style the button appropriately if form is expanded
+  if (expandForm) {
+    document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-times"></i> Cancel';
+    document.getElementById('setAppointmentBtn').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+    document.getElementById('setAppointmentBtn').classList.add('bg-gray-500', 'hover:bg-gray-600');
+  }
+  
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+}
+
+
+// Modify showAppointmentModal function
+async function showAppointmentModal(leadId) {
+  try {
+    document.getElementById("loader").classList.remove("hidden");
+    
+    // Get the most recent appointment for this lead
+    const appointmentQuery = await appointmentsCollection
+      .where('leadId', '==', leadId)
+      .orderBy('date', 'desc')
+      .limit(1)
+      .get();
+
+    if (!appointmentQuery.empty) {
+      const appointmentDoc = appointmentQuery.docs[0];
+      const appointment = appointmentDoc.data();
+      const appointmentDate = appointment.date.toDate();
+      const now = new Date();
+      
+      // Store both IDs in the modal's dataset
+      const modal = document.getElementById('appointmentModal');
+      modal.dataset.leadId = leadId;
+      modal.dataset.appointmentId = appointmentDoc.id;
+
+      // Display basic info
+      document.getElementById('appointmentModalDate').textContent = 
+        appointmentDate.toLocaleDateString();
+      document.getElementById('appointmentModalTime').textContent = 
+        appointmentDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      document.getElementById('appointmentModalLocation').textContent = 
+        appointment.location;
+      document.getElementById('appointmentModalStatus').textContent = 
+        appointment.status;
+      
+      // Show/hide sections based on status and time
+      const statusUpdateSection = document.getElementById('statusUpdateSection');
+      const originalActions = document.getElementById('originalActions');
+      
+    // In the "No Show" condition block:
+if (appointment.status === "No Show") {
+  // For "No Show" status, always show original actions (Reschedule/Cancel)
+  statusUpdateSection.classList.add('hidden');
+  originalActions.classList.remove('hidden');
+  
+  // Update the reschedule button to include a data attribute
+  document.getElementById('rescheduleBtn').dataset.isReschedule = "true";
+}
+
+      else if (appointmentDate <= now) {
+        // Appointment has passed - show outcome options
+        statusUpdateSection.classList.remove('hidden');
+        originalActions.classList.add('hidden');
+        
+        // Initialize outcome buttons
+        setupOutcomeButtons();
+      } else {
+        // Future appointment - show original buttons
+        statusUpdateSection.classList.add('hidden');
+        originalActions.classList.remove('hidden');
+      }
+      
+      // Show modal
+      document.getElementById('appointmentModal').style.display = 'flex';
+    } else {
+      alert('No appointment found for this lead');
+    }
+  } catch (error) {
+    console.error("Error loading appointment:", error);
+    alert("Error loading appointment details");
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
+  }
+}
+
+
+// Handle outcome selection
+// Handle outcome selection
+function setupOutcomeButtons() {
+  // Clear any existing event listeners to prevent duplicates
+  document.getElementById('confirmSaleBtn').replaceWith(document.getElementById('confirmSaleBtn').cloneNode(true));
+  document.getElementById('confirmNoSaleBtn').replaceWith(document.getElementById('confirmNoSaleBtn').cloneNode(true));
+  document.getElementById('confirmNoShowBtn').replaceWith(document.getElementById('confirmNoShowBtn').cloneNode(true));
+
+  // Sale/Enrolled flow
+  document.getElementById('saleBtn').addEventListener('click', () => {
+    document.getElementById('saleFollowupForm').classList.remove('hidden');
+    document.getElementById('noSaleFollowupForm').classList.add('hidden');
+    document.getElementById('noShowFollowupForm').classList.add('hidden');
+  });
+  
+  // No Sale flow
+  document.getElementById('noSaleBtn').addEventListener('click', () => {
+    document.getElementById('noSaleFollowupForm').classList.remove('hidden');
+    document.getElementById('saleFollowupForm').classList.add('hidden');
+    document.getElementById('noShowFollowupForm').classList.add('hidden');
+  });
+  
+  // No Show flow
+  document.getElementById('noShowBtn').addEventListener('click', () => {
+    document.getElementById('noShowFollowupForm').classList.remove('hidden');
+    document.getElementById('saleFollowupForm').classList.add('hidden');
+    document.getElementById('noSaleFollowupForm').classList.add('hidden');
+  });
+  
+  // Confirm Sale/Enrolled
+  document.getElementById('confirmSaleBtn').addEventListener('click', async () => {
+    const enrollmentType = document.getElementById('enrollmentType').value;
+    const notes = document.getElementById('saleNotes').value;
+    
+    if (!notes) {
+      alert('Please add notes about the sale/enrollment');
+      return;
+    }
+    
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      await updateAppointmentOutcome(
+        `Enrolled as ${enrollmentType === 'PC' ? 'Preferred Customer' : 'Associate'}`,
+        notes,
+        null,
+        enrollmentType
+      );
+      loadLeads(); // Refresh the table
+    } catch (error) {
+      console.error("Error confirming sale:", error);
+      alert("Error confirming sale. Please try again.");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
+  });
+  
+  // Confirm No Sale
+  document.getElementById('confirmNoSaleBtn').addEventListener('click', async function() {
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      
+      // Set the hidden flag to true
+      document.getElementById('isSecondAppointment').value = "true";
+      
+      // Get the modal reference
+      const modal = document.getElementById('appointmentModal');
+      const leadId = modal.dataset.leadId;
+      
+      // Close the appointment modal
+      document.getElementById('appointmentModal').style.display = 'none';
+      
+      // Get the lead data
+      const leadDoc = await leadsCollection.doc(leadId).get();
+      const lead = leadDoc.data();
+      
+      // Update the lead status first
+      await leadsCollection.doc(leadId).update({
+        status: "Presented (To set second appointment)",
+        lastContacted: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Show the lead modal with form expanded
+      await showModal(
+        lead.Name, 
+        lead.Birthday, 
+        lead.Contact, 
+        lead.Email, 
+        lead.Address, 
+        leadId
+      );
+      
+      // Expand the appointment form
+      document.getElementById('appointmentForm').style.display = 'block';
+      document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-times"></i> Cancel';
+      document.getElementById('setAppointmentBtn').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+      document.getElementById('setAppointmentBtn').classList.add('bg-gray-500', 'hover:bg-gray-600');
+      
+      loadLeads(); // Refresh the table
+    } catch (error) {
+      console.error("Error confirming no sale:", error);
+      alert("Error processing no sale. Please try again.");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
+  });
+
+  // Confirm No Show
+  document.getElementById('confirmNoShowBtn').addEventListener('click', async () => {
+    const notes = document.getElementById('noShowNotes').value || "No show - no reason given";
+    
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      
+      // Get the modal reference
+      const modal = document.getElementById('appointmentModal');
+      const leadId = modal.dataset.leadId;
+      const appointmentId = modal.dataset.appointmentId;
+
+      if (!leadId || !appointmentId) {
+        throw new Error('Missing lead or appointment reference');
+      }
+
+      // Update the documents
+      await leadsCollection.doc(leadId).update({
+        status: "No Show",
+        lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+        notes: notes,
+        followUpDate: null
+      });
+
+      await appointmentsCollection.doc(appointmentId).update({
+        status: "No Show",
+        outcomeNotes: notes,
+        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Close modals and refresh
+      document.getElementById('appointmentModal').style.display = 'none';
+      document.getElementById('noShowFollowupForm').classList.add('hidden');
+      loadLeads(); // Refresh the table
+      loadNotifications();
+    } catch (error) {
+      console.error("Error marking as No Show:", error);
+      alert("Error updating status. Please try again.");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
+  });
+}
+
+// Update Firestore with outcome
+async function updateAppointmentOutcome(outcome, notes, followupDate, enrollmentType = null) {
+  const modal = document.getElementById('appointmentModal');
+  const leadId = modal.dataset.leadId;
+  const appointmentId = modal.dataset.appointmentId;
+
+  if (!leadId || !appointmentId) {
+    alert('Error: Missing lead or appointment reference');
+    return;
+  }
+
+  try {
+    document.getElementById("loader").classList.remove("hidden");
+    
+    // 1. Update the LEAD document
+    const leadUpdate = {
+      status: outcome,
+      lastContacted: firebase.firestore.FieldValue.serverTimestamp(),
+      notes: notes
+    };
+    
+    if (followupDate) {
+      leadUpdate.followUpDate = firebase.firestore.Timestamp.fromDate(followupDate);
+    }
+
+    await leadsCollection.doc(leadId).update(leadUpdate);
+
+    // 2. Update the APPOINTMENT document
+    const appointmentUpdate = {
+      status: outcome,
+      outcomeNotes: notes,
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (enrollmentType) {
+      appointmentUpdate.enrollmentType = enrollmentType;
+    }
+
+    await appointmentsCollection.doc(appointmentId).update(appointmentUpdate);
+
+    // 3. Create new follow-up appointment if needed
+    if (followupDate) {
+      const leadDoc = await leadsCollection.doc(leadId).get();
+      const leadData = leadDoc.data();
+      
+      await appointmentsCollection.add({
+        leadId: leadId,
+        userId: currentUser.uid,
+        date: followupDate,
+        location: currentAppointmentSettings.location,
+        status: "Scheduled",
+        leadName: leadData.Name,
+        leadPhone: leadData.Contact,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        isFollowup: true,
+        previousAppointmentId: appointmentId,
+        previousOutcome: outcome
+      });
+    }
+
+    loadLeads(); // Refresh the table
+    loadNotifications();
+    document.getElementById('appointmentModal').style.display = 'none';
+  } catch (error) {
+    console.error("Error updating outcome:", error);
+    alert("Failed to update. Check console.");
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
+  }
+}
+
+  
+// Close appointment modal
+document.getElementById('closeAppointmentModal').addEventListener('click', () => {
+  document.getElementById('appointmentModal').style.display = 'none';
+});
+
+// Cancel appointment
+document.getElementById('cancelAppointmentBtn').addEventListener('click', async function() {
+  if (confirm("Are you sure you want to cancel this appointment?")) {
+    const modal = document.getElementById('appointmentModal');
+    const leadId = modal.dataset.leadId;
+    const appointmentId = modal.dataset.appointmentId;
+    
+    try {
+      document.getElementById("loader").classList.remove("hidden");
+      
+      // Update lead status
+      await leadsCollection.doc(leadId).update({
+        status: "Followed Up",
+        followUpDate: null
+      });
+      
+      // Delete appointment
+      await appointmentsCollection.doc(appointmentId).delete();
+      
+      // Refresh data
+      loadLeads();
+      loadNotifications();
+      document.getElementById('appointmentModal').style.display = 'none';
+      alert("Appointment cancelled successfully");
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      alert("Error cancelling appointment");
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
+  }
+});
+
+
+// Reschedule appointment
+document.getElementById('rescheduleBtn').addEventListener('click', async function() {
+  const leadId = document.getElementById('appointmentModal').dataset.leadId;
+  
+  // Close appointment modal
+  document.getElementById('appointmentModal').style.display = 'none';
+  
+  // Get lead data
+  const leadDoc = await leadsCollection.doc(leadId).get();
+  if (!leadDoc.exists) return;
+  
+  const lead = leadDoc.data();
+
+  // Clear the form inputs
+  clearAppointmentForm();
+
+  // Show lead modal with form already expanded
+  showModal(
+    lead.Name, 
+    lead.Birthday, 
+    lead.Contact, 
+    lead.Email, 
+    lead.Address, 
+    leadId,
+    true // This flag forces form expansion
+  );
+  
+  // Additional form setup
+  setupExpandedForm();
+});
+
+function setupExpandedForm() {
+  // Expand the form
+  const form = document.getElementById('appointmentForm');
+  form.style.display = 'block';
+  
+  // Update button appearance
+  const btn = document.getElementById('setAppointmentBtn');
+  btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+  btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+  btn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+  
+  // Only set default values if form is empty
+  if (!document.getElementById('appointmentDate').value) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('appointmentDate').value = tomorrow.toISOString().split('T')[0];
+    document.getElementById('appointmentTime').value = '10:00';
+    document.getElementById('customLocation').value = currentAppointmentSettings.location;
+  }
+  
+  // Mark as reschedule
+  document.getElementById('isSecondAppointment').value = "true";
+}
+
+
+async function showModalFromAppointment(leadId) {
+  const leadDoc = await leadsCollection.doc(leadId).get();
+  const lead = leadDoc.data();
+  
+  showModal(lead.Name, lead.Birthday, lead.Contact, lead.Email, lead.Address, leadId);
+  
+  // Open the appointment form
+  document.getElementById('appointmentForm').style.display = 'block';
+  document.getElementById('setAppointmentBtn').innerHTML = '<i class="fas fa-times"></i> Cancel';
+  document.getElementById('setAppointmentBtn').classList.remove('bg-blue-600');
+  document.getElementById('setAppointmentBtn').classList.add('bg-gray-500');
+}
+
+
+    // Format phone number
+    function formatPhoneNumber(phone) {
+        if (!phone) return '';
+        
+        // Remove all non-digit characters
+        let cleanNumber = phone.replace(/\D/g, '');
+        
+        // If number starts with 0, replace with +63
+        if (cleanNumber.startsWith('0')) {
+            cleanNumber = '+63' + cleanNumber.substring(1);
+        }
+        // If number starts with 63 but missing +, add it
+        else if (cleanNumber.startsWith('63')) {
+            cleanNumber = '+' + cleanNumber;
+        }
+        // If number doesn't start with +, add +63
+        else if (!cleanNumber.startsWith('+')) {
+            cleanNumber = '+63' + cleanNumber;
+        }
+        
+        return cleanNumber;
+    }
+
+    // Format Firestore timestamp
+    function formatFirestoreDate(timestamp) {
+        if (!timestamp) return '';
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString();
+    }
+
+    // Format date for display
+    function formatDate(date) {
+        return date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+    }
+
+    // Format date/time for display
+    function formatDateTime(date) {
+        return date.toLocaleString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // Helper function to escape HTML special characters
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Convert string to proper case
+    function toProperCase(str) {
+        if (!str) return '';
+        return str.toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+  // Close modal
+closeModal.addEventListener('click', () => {
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 300);
+});
+
+
+    // Call button
+    callButton.addEventListener('click', () => {
+        const phoneNumber = modalContact.textContent.trim();
+        if (phoneNumber) {
+            window.open(`tel:${phoneNumber}`);
+        } else {
+            alert('No phone number available for this contact');
+        }
+    });
+
+    // Handle logout
+    function handleLogout() {
+        auth.signOut()
+            .then(() => window.location.href = "index.html")
+            .catch(error => {
+                console.error("Logout failed:", error);
+                alert("Logout error. Check console.");
+            });
+    }
+
+    // Attach logout handlers
+    document.getElementById("sidebarLogoutBtn")?.addEventListener("click", handleLogout);
+    document.getElementById("topbarLogoutBtn")?.addEventListener("click", handleLogout);
+
+    // Make functions available globally
+    window.showModal = showModal;
+    window.escapeHtml = escapeHtml;
+    window.toProperCase = toProperCase;
+    window.updateStatus = updateStatus;
+    window.updateFollowUpDate = updateFollowUpDate;
+    window.updateNotes = updateNotes;
+    window.deleteLead = deleteLead;
+    window.saveSettings = saveSettings;
+
+
+
+// Toggle appointment form visibility
+document.getElementById('setAppointmentBtn').addEventListener('click', function() {
+  const form = document.getElementById('appointmentForm');
+  const btn = document.getElementById('setAppointmentBtn');
+  
+  if (form.style.display === 'none') {
+    form.style.display = 'block';
+    btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+    btn.classList.remove('bg-blue-600');
+    btn.classList.add('bg-gray-500');
+  } else {
+    form.style.display = 'none';
+    btn.innerHTML = '<i class="fas fa-calendar-plus"></i> Set Appointment';
+    btn.classList.remove('bg-gray-500');
+    btn.classList.add('bg-blue-600');
+  }
+});
+
+
+// Notification system
+let notifications = [];
+
+// Load notifications from Firestore
+async function loadNotifications() {
+  try {
+    const now = firebase.firestore.Timestamp.now();
+    const notificationsMap = new Map();
+
+    // 1. First get all upcoming appointments (no date filter)
+    const upcomingQuery = await appointmentsCollection
+      .where('status', '==', 'Scheduled')
+      .orderBy('read')  // Sort by read status first
+      .orderBy('date', 'asc')  // Then by date
+      .limit(500)
+      .get();
+
+    upcomingQuery.forEach(doc => {
+      const appointment = doc.data();
+      notificationsMap.set(doc.id, {
+        id: doc.id,
+        ...appointment,
+        type: 'upcoming',
+        read: appointment.read || false,
+        expanded: false
+      });
+    });
+
+    // 2. Then get past-due appointments (with date inequality)
+    // NOTE: Must orderBy date first when using inequality!
+    const pastDueQuery = await appointmentsCollection
+      .where('status', '==', 'Scheduled')
+      .where('date', '<=', now)
+      .orderBy('date', 'asc')  // Required to be first with inequality
+      .orderBy('read')         // Can add secondary sort
+      .limit(500)
+      .get();
+
+    pastDueQuery.forEach(doc => {
+      if (!notificationsMap.has(doc.id)) {
+        const appointment = doc.data();
+        notificationsMap.set(doc.id, {
+          id: doc.id,
+          ...appointment,
+          type: 'past-due',
+          read: appointment.read || false,
+          expanded: false
+        });
+      }
+    });
+
+    // Convert to array and sort
+    notifications = Array.from(notificationsMap.values());
+    
+    // Client-side sorting to put unread first
+    notifications.sort((a, b) => {
+      if (a.read !== b.read) return a.read ? 1 : -1; // Unread first
+      return a.date.toDate() - b.date.toDate(); // Then by date
+    });
+
+    updateNotificationBadge();
+    renderNotificationList();
+  } catch (error) {
+    console.error("Error loading notifications:", error);
+    // Show error to user if needed
+    alert("Error loading notifications. Please check console for details.");
+  }
+}
+
+
+// Update notification badge count
+function updateNotificationBadge() {
+  if (!notifications) return;  // Add this check
+  const unreadCount = notifications.filter(n => !n.read).length;
+  const badge = document.getElementById('notificationCount');
+  
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+// Render notification list
+function renderNotificationList() {
+  const listContainer = document.getElementById('notificationList');
+  if (!listContainer || !notifications) return;  // Add null checks
+  listContainer.innerHTML = '';
+
+  if (notifications.length === 0) {
+    listContainer.innerHTML = '<p class="text-center text-gray-500 py-4">No notifications</p>';
+    return;
+  }
+
+  notifications.forEach(notification => {
+    const appointmentDate = notification.date.toDate();
+    const leadName = notification.leadName || 'Unknown Lead';
+    
+    const notificationItem = document.createElement('div');
+    notificationItem.className = `notification-item ${!notification.read ? 'unread bg-blue-50 border-l-4 border-blue-500' : ''}`;
+    notificationItem.innerHTML = `
+      <div class="flex justify-between items-start">
+        <div class="flex-1">
+          <h3 class="font-medium ${!notification.read ? 'text-blue-800' : 'text-gray-800'}">
+            ${escapeHtml(leadName)}
+            ${!notification.read ? '<span class="ml-2 text-xs font-normal text-blue-600">(NEW)</span>' : ''}
+          </h3>
+          <p class="text-sm ${!notification.read ? 'text-blue-600' : 'text-gray-600'}">
+            ${formatDateTime(appointmentDate)} at ${escapeHtml(notification.location)}
+          </p>
+          <p class="notification-time ${!notification.read ? 'text-blue-500' : 'text-gray-500'}">
+            ${formatRelativeTime(appointmentDate)}
+          </p>
+        </div>
+        ${!notification.read ? '<span class="ml-2 w-2 h-2 rounded-full bg-blue-500"></span>' : ''}
+      </div>
+    `;
+    
+    notificationItem.addEventListener('click', async () => {
+      // Mark as read when clicked
+      if (!notification.read) {
+        await appointmentsCollection.doc(notification.id).update({
+          read: true,
+          readAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        notification.read = true;
+        updateNotificationBadge();
+        renderNotificationList(); // Re-render to move to read section
+      }
+      showAppointmentModal(notification.id);
+    });
+    
+    listContainer.appendChild(notificationItem);
+  });
+}
+
+
+
+// Format relative time (e.g., "in 2 days")
+function formatRelativeTime(date) {
+  const now = new Date();
+  const diffInDays = Math.floor((date - now) / (1000 * 60 * 60 * 24));
+  
+  if (diffInDays < 0) {
+    return 'Past due';
+  } else if (diffInDays === 0) {
+    return 'Today';
+  } else if (diffInDays === 1) {
+    return 'Tomorrow';
+  } else {
+    return `in ${diffInDays} days`;
+  }
+}
+
+
+
+
+// Notification bell click handler
+document.getElementById('notificationBell').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('notificationModal').style.display = 'flex';
+  loadNotifications();
+});
+
+// Close notification modal
+document.getElementById('closeNotificationModal').addEventListener('click', () => {
+  document.getElementById('notificationModal').style.display = 'none';
+});
+
+// Toggle options menu
+document.getElementById('notificationOptions').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('notificationOptionsMenu');
+  menu.classList.toggle('hidden');
+});
+
+// Mark all as read
+document.getElementById('markAllRead').addEventListener('click', async () => {
+  try {
+    // Update all in Firestore
+    const batch = db.batch();
+    notifications.forEach(n => {
+      const ref = appointmentsCollection.doc(n.id);
+      batch.update(ref, { 
+        read: true,
+        readAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    
+    await batch.commit();
+    
+    // Update local state
+    notifications.forEach(n => n.read = true);
+    updateNotificationBadge();
+    renderNotificationList();
+    document.getElementById('notificationOptionsMenu').classList.add('hidden');
+  } catch (error) {
+    console.error("Error marking all as read:", error);
+  }
+});
+
+
+// Mark all as unread
+document.getElementById('markAllUnread').addEventListener('click', async () => {
+  try {
+    // Update all in Firestore
+    const batch = db.batch();
+    notifications.forEach(n => {
+      const ref = appointmentsCollection.doc(n.id);
+      batch.update(ref, { read: false });
+    });
+    
+    await batch.commit();
+    
+    // Update local state
+    notifications.forEach(n => n.read = false);
+    updateNotificationBadge();
+    renderNotificationList();
+    document.getElementById('notificationOptionsMenu').classList.add('hidden');
+  } catch (error) {
+    console.error("Error marking all as unread:", error);
+  }
+});
+
+
+// Handle SMS from notification
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.sms-notification-btn')) {
+    const leadId = e.target.closest('.sms-notification-btn').dataset.leadId;
+    const notification = notifications.find(n => n.leadId === leadId);
+    if (notification) {
+      const phoneNumber = notification.leadPhone;
+      const leadName = notification.leadName;
+      const message = `Hi ${leadName}! This is a reminder about your appointment tomorrow. Please confirm if you'll be able to make it.`;
+      window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
+    }
+  }
+  
+  if (e.target.closest('.call-notification-btn')) {
+    const phoneNumber = e.target.closest('.call-notification-btn').dataset.phone;
+    if (phoneNumber) {
+      window.open(`tel:${phoneNumber}`);
+    }
+  }
+});
+
+// Close menu when clicking elsewhere
+document.addEventListener('click', () => {
+  document.getElementById('notificationOptionsMenu').classList.add('hidden');
+});
+
+
+// Check for new notifications periodically
+setInterval(() => {
+  if (currentUser.uid) {
+    loadNotifications();
+  }
+}, 30 * 60 * 1000); // 30 minutes
+
+
+
+</script>
+</body>
+</html>
+
+
