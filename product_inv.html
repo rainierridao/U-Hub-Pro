@@ -3467,7 +3467,6 @@ async function saveNewCustomer() {
     }
 }
 
-
 // Modified loadCustomers that works with auth state
 async function loadCustomers() {
     return new Promise((resolve) => {
@@ -3481,7 +3480,7 @@ async function loadCustomers() {
                     const snapshot = await db.collection('users')
                         .doc(user.uid)
                         .collection('customers')
-                        .orderBy('createdAt', 'desc')
+                        .orderBy('name') // Sort by name directly in Firebase query
                         .get();
 
                     customerSelect.innerHTML = '<option value="" disabled selected>Select Customer</option>';
@@ -3489,44 +3488,33 @@ async function loadCustomers() {
                     if (snapshot.empty) {
                         customerSelect.innerHTML += '<option value="" disabled>No customers found</option>';
                     } else {
-                        // Use a Map to track unique customer names and their first occurrence
-                        const uniqueCustomers = new Map();
+                        // Use Set to track unique customer names
+                        const uniqueCustomerNames = new Set();
                         
                         snapshot.forEach(doc => {
                             const customer = doc.data();
-                            const customerName = (customer.name || `Customer ${doc.id.substring(0, 5)}`).trim();
+                            const customerName = customer.name || `Customer ${doc.id.substring(0, 5)}`;
                             
-                            // If we haven't seen this customer name before, add it to the map
-                            if (!uniqueCustomers.has(customerName)) {
-                                uniqueCustomers.set(customerName, {
-                                    id: doc.id,
-                                    name: customerName,
-                                    originalData: customer
-                                });
+                            // Only add if we haven't seen this name before
+                            if (!uniqueCustomerNames.has(customerName)) {
+                                uniqueCustomerNames.add(customerName);
+                                
+                                const option = document.createElement('option');
+                                option.value = doc.id;
+                                option.textContent = customerName;
+                                customerSelect.appendChild(option);
                             }
-                            // Keep the first occurrence of each duplicate name
                         });
 
-                        // Convert Map values to array and sort alphabetically
-                        const sortedCustomers = Array.from(uniqueCustomers.values())
-                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { 
-                                sensitivity: 'base',
-                                numeric: true 
-                            }));
-
-                        // Populate the dropdown with sorted, unique customers
-                        sortedCustomers.forEach(customer => {
-                            const option = document.createElement('option');
-                            option.value = customer.id;
-                            option.textContent = customer.name;
-                            customerSelect.appendChild(option);
-                        });
-
-                        // Show count info in console for debugging
-                        if (snapshot.size !== sortedCustomers.length) {
-                            console.log(`Loaded ${sortedCustomers.length} unique customers from ${snapshot.size} total records`);
-                        }
+                        console.log(`Loaded ${uniqueCustomerNames.size} unique customers from ${snapshot.size} total records`);
                     }
+
+                    // Add walk-in option
+                    const walkInOption = document.createElement('option');
+                    walkInOption.value = '';
+                    walkInOption.textContent = 'Walk-in Customer';
+                    customerSelect.appendChild(walkInOption);
+
                     resolve(); // Resolve the promise when done
                 } catch (error) {
                     console.error("Error loading customers:", error);
