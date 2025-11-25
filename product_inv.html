@@ -3333,12 +3333,19 @@ setupRealTimePaymentCheck();
 
 
 
-// Modified loadCustomers that works with auth state
+// Add this at the top of your script section
+console.log('=== INVENTORY SCRIPT LOADED ===');
+console.log('Version: 2.0 - Customer Sorting & Duplicate Handling');
+console.log('Load Time:', new Date().toLocaleString());
+
+// Modified loadCustomers function with better logging
 async function loadCustomers() {
+    console.log('🔄 loadCustomers called - checking for updates');
     return new Promise((resolve) => {
         const authListener = firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 try {
+                    console.log('Loading customers for user:', user.uid);
                     const customerSelect = document.getElementById('customerSelect');
                     customerSelect.disabled = true;
                     customerSelect.innerHTML = '<option value="">Loading customers...</option>';
@@ -3349,19 +3356,21 @@ async function loadCustomers() {
                         .orderBy('createdAt', 'desc')
                         .get();
 
+                    console.log(`Found ${snapshot.size} customer records`);
+                    
                     customerSelect.innerHTML = '<option value="" disabled selected>Select Customer</option>';
 
                     if (snapshot.empty) {
                         customerSelect.innerHTML += '<option value="" disabled>No customers found</option>';
+                        console.log('No customers found in database');
                     } else {
-                        // Use a Map to track unique customer names and their first occurrence
+                        // Use a Map to track unique customer names
                         const uniqueCustomers = new Map();
                         
                         snapshot.forEach(doc => {
                             const customer = doc.data();
                             const customerName = (customer.name || `Customer ${doc.id.substring(0, 5)}`).trim();
                             
-                            // If we haven't seen this customer name before, add it to the map
                             if (!uniqueCustomers.has(customerName)) {
                                 uniqueCustomers.set(customerName, {
                                     id: doc.id,
@@ -3369,17 +3378,18 @@ async function loadCustomers() {
                                     originalData: customer
                                 });
                             }
-                            // Keep the first occurrence of each duplicate name
                         });
 
-                        // Convert Map values to array and sort alphabetically
+                        // Convert to array and sort alphabetically
                         const sortedCustomers = Array.from(uniqueCustomers.values())
                             .sort((a, b) => a.name.localeCompare(b.name, undefined, { 
                                 sensitivity: 'base',
                                 numeric: true 
                             }));
 
-                        // Populate the dropdown with sorted, unique customers
+                        console.log(`Displaying ${sortedCustomers.length} unique customers (removed ${snapshot.size - sortedCustomers.length} duplicates)`);
+
+                        // Populate dropdown
                         sortedCustomers.forEach(customer => {
                             const option = document.createElement('option');
                             option.value = customer.id;
@@ -3387,12 +3397,13 @@ async function loadCustomers() {
                             customerSelect.appendChild(option);
                         });
 
-                        // Show count info in console for debugging
-                        if (snapshot.size !== sortedCustomers.length) {
-                            console.log(`Loaded ${sortedCustomers.length} unique customers from ${snapshot.size} total records`);
-                        }
+                        // Add walk-in option
+                        const walkInOption = document.createElement('option');
+                        walkInOption.value = '';
+                        walkInOption.textContent = 'Walk-in Customer';
+                        customerSelect.appendChild(walkInOption);
                     }
-                    resolve(); // Resolve the promise when done
+                    resolve();
                 } catch (error) {
                     console.error("Error loading customers:", error);
                     const customerSelect = document.getElementById('customerSelect');
@@ -3408,7 +3419,6 @@ async function loadCustomers() {
                 console.log("User not authenticated, can't load customers");
                 resolve();
             }
-            // Remove the auth listener after the first check
             authListener();
         });
     });
