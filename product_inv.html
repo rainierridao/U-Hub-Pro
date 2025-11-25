@@ -6,9 +6,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
     <title>U Hub Pro - Product Inventory</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="manifest" href="/manifest.json">
@@ -17,11 +14,6 @@
     
     <!-- Add to <head> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
-  <script>
-// Add this at the very top of your script to confirm it's loading
-console.log('🔄 Script loaded - version: ' + new Date().toISOString());
-</script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
     
     
@@ -2136,7 +2128,7 @@ const productData = {
         "Nutrimeal Choco": { member: 1950, srp: 2340, ao: 1755, svp: 12 },
         "Nutrimeal Strawberry": { member: 1950, srp: 2340, ao: 1755, svp: 12 },
         "Nutrimeal Vanilla": { member: 1950, srp: 2340, ao: 1755, svp: 12 },
-        "Palmetto Plus": { member: 2730, srp: 3280, ao: 2457, svp: 17 },
+        "Palmetto Plus": { member: 2730, srp: 3280, ao: 2457, svp: 25 },
         "Poly C": { member: 1600, srp: 1920, ao: 1440, svp: 10 },
         "Procalm+": { member: 1680, srp: 2020, ao: 1512, svp: 12 },
         "Procosa": { member: 2580, srp: 3100, ao: 2322, svp: 19 },
@@ -2150,18 +2142,21 @@ const productData = {
         "Whitening Toothpaste": { member: 480, srp: 580, ao: 432, svp: 3 }
     },
     Celavive: {
-    "Bi-Phase Makeup Remover": { member: 1800, srp: 2160, ao: 1800, svp: 14 },
-    "Contouring Face & Neck Crème": { member: 5000, srp: 6000, ao: 5000, svp: 55 },
+	"Bi-Phase Makeup Remover": { member: 1800, srp: 2160, ao: 1800, svp: 14 },
     "Creamy Foam Cleanser": { member: 1890, srp: 2270, ao: 1890, svp: 14 },
+    "Daily Mineral Protective Cream": { member: 1890, srp: 2270, ao: 1890, svp: 16 },
     "Exfoliating Scrub + Mask": { member: 1580, srp: 1900, ao: 1580, svp: 10 },
+    "Gentle Milk Cleanser": { member: 1890, srp: 2270, ao: 1890, svp: 14 },
+    "Hydrating Eye Essence": { member: 2940, srp: 3530, ao: 2940, svp: 22 },
     "Hydrating Sheet Mask": { member: 1260, srp: 1520, ao: 1260, svp: 9 },
     "Luminous Moisture Cream": { member: 2310, srp: 2780, ao: 2310, svp: 22 },
+    "Perfecting Toner": { member: 1950, srp: 2350, ao: 1950, svp: 14 },
     "Protective Day Cream": { member: 2000, srp: 2400, ao: 2000, svp: 16 },
     "Protective Day Lotion": { member: 2000, srp: 2400, ao: 2000, svp: 16 },
-    "Perfecting Toner": { member: 1950, srp: 2350, ao: 1950, svp: 14 },
-    "Vitalizing Serum": { member: 5500, srp: 6600, ao: 5500, svp: 60 },
+    "Replenishing Night Cream": { member: 2000, srp: 2400, ao: 2000, svp: 16 },
+    "Replenishing Night Gel": { member: 2000, srp: 2400, ao: 2000, svp: 16 },
     "Resurfacing 4-in-1 Serum": { member: 5500, srp: 6600, ao: 5500, svp: 60 },
-    "Triple Action Eye Cream: Brightening": { member: 5000, srp: 6000, ao: 5000, svp: 55 }
+    "Vitalizing Serum": { member: 2940, srp: 3530, ao: 2940, svp: 22 }
 }
 };
 
@@ -3333,95 +3328,38 @@ setupRealTimePaymentCheck();
 
 
 
-// Add this at the top of your script section
-console.log('=== INVENTORY SCRIPT LOADED ===');
-console.log('Version: 2.0 - Customer Sorting & Duplicate Handling');
-console.log('Load Time:', new Date().toLocaleString());
 
-// Modified loadCustomers function with better logging
+// Helper function to load customers
 async function loadCustomers() {
-    console.log('🔄 loadCustomers called - checking for updates');
-    return new Promise((resolve) => {
-        const authListener = firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    console.log('Loading customers for user:', user.uid);
-                    const customerSelect = document.getElementById('customerSelect');
-                    customerSelect.disabled = true;
-                    customerSelect.innerHTML = '<option value="">Loading customers...</option>';
+    const user = firebase.auth().currentUser;
+    if (!user) return;
 
-                    const snapshot = await db.collection('users')
-                        .doc(user.uid)
-                        .collection('customers')
-                        .orderBy('createdAt', 'desc')
-                        .get();
+    const customerSelect = document.getElementById('customerSelect');
+    customerSelect.innerHTML = '<option value="" disabled selected>Select Customer</option>';
 
-                    console.log(`Found ${snapshot.size} customer records`);
-                    
-                    customerSelect.innerHTML = '<option value="" disabled selected>Select Customer</option>';
+    try {
+        const snapshot = await db.collection('users')
+            .doc(user.uid)
+            .collection('customers')
+            .orderBy('name')
+            .get();
 
-                    if (snapshot.empty) {
-                        customerSelect.innerHTML += '<option value="" disabled>No customers found</option>';
-                        console.log('No customers found in database');
-                    } else {
-                        // Use a Map to track unique customer names
-                        const uniqueCustomers = new Map();
-                        
-                        snapshot.forEach(doc => {
-                            const customer = doc.data();
-                            const customerName = (customer.name || `Customer ${doc.id.substring(0, 5)}`).trim();
-                            
-                            if (!uniqueCustomers.has(customerName)) {
-                                uniqueCustomers.set(customerName, {
-                                    id: doc.id,
-                                    name: customerName,
-                                    originalData: customer
-                                });
-                            }
-                        });
-
-                        // Convert to array and sort alphabetically
-                        const sortedCustomers = Array.from(uniqueCustomers.values())
-                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { 
-                                sensitivity: 'base',
-                                numeric: true 
-                            }));
-
-                        console.log(`Displaying ${sortedCustomers.length} unique customers (removed ${snapshot.size - sortedCustomers.length} duplicates)`);
-
-                        // Populate dropdown
-                        sortedCustomers.forEach(customer => {
-                            const option = document.createElement('option');
-                            option.value = customer.id;
-                            option.textContent = customer.name;
-                            customerSelect.appendChild(option);
-                        });
-
-                        // Add walk-in option
-                        const walkInOption = document.createElement('option');
-                        walkInOption.value = '';
-                        walkInOption.textContent = 'Walk-in Customer';
-                        customerSelect.appendChild(walkInOption);
-                    }
-                    resolve();
-                } catch (error) {
-                    console.error("Error loading customers:", error);
-                    const customerSelect = document.getElementById('customerSelect');
-                    customerSelect.innerHTML = '<option value="" disabled>Error loading customers</option>';
-                    resolve();
-                } finally {
-                    const customerSelect = document.getElementById('customerSelect');
-                    if (customerSelect) {
-                        customerSelect.disabled = false;
-                    }
-                }
-            } else {
-                console.log("User not authenticated, can't load customers");
-                resolve();
-            }
-            authListener();
+        snapshot.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = doc.data().name;
+            customerSelect.appendChild(option);
         });
-    });
+
+        // Add walk-in option
+        const walkInOption = document.createElement('option');
+        walkInOption.value = '';
+        walkInOption.textContent = 'Walk-in Customer';
+        customerSelect.appendChild(walkInOption);
+    } catch (error) {
+        console.error('Error loading customers:', error);
+        showToast('Error loading customers', 'error');
+    }
 }
 
 // Add event listener for payment type change
@@ -3529,6 +3467,7 @@ async function saveNewCustomer() {
     }
 }
 
+
 // Modified loadCustomers that works with auth state
 async function loadCustomers() {
     return new Promise((resolve) => {
@@ -3550,13 +3489,43 @@ async function loadCustomers() {
                     if (snapshot.empty) {
                         customerSelect.innerHTML += '<option value="" disabled>No customers found</option>';
                     } else {
+                        // Use a Map to track unique customer names and their first occurrence
+                        const uniqueCustomers = new Map();
+                        
                         snapshot.forEach(doc => {
                             const customer = doc.data();
+                            const customerName = (customer.name || `Customer ${doc.id.substring(0, 5)}`).trim();
+                            
+                            // If we haven't seen this customer name before, add it to the map
+                            if (!uniqueCustomers.has(customerName)) {
+                                uniqueCustomers.set(customerName, {
+                                    id: doc.id,
+                                    name: customerName,
+                                    originalData: customer
+                                });
+                            }
+                            // Keep the first occurrence of each duplicate name
+                        });
+
+                        // Convert Map values to array and sort alphabetically
+                        const sortedCustomers = Array.from(uniqueCustomers.values())
+                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { 
+                                sensitivity: 'base',
+                                numeric: true 
+                            }));
+
+                        // Populate the dropdown with sorted, unique customers
+                        sortedCustomers.forEach(customer => {
                             const option = document.createElement('option');
-                            option.value = doc.id;
-                            option.textContent = customer.name || `Customer ${doc.id.substring(0, 5)}`;
+                            option.value = customer.id;
+                            option.textContent = customer.name;
                             customerSelect.appendChild(option);
                         });
+
+                        // Show count info in console for debugging
+                        if (snapshot.size !== sortedCustomers.length) {
+                            console.log(`Loaded ${sortedCustomers.length} unique customers from ${snapshot.size} total records`);
+                        }
                     }
                     resolve(); // Resolve the promise when done
                 } catch (error) {
@@ -3579,6 +3548,7 @@ async function loadCustomers() {
         });
     });
 }
+
 
 
 
